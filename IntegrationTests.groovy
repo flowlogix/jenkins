@@ -40,6 +40,8 @@ pipeline {
                 -Dmaven.install.skip=true -DadminPort=$env.admin_port \
                 -Dmaven.test.skip=true -DskipITs=true \
                 """
+                githubNotify description: 'Deploy Snapshots', context: 'CI/Deploy', status: 'SUCCESS',
+                    targetUrl: 'https://oss.sonatype.org/content/repositories/snapshots/com/flowlogix/'
             }
         }
     }
