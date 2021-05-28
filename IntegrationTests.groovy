@@ -1,12 +1,16 @@
 @Library('payara') _
 env.domain_name = 'test-domain'
-def profiles = "payara-server-remote"
+def profiles = 'all-tests,payara-server-remote'
 
 pipeline {
     agent any
 
     options {
-        quietPeriod 120
+        disableConcurrentBuilds()
+        quietPeriod 0
+    }
+    triggers {
+        pollSCM('@daily')
     }
 
     stages {
@@ -15,14 +19,14 @@ pipeline {
                 sh "mvn -V -B -N -P${profiles} help:all-profiles"
             }
         }
-        stage('Maven Verify - Tests') {
+        stage('Maven Verify - All Tests') {
             steps {
                 startPayara()
                 withMaven {
                     sh """\
                     MAVEN_OPTS="$JAVA_TOOL_OPTIONS" \
                     env -u JAVA_TOOL_OPTIONS \
-                    mvn -B verify -fae -P${profiles} \
+                    mvn -B verify -P${profiles} -fae \
                     -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
                     -Dmaven.install.skip=true -DadminPort=$env.admin_port \
                     """
@@ -30,6 +34,7 @@ pipeline {
             }
         }
     }
+
     post {
         always {
             archiveArtifacts artifacts: '**/payara5/**/server.log*'
