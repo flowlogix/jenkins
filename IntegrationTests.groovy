@@ -35,15 +35,11 @@ pipeline {
         }
         stage('Deploy Snapshot Release') {
             steps {
-                withMaven {
-                    sh """\
-                    MAVEN_OPTS="$JAVA_TOOL_OPTIONS" \
-                    env -u JAVA_TOOL_OPTIONS \
-                    mvn -B deploy -P$profiles -DtrimStackTrace=false \
-                    -Dmaven.install.skip=true -DadminPort=$env.admin_port \
-                    -Dmaven.test.skip=true -DskipITs=true \
-                    """
-                }
+                sh """\
+                mvn -B deploy -P$profiles -DtrimStackTrace=false \
+                -Dmaven.install.skip=true -DadminPort=$env.admin_port \
+                -Dmaven.test.skip=true -DskipITs=true \
+                """
             }
         }
     }
