@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Maven Info') {
             steps {
-                sh "mvn -V -B -N -P${profiles} help:all-profiles"
+                sh "mvn -V -B -N -P$profiles help:all-profiles"
             }
         }
         stage('Maven Verify - Tests') {
@@ -22,7 +22,7 @@ pipeline {
                     sh """\
                     MAVEN_OPTS="$JAVA_TOOL_OPTIONS" \
                     env -u JAVA_TOOL_OPTIONS \
-                    mvn -B verify -fae -P${profiles} \
+                    mvn -B verify -fae -P$profiles \
                     -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
                     -Dmaven.install.skip=true -DadminPort=$env.admin_port \
                     """

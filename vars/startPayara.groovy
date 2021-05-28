@@ -13,6 +13,6 @@ def call() {
     sh "$env.asadmin create-domain --nopassword --portbase $env.portbase $env.domain_name || exit 0"
     env.admin_port = sh(
         script: "$env.asadmin list-domains --long --header=false | fgrep $env.domain_name | awk '{print \$3}'",
-        returnStdout: true)
+        returnStdout: true).trim()
     sh "$env.asadmin start-domain $env.domain_name"
 }

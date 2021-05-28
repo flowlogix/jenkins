@@ -40,8 +40,8 @@ pipeline {
                 withMaven {
                     sh """\
                     mvn -B release:prepare release:perform -DtrimStackTrace=false \
-                    -DreleaseVersion=${Version} -Darguments=\"-Dauto.release=${releaseInMaven} \
-                    -Dpayara.start.skip=true -Dmaven.install.skip=true -DadminPort=${env.admin_port}\" \
+                    -DreleaseVersion=$Version -Darguments=\"-Dauto.release=$releaseInMaven \
+                    -Dpayara.start.skip=true -Dmaven.install.skip=true -DadminPort=$env.admin_port\" \
                     """
                 }
             }
@@ -54,10 +54,10 @@ pipeline {
             stopPayara()
         }
         success {
-            sh "git push origin Version-${Version}"
+            sh "git push origin Version-$Version"
         }
         failure {
-            sh "git tag -d Version-${Version} || true"
+            sh "git tag -d Version-$Version || true"
         }
     }
 }
