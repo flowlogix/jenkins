@@ -10,13 +10,15 @@ pipeline {
         choice(choices: ['push', 'init', 'catchup'], name: 'publishType', description: 'git ftp command to execute')
         string(name: 'syncRoot', trim: true, description: 'Synchronization Root Directory', defaultValue: 'docs')
     }
-
+    
+//                git ftp $publishType -u \$ftpcreds_USR -p \$ftpcreds_PSW \
+//                --syncroot $syncRoot ftpes://web173.dnchosting.com/test_website/$syncRoot \
     stages {
         stage('Publish Web Site') {
             steps {
                 sh """ \
-                git ftp $publishType -u \$ftpcreds_USR -p \$ftpcreds_PSW \
-                --syncroot $syncRoot ftpes://web173.dnchosting.com/test_website/$syncRoot \
+                lftp -u \$ftpcreds_USR,\$ftpcreds_PSW -e \
+                'mirror -R -e -P --ignore-time $syncRoot test_website/$syncRoot' web173.dnchosting.com \
                 """
             }
         }
