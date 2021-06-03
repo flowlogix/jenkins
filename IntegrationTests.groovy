@@ -19,29 +19,18 @@ pipeline {
                 sh "mvn -V -B -N -P$profiles help:all-profiles"
             }
         }
-        stage('Maven Verify - All Tests') {
+        stage('Maven Verify and Deploy - All Tests') {
             steps {
                 startPayara()
                 withMaven {
                     sh """\
                     MAVEN_OPTS="$JAVA_TOOL_OPTIONS" \
                     env -u JAVA_TOOL_OPTIONS \
-                    mvn -B verify -P$profiles -fae \
+                    mvn -B deploy -P$profiles -fae \
                     -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
                     -Dmaven.install.skip=true -DadminPort=$env.admin_port \
                     """
                 }
-            }
-        }
-        stage('Deploy Snapshot Release') {
-            steps {
-                sh """\
-                mvn -B deploy -P$profiles -DtrimStackTrace=false \
-                -Dmaven.install.skip=true -DadminPort=$env.admin_port \
-                -Dmaven.test.skip=true -DskipITs=true \
-                """
-                githubNotify description: 'Deploy Snapshots', context: 'CI/Deploy', status: 'SUCCESS',
-                    targetUrl: 'https://oss.sonatype.org/content/repositories/snapshots/com/flowlogix/'
             }
         }
     }
@@ -50,6 +39,10 @@ pipeline {
         always {
             archiveArtifacts artifacts: '**/payara5/**/server.log*'
             stopPayara()
+        }
+        success {
+            githubNotify description: 'Deploy Snapshots', context: 'CI/Deploy', status: 'SUCCESS',
+                targetUrl: 'https://oss.sonatype.org/content/repositories/snapshots/com/flowlogix/'
         }
     }
 }
