@@ -7,7 +7,6 @@ pipeline {
         quietPeriod 120
     }
     parameters {
-        choice(choices: ['push', 'init', 'catchup'], name: 'publishType', description: 'git ftp command to execute')
         string(name: 'syncRoot', trim: true, description: 'Synchronization Root Directory', defaultValue: 'docs')
     }
     
