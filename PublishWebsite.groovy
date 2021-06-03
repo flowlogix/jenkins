@@ -18,7 +18,8 @@ pipeline {
             steps {
                 sh """ \
                 lftp -u \$ftpcreds_USR,\$ftpcreds_PSW -e \
-                'mirror -R -e -P --ignore-time $syncRoot test_website/$syncRoot; exit top' web173.dnchosting.com \
+                'mirror -R -e -P --ignore-time -x .git --delete-excluded \
+                $syncRoot test_website/$syncRoot; exit top' web173.dnchosting.com \
                 """
             }
         }
