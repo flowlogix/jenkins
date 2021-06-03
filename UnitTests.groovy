@@ -1,6 +1,6 @@
 @Library('payara') _
 env.domain_name = 'test-domain'
-def profiles = "payara-server-remote"
+def profiles = "payara-server-remote,ui-test"
 
 pipeline {
     agent any
