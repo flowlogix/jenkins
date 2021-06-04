@@ -1,5 +1,6 @@
 @Library('payara') _
 env.domain_name = 'prod-domain'
+def profiles = 'all-tests,payara-server-remote'
 
 pipeline {
     agent any
@@ -32,9 +33,9 @@ pipeline {
                 startPayara()
                 withMaven {
                     sh """\
-                    mvn -B release:prepare release:perform -DtrimStackTrace=false \
-                    -DreleaseVersion=$Version -Darguments=\"-Dauto.release=$releaseInMaven \
-                    -Dpayara.start.skip=true -Dmaven.install.skip=true -DadminPort=$env.admin_port\" \
+                    mvn -B -P$profiles release:prepare release:perform -DreleaseVersion=$Version \
+                    -Darguments=\"-Dauto.release=$releaseInMaven -DtrimStackTrace=false \
+                    -Dmaven.install.skip=true -DadminPort=$env.admin_port\" \
                     """
                 }
             }

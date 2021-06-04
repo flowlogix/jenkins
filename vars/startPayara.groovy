@@ -7,7 +7,7 @@ def call() {
         error 'env.domain_name not specified'
     }
 
-    sh """cd ..; mvn dependency:unpack -Dartifact=fish.payara.distributions:payara:5.2021.3:zip \
+    sh """cd ..; mvn dependency:unpack -Dartifact=fish.payara.distributions:payara:5.2021.4:zip \
                 -Dproject.basedir=$WORKSPACE -DoverWrite=false \
                 """
     sh "$env.asadmin create-domain --nopassword --portbase $env.portbase $env.domain_name || exit 0"
