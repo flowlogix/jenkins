@@ -36,15 +36,15 @@ pipeline {
                 }
             }
         }
-        stage('Maven Deply Snapshots') {
+        stage('Maven Deploy Snapshots') {
             when {
                 expression { currentBuild.currentResult == 'SUCCESS' }
             }
             steps {
                 sh """\
-		mvn -B jar:jar \
-		org.sonatype.plugins:nexus-staging-maven-plugin:deploy \
-		-P$profiles -fae -Dmaven.install.skip=true \
+                mvn -B jar:jar \
+                org.sonatype.plugins:nexus-staging-maven-plugin:deploy \
+                -P$profiles -fae -Dmaven.install.skip=true \
                 """
             }
         }
