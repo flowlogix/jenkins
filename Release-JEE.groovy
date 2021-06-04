@@ -22,7 +22,7 @@ pipeline {
                         error 'Version cannot be empty'
                     }
                 }
-                sh "mvn -V -N help:all-profiles"
+                sh "mvn -V -N -P$profiles help:all-profiles"
                 script {
                     currentBuild.description = "Working on git commit $env.GIT_COMMIT"
                 }
