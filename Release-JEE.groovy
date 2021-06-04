@@ -22,6 +22,9 @@ pipeline {
                     }
                 }
                 sh "mvn -V -N help:all-profiles"
+                script {
+                    currentBuild.description = "Working on git commit $env.GIT_COMMIT"
+                }
             }
         }
         stage('Maven - Release') {
