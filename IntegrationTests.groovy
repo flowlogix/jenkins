@@ -22,18 +22,30 @@ pipeline {
                 }
             }
         }
-        stage('Maven Verify and Deploy - All Tests') {
+        stage('Maven Verify - All Tests') {
             steps {
                 startPayara()
                 withMaven {
                     sh """\
                     MAVEN_OPTS="$JAVA_TOOL_OPTIONS" \
                     env -u JAVA_TOOL_OPTIONS \
-                    mvn -B deploy -P$profiles -fae \
+                    mvn -B verify -P$profiles -fae \
                     -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
                     -Dmaven.install.skip=true -DadminPort=$env.admin_port \
                     """
                 }
+            }
+        }
+        stage('Maven Deply Snapshots') {
+            when {
+                expression { currentBuild.currentResult == 'SUCCESS' }
+            }
+            steps {
+                sh """\
+		mvn -B jar:jar \
+		org.sonatype.plugins:nexus-staging-maven-plugin:deploy \
+		-P$profiles -fae -Dmaven.install.skip=true \
+                """
             }
         }
     }

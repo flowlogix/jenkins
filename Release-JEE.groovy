@@ -1,15 +1,5 @@
 @Library('payara') _
 env.domain_name = 'prod-domain'
-def lastTagName
-def lastVersion
-
-String getLastTagName() {
-    sh(script: "git describe --abbrev=0 --tags", returnStdout: true).trim()
-}
-
-String getVersion(String branchName) {
-    branchName.substring(branchName.lastIndexOf('-') + 1, branchName.length())
-}
 
 pipeline {
     agent any
