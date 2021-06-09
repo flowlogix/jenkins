@@ -32,10 +32,10 @@ pipeline {
             steps {
                 startPayara()
                 withMaven {
-                    sh """\
+                    sh """!/bin/bash -pl
                     mvn -B -P$profiles release:prepare release:perform -DreleaseVersion=$Version \
                     -Darguments=\"-Dauto.release=$releaseInMaven -DtrimStackTrace=false \
-                    -Dmaven.install.skip=true -DadminPort=$env.admin_port\" \
+                    -Dmaven.install.skip=true -DadminPort=$env.admin_port\"
                     """
                 }
             }

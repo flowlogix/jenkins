@@ -23,13 +23,11 @@ pipeline {
         stage('Maven Verify - Regular + Stress Tests') {
             steps {
                 withMaven {
-                    sh """\
-                    MAVEN_OPTS="$MAVEN_OPTS $JAVA_TOOL_OPTIONS" \
-                    env -u JAVA_TOOL_OPTIONS \
+                    sh """#!/bin/bash -pl
+                    MAVEN_OPTS="$MAVEN_OPTS $JAVA_TOOL_OPTIONS"
+                    env -u JAVA_TOOL_OPTIONS
                     mvn -B verify -DforkCount=0 -Dsurefire.useSystemClassLoader=false \
-                    -Dmaven.install.skip=true \
-                    -Pall-tests \
-                    -fae \
+                    -Dmaven.install.skip=true -Pall-tests -fae
                     """
                 }
             }

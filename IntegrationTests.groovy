@@ -26,13 +26,13 @@ pipeline {
             steps {
                 startPayara()
                 withMaven {
-                    sh """\
-                    MAVEN_OPTS="$JAVA_TOOL_OPTIONS" \
-                    env -u JAVA_TOOL_OPTIONS \
-                    mvn -B verify -P$profiles -fae \
-                    -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
-                    -Dmaven.install.skip=true -DadminPort=$env.admin_port \
-                    """
+                    sh """#!/bin/bash -pl
+                       MAVEN_OPTS="$JAVA_TOOL_OPTIONS"
+                       env -u JAVA_TOOL_OPTIONS
+                       mvn -B verify -P$profiles -fae \
+                       -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
+                       -Dmaven.install.skip=true -DadminPort=$env.admin_port
+                       """
                 }
             }
         }
@@ -41,10 +41,9 @@ pipeline {
                 expression { currentBuild.currentResult == 'SUCCESS' }
             }
             steps {
-                sh """\
-                mvn -B jar:jar \
-                org.sonatype.plugins:nexus-staging-maven-plugin:deploy \
-                -P$profiles -fae -Dmaven.install.skip=true \
+                sh """
+                mvn -B jar:jar org.sonatype.plugins:nexus-staging-maven-plugin:deploy \
+                -P$profiles -fae -Dmaven.install.skip=true
                 """
             }
         }
