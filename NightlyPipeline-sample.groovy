@@ -24,7 +24,7 @@ pipeline {
             steps {
                 withMaven {
                     sh """#!/bin/bash -pl
-                    MAVEN_OPTS="$MAVEN_OPTS $JAVA_TOOL_OPTIONS"
+                    export MAVEN_OPTS="$MAVEN_OPTS $JAVA_TOOL_OPTIONS"
                     unset JAVA_TOOL_OPTIONS
                     mvn -B verify -DforkCount=0 -Dsurefire.useSystemClassLoader=false \
                     -Dmaven.install.skip=true -Pall-tests -fae
