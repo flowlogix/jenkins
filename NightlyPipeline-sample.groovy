@@ -24,6 +24,7 @@ pipeline {
             steps {
                 withMaven {
                     sh """#!/bin/bash -pl
+                    sdk current
                     export MAVEN_OPTS="$JAVA_TOOL_OPTIONS"
                     unset JAVA_TOOL_OPTIONS
                     mvn -B verify -DforkCount=0 -Dsurefire.useSystemClassLoader=false \

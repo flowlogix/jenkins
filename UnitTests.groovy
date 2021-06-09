@@ -22,7 +22,7 @@ pipeline {
             steps {
                 startPayara()
                 withMaven {
-                    sh """/bin/bash -pl
+                    sh """
                     export MAVEN_OPTS="$JAVA_TOOL_OPTIONS"
                     unset JAVA_TOOL_OPTIONS
                     mvn -B verify -fae -P$profiles \
