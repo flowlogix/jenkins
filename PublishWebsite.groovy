@@ -13,6 +13,9 @@ pipeline {
     stages {
         stage('Publish Web Site') {
             steps {
+                script {
+                    currentBuild.description = "Working on git commit $env.GIT_COMMIT"
+                }
                 sh """ \
                 lftp -u \$ftpcreds_USR,\$ftpcreds_PSW -e \
                 'mirror -R -e -P7 -x .git --delete-excluded \
