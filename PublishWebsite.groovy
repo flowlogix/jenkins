@@ -1,3 +1,5 @@
+def website_host = 'web154.dnchosting.com'
+
 pipeline {
     agent any
     environment {
@@ -19,7 +21,7 @@ pipeline {
                 sh """ \
                 lftp -u \$ftpcreds_USR,\$ftpcreds_PSW -e \
                 'mirror -R -e -P7 -x .git --delete-excluded \
-                $syncRoot test_website/$syncRoot; exit top' web173.dnchosting.com
+                $syncRoot test_website/$syncRoot; exit top' $website_host
                 """
             }
         }
