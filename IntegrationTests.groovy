@@ -31,7 +31,7 @@ pipeline {
                        unset JAVA_TOOL_OPTIONS
                        mvn -B verify -P$profiles -fae \
                        -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
-                       -Dmaven.install.skip=true -DadminPort=$env.admin_port
+                       -Ddocs.phase=package -Dmaven.install.skip=true -DadminPort=$env.admin_port
                        """
                 }
             }
@@ -42,7 +42,8 @@ pipeline {
             }
             steps {
                 sh """
-                mvn -B jar:jar org.sonatype.plugins:nexus-staging-maven-plugin:deploy \
+                mvn -B jar:jar javadoc:jar source:jar-no-fork \
+                org.sonatype.plugins:nexus-staging-maven-plugin:deploy \
                 -P$profiles -fae -Dmaven.install.skip=true
                 """
             }
