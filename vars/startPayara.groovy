@@ -8,7 +8,7 @@ def call() {
     }
 
     sh """cd ..
-       mvn dependency:unpack -Dartifact=fish.payara.distributions:payara:5.2021.5:zip \
+       mvn dependency:unpack -Dartifact=fish.payara.distributions:payara:5.2021.7:zip \
            -Dproject.basedir=$WORKSPACE -DoverWrite=false
        """
     sh "$env.asadmin create-domain --nopassword --portbase $env.portbase $env.domain_name || exit 0"
