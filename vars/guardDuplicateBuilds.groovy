@@ -1,8 +1,8 @@
 import groovy.transform.Field
 
 @Field
-def guardDupBuildsParamsDefault = 
-    [neverRan : true, context : 'CI/unit-tests/pr-merge-alternate', 
+def guardDupBuildsParamsDefault =
+    [neverRan : true, context : 'CI/unit-tests/pr-merge-alternate',
     description : 'Please ignore failure - Another build started']
 
 def call(def parameters, Closure cl) {
