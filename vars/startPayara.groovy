@@ -13,7 +13,7 @@ final def payara_default_config =
     [domain_name : 'domain1', payara_version : '5.2021.7', asadmin : "$payara_base/bin/asadmin"]
 
 def call(def payara_config) {
-    payara_config << payara_config.withDefault payara_default_config.&get
+    payara_config << payara_default_config + payara_config
     if (!payara_config.domain_name) {
         payara_config.asadmin = null
         error 'domain_name not specified'

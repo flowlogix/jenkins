@@ -6,7 +6,7 @@ def guardDupBuildsParamsDefault =
     description : 'Please ignore failure - Another build started']
 
 def call(def parameters, Closure cl) {
-    parameters = parameters.withDefault guardDupBuildsParamsDefault.&get
+    parameters << guardDupBuildsParamsDefault + parameters
     echo "parameters: $parameters"
     if (!parameters.resourceName) {
         parameters.resourceName = "${env.GIT_COMMIT}_$env.JOB_NAME"
