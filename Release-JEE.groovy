@@ -1,6 +1,6 @@
 @Library('payara') _
-env.domain_name = 'prod-domain'
-def profiles = 'all-tests,payara-server-remote'
+def payara_config = [domain_name : 'prod-domain']
+final def profiles = 'all-tests,payara-server-remote'
 
 pipeline {
     agent any
@@ -30,12 +30,12 @@ pipeline {
         }
         stage('Maven - Release') {
             steps {
-                startPayara()
+                startPayara payara_config
                 withMaven {
                     sh """
                     mvn -B -P$profiles release:prepare release:perform -DreleaseVersion=$Version \
                     -Darguments=\"-Dauto.release=$releaseInMaven -DtrimStackTrace=false \
-                    -Dmaven.install.skip=true -DadminPort=$env.admin_port\"
+                    -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port\"
                     """
                 }
             }
@@ -45,7 +45,7 @@ pipeline {
     post {
         always {
             archiveArtifacts artifacts: '**/payara5/**/server.log*'
-            stopPayara()
+            stopPayara payara_config
         }
         success {
             sh "git push origin Version-$Version"

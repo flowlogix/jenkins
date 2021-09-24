@@ -1,4 +1,4 @@
-def website_host = 'web154.dnchosting.com'
+final def website_host = 'web154.dnchosting.com'
 
 pipeline {
     agent any
@@ -7,6 +7,7 @@ pipeline {
     }
     options {
         quietPeriod 120
+        disableConcurrentBuilds()
     }
     parameters {
         string(name: 'syncRoot', trim: true, description: 'Synchronization Root Directory', defaultValue: 'docs')
@@ -27,4 +28,3 @@ pipeline {
         }
     }
 }
-
