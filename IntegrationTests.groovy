@@ -1,5 +1,5 @@
 @Library('payara') _
-env.domain_name = 'test-domain'
+def payara_config = [domain_name : 'test-domain']
 def profiles = 'all-tests,payara-server-remote'
 
 pipeline {
@@ -24,7 +24,7 @@ pipeline {
         }
         stage('Maven Verify - All Tests') {
             steps {
-                startPayara()
+                startPayara payara_config
                 withMaven {
                     sh """
                        export MAVEN_OPTS="$JAVA_TOOL_OPTIONS"
@@ -53,7 +53,7 @@ pipeline {
     post {
         always {
             archiveArtifacts artifacts: '**/payara5/**/server.log*'
-            stopPayara()
+            stopPayara payara_config
         }
         success {
             githubNotify description: 'Deploy Snapshots', context: 'CI/Deploy', status: 'SUCCESS',

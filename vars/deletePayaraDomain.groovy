@@ -1,9 +1,7 @@
 // Delete payara domain
 
-def call() {
-    createPayaraVariables()
-    if (env.asadmin && env.domain_name) {
-        sh "$env.asadmin delete-domain $env.domain_name"
+def call(def payara_config) {
+    if (payara_config.asadmin && payara_config.domain_name) {
+        sh "$payara_config.asadmin delete-domain $payara_config.domain_name"
     }
 }
-

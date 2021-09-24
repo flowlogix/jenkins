@@ -7,6 +7,7 @@ pipeline {
     }
     options {
         quietPeriod 120
+        disableConcurrentBuilds()
     }
     parameters {
         string(name: 'syncRoot', trim: true, description: 'Synchronization Root Directory', defaultValue: 'docs')
@@ -27,4 +28,3 @@ pipeline {
         }
     }
 }
-
