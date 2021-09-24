@@ -1,6 +1,8 @@
 @Library('payara') _
 final def profiles = "payara-server-remote,ui-test"
 def payara_config = [domain_name : 'test-domain']
+
+@Library('util') _
 def guardParameters = [ : ]
 
 pipeline {
