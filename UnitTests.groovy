@@ -1,7 +1,7 @@
 @Library('payara') _
-def profiles = "payara-server-remote,ui-test"
+final def profiles = "payara-server-remote,ui-test"
 def payara_config = [domain_name : 'test-domain']
-def guardParameters = [context : 'CI/unit-tests/pr-merge-duplicate']
+def guardParameters = [ : ]
 
 pipeline {
     agent any

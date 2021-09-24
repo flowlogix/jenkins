@@ -1,13 +1,15 @@
+// Jenkins has a bug that triggers multiple builds via a single push randomly
+// this code aborts the duplicate build
+
 import groovy.transform.Field
 
 @Field
 def guardDupBuildsParamsDefault =
-    [neverRan : true, context : 'CI/unit-tests/pr-merge-alternate',
-    description : 'Please ignore failure - Another build started']
+    [neverRan : true, context : 'CI/unit-tests/pr-merge-duplicate',
+    description : 'Please ignore temporary failure - another build started']
 
 def call(def parameters, Closure cl) {
     parameters << guardDupBuildsParamsDefault + parameters
-    echo "parameters: $parameters"
     if (!parameters.resourceName) {
         parameters.resourceName = "${env.GIT_COMMIT}_$env.JOB_NAME"
     }

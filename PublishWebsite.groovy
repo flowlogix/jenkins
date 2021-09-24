@@ -1,4 +1,4 @@
-def website_host = 'web154.dnchosting.com'
+final def website_host = 'web154.dnchosting.com'
 
 pipeline {
     agent any
