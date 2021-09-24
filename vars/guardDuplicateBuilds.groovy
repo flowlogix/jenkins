@@ -5,8 +5,9 @@ def guardDupBuildsParamsDefault =
     [neverRan : true, context : 'CI/unit-tests/pr-merge-alternate', 
     description : 'Please ignore failure - Another build started']
 
-void guardDuplicateBuilds(def parameters, Closure cl) {
+def call(def parameters, Closure cl) {
     parameters << parameters.withDefault guardDupBuildsParamsDefault.&get
+    echo "parameters: $parameters"
     if (!parameters.resourceName) {
         parameters.resourceName = "${env.GIT_COMMIT}_$env.JOB_NAME"
     }
