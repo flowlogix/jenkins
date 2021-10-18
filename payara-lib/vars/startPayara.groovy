@@ -18,6 +18,7 @@ def call(def payara_config) {
         payara_config.asadmin = null
         error 'domain_name not specified'
     }
+    payara_config.asadmin = "jdk11.sh $payara_config.asadmin"
 
     sh """cd ..
        mvn dependency:unpack -Dartifact=fish.payara.distributions:payara:${payara_config.payara_version}:zip \
