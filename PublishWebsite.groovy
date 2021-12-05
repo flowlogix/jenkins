@@ -20,9 +20,11 @@ pipeline {
                     currentBuild.description = "Working on git commit $env.GIT_COMMIT"
                 }
                 sh """ \
+                set +x; . "$HOME/.sdkman/bin/sdkman-init.sh"; set -x
+                jbake -b $syncRoot
                 lftp -u \$ftpcreds_USR,\$ftpcreds_PSW -e \
                 'mirror -R -e -P7 -x .git --delete-excluded \
-                $syncRoot test_website/$syncRoot; exit top' $website_host
+                $syncRoot/output test_website; exit top' $website_host
                 """
             }
         }
