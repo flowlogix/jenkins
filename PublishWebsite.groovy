@@ -6,7 +6,7 @@ pipeline {
         ftpcreds = credentials '8695b924-52bd-4fc2-9752-42041489b734'
     }
     options {
-        quietPeriod 120
+        quietPeriod 0
         disableConcurrentBuilds()
     }
     parameters {
