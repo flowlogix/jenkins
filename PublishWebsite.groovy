@@ -51,7 +51,7 @@ pipeline {
         success {
             script {
                 if (website_subdir as boolean) {
-                    githubNotify description: 'Deploy PR Website', context: 'CI/Deploy', status: 'SUCCESS',
+                    githubNotify description: 'Preview Changes Link', context: 'CI/deploy-preview', status: 'SUCCESS',
                         targetUrl: "https://pr.test.hope.nyc.ny.us$website_subdir"
                 }
             }
