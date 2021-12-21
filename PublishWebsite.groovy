@@ -23,7 +23,7 @@ pipeline {
                         case ["master", "main"]:
                             break
                         default:
-                            website_subdir = "/branch/$mybranch"
+                            website_subdir = "/branch/$env.GIT_BRANCH"
                     }
                 }
             }
