@@ -1,4 +1,6 @@
 final def website_host = 'web154.dnchosting.com'
+def syncRoot = 'docs'
+def website_root = 'test_website'
 def website_subdir = ''
 
 pipeline {
@@ -10,9 +12,6 @@ pipeline {
         quietPeriod 0
         disableConcurrentBuilds()
     }
-    parameters {
-        string(name: 'syncRoot', trim: true, description: 'Synchronization Root Directory', defaultValue: 'docs')
-    }
     
     stages {
         stage('Prep') {
@@ -23,7 +22,8 @@ pipeline {
                         case ["master", "main"]:
                             break
                         default:
-                            website_subdir = "/branch/$env.GIT_BRANCH"
+                            website_root = 'test_website_pr'
+                            website_subdir = "/$env.GIT_BRANCH"
                     }
                 }
             }
@@ -41,8 +41,19 @@ pipeline {
                 sh """ \
                 lftp -u \$ftpcreds_USR,\$ftpcreds_PSW -e \
                 'mirror -R -e -P7 -x .git --delete-excluded \
-                $syncRoot/output test_website$website_subdir; exit top' $website_host
+                $syncRoot/output $website_root$website_subdir; exit top' $website_host
                 """
+            }
+        }
+    }
+
+    post {
+        success {
+            script {
+                if (website_subdir as boolean) {
+                    githubNotify description: 'Deploy PR Website', context: 'CI/Deploy', status: 'SUCCESS',
+                        targetUrl: "https://pr.test.hope.nyc.ny.us$website_subdir"
+                }
             }
         }
     }
