@@ -10,7 +10,7 @@ final def portbase = 4900 + (env.EXECUTOR_NUMBER as int) * 100
 
 @Field
 final def payara_default_config =
-    [domain_name : 'domain1', payara_version : '5.2021.7', asadmin : "$payara_base/bin/asadmin"]
+    [domain_name : 'domain1', payara_version : '5.2021.10', asadmin : "$payara_base/bin/asadmin"]
 
 def call(def payara_config) {
     payara_config << payara_default_config + payara_config
