@@ -31,7 +31,10 @@ pipeline {
         stage('JBake') {
             steps {
                 sh """ \
-                set +x; . "$HOME/.sdkman/bin/sdkman-init.sh"; set -x
+                set +x; . "$HOME/.sdkman/bin/sdkman-init.sh"
+                export JBAKE_OPTS='--add-opens java.base/sun.nio.ch=ALL-UNNAMED \
+                --add-opens java.base/java.io=ALL-UNNAMED'
+                set -x
                 jbake -b $syncRoot
                 """
             }
