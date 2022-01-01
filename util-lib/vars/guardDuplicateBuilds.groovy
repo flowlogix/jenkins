@@ -21,6 +21,7 @@ def call(def parameters, Closure cl) {
         }
     }
     if (!parameters.lockSuccess) {
+        currentBuild.description = 'Duplicate Build'
         githubNotify description: parameters.description,
         context: parameters.context, status: 'SUCCESS'
         currentBuild.result = 'not_built'
