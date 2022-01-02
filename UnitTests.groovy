@@ -29,7 +29,7 @@ pipeline {
                     startPayara payara_config
                     withMaven {
                         sh """
-                        export MAVEN_OPTS="$JAVA_TOOL_OPTIONS"
+                        export MAVEN_OPTS="\$MAVEN_OPTS $JAVA_TOOL_OPTIONS"
                         unset JAVA_TOOL_OPTIONS
                         mvn -B verify -fae -P$profiles \
                         -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \

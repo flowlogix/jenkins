@@ -33,6 +33,13 @@ pipeline {
                 startPayara payara_config
                 withMaven {
                     sh """
+                    # TODO: Remove after OSSRH-66257, NEXUS-26993 are fixed. Workaround for JDK 16+ support
+                    export MAVEN_OPTS="\$MAVEN_OPTS \
+                    --add-opens=java.base/java.util=ALL-UNNAMED \
+                    --add-opens=java.base/java.lang.reflect=ALL-UNNAMED \
+                    --add-opens=java.base/java.text=ALL-UNNAMED \
+                    --add-opens=java.desktop/java.awt.font=ALL-UNNAMED"
+
                     mvn -B -P$profiles release:prepare release:perform -DreleaseVersion=$Version \
                     -Darguments=\"-Dauto.release=$releaseInMaven -DtrimStackTrace=false \
                     -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port\"
