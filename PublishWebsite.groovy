@@ -17,7 +17,7 @@ pipeline {
         stage('Prep') {
             steps {
                 script {
-                    currentBuild.description = "Working on git commit $env.GIT_COMMIT branch $env.GIT_BRANCH"
+                    currentBuild.description = "Working on git commit $env.GIT_COMMIT branch $env.GIT_BRANCH Node $env.NODE_NAME"
                     switch (env.GIT_BRANCH) {
                         case ["master", "main"]:
                             break
