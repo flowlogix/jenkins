@@ -35,6 +35,7 @@ pipeline {
                     sh """
                     mvn -B -P$profiles release:prepare release:perform -DreleaseVersion=$Version \
                     -Darguments=\"-Dauto.release=$releaseInMaven -DtrimStackTrace=false \
+                    \$(eval echo \$MAVEN_ADD_OPTIONS) -Dwebdriver.chrome.binary='\$(eval echo \$CHROME_BINARY)' \
                     -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port\"
                     """
                 }

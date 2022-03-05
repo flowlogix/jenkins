@@ -31,7 +31,8 @@ pipeline {
                         sh """
                         export MAVEN_OPTS="\$MAVEN_OPTS $JAVA_TOOL_OPTIONS"
                         unset JAVA_TOOL_OPTIONS
-                        mvn -B verify -fae -P$profiles \
+                        mvn -B verify -fae -P$profiles \$(eval echo \$MAVEN_ADD_OPTIONS) \
+                        -Dwebdriver.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
                         -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
                         -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port
                         """
