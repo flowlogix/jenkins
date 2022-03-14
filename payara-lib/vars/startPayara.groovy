@@ -19,9 +19,8 @@ def call(def payara_config) {
         error 'domain_name not specified'
     }
 
-    sh """cd ..
-       mvn dependency:unpack -Dartifact=fish.payara.distributions:payara:${payara_config.payara_version}:zip \
-           -Dproject.basedir=$WORKSPACE -DoverWrite=false
+    sh """mvn dependency:unpack \
+          -Dartifact=fish.payara.distributions:payara:${payara_config.payara_version}:zip -DoverWrite=false
        """
     sh "$payara_config.asadmin create-domain --nopassword --portbase $portbase $payara_config.domain_name || exit 0"
     payara_config.admin_port = sh(
