@@ -10,7 +10,7 @@ final def portbase = 4900 + (env.EXECUTOR_NUMBER as int) * 100
 
 @Field
 final def payara_default_config =
-    [domain_name : 'domain1', payara_version : '5.2022.1', asadmin : "$payara_base/bin/asadmin"]
+    [domain_name : 'domain1', asadmin : "$payara_base/bin/asadmin"]
 
 def call(def payara_config) {
     payara_config << payara_default_config + payara_config
@@ -19,9 +19,7 @@ def call(def payara_config) {
         error 'domain_name not specified'
     }
 
-    sh """mvn dependency:unpack \
-          -Dartifact=fish.payara.distributions:payara:${payara_config.payara_version}:zip -DoverWrite=false
-       """
+    sh "mvn -B dependency:unpack"
     sh "$payara_config.asadmin create-domain --nopassword --portbase $portbase $payara_config.domain_name || exit 0"
     payara_config.admin_port = sh(
         script: "$payara_config.asadmin list-domains --long --header=false | fgrep $payara_config.domain_name | awk '{print \$3}'",
