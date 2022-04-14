@@ -12,7 +12,29 @@ pipeline {
         quietPeriod 0
     }
 
+    triggers {
+        issueCommentTrigger('.*jenkins test.*')
+    }
+
     stages {
+        stage('Bootstrap Guard') {
+            when {
+                not {
+                    triggeredBy cause: 'UserIdCause'
+                }
+            }
+            steps {
+                script {
+                    if (env.CHANGE_ID && !env.GITHUB_COMMENT) {
+                        currentBuild.result = 'not_built'
+                        currentBuild.description = 'Boostrap Build Only - Initial Build Aborted'
+                        githubNotify description: 'Bootstrap only - Initial build was aborted',
+                            context: 'CI/unit-tests/bootstrap', status: 'SUCCESS'
+                        error currentBuild.description
+                    }
+                }
+            }
+        }
         stage('Maven Info') {
             steps {
                 guardDuplicateBuilds guardParameters, {
