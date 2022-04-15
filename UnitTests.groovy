@@ -27,8 +27,8 @@ pipeline {
             steps {
                 script {
                     if (env.CHANGE_ID && !env.GITHUB_COMMENT) {
-                        githubNotify description: 'Project Member can initiate a build',
-                            context: ci_context, status: 'PENDING'
+                        githubNotify description: 'Project Member can initiate a build and test cycle',
+                            context: ci_context + '/needs-build', status: 'SUCCESS'
                         currentBuild.result = 'not_built'
                         currentBuild.description = 'Boostrap Build Only - Initial Build Not Started'
                         error currentBuild.description
