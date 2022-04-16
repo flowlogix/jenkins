@@ -14,7 +14,7 @@ pipeline {
     }
 
     triggers {
-        issueCommentTrigger('.*jenkins test.*')
+        issueCommentTrigger('(?i).*jenkins.*test.*')
     }
 
     stages {
