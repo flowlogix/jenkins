@@ -1,6 +1,6 @@
 final def website_host = 'web154.dnchosting.com'
-def syncRoot = 'docs'
-def website_root = 'test_website'
+def syncRoot = 'website'
+def website_root = 'website'
 def website_subdir = ''
 
 pipeline {
@@ -22,7 +22,7 @@ pipeline {
                         case ["master", "main"]:
                             break
                         default:
-                            website_root = 'test_website_pr'
+                            website_root += '_pr'
                             website_subdir = "/$env.GIT_BRANCH"
                     }
                 }
@@ -55,7 +55,7 @@ pipeline {
             script {
                 if (website_subdir as boolean) {
                     githubNotify description: 'Preview Changes Link', context: 'CI/deploy-preview', status: 'SUCCESS',
-                        targetUrl: "https://pr.test.hope.nyc.ny.us$website_subdir"
+                        targetUrl: "https://pullrequest.hope.nyc.ny.us$website_subdir"
                 }
             }
         }
