@@ -1,6 +1,6 @@
 final def website_host = 'web154.dnchosting.com'
 def syncRoot = 'website'
-def website_root = 'website'
+def website_root = 'hope_website'
 def website_subdir = ''
 
 pipeline {
@@ -43,7 +43,7 @@ pipeline {
             steps {
                 sh """ \
                 lftp -u \$ftpcreds_USR,\$ftpcreds_PSW -e \
-                'mirror -R -e -P7 -x .git --delete-excluded \
+                'mirror -R -P7 -x .git --delete --delete-excluded \
                 $syncRoot/output $website_root$website_subdir; exit top' $website_host
                 """
             }
