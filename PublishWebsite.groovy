@@ -1,5 +1,4 @@
 final def website_host = 'web154.dnchosting.com'
-def syncRoot = 'website'
 def website_root = 'hope_website'
 def website_subdir = ''
 
@@ -35,7 +34,7 @@ pipeline {
                 export JBAKE_OPTS='--add-opens java.base/sun.nio.ch=ALL-UNNAMED \
                 --add-opens java.base/java.io=ALL-UNNAMED'
                 set -x
-                jbake -b $syncRoot
+                jbake -b
                 """
             }
         }
@@ -44,7 +43,7 @@ pipeline {
                 sh """ \
                 lftp -u \$ftpcreds_USR,\$ftpcreds_PSW -e \
                 'mirror -R -P7 -x .git --overwrite --delete --delete-excluded \
-                $syncRoot/output $website_root$website_subdir; exit top' $website_host
+                output $website_root$website_subdir; exit top' $website_host
                 """
             }
         }
