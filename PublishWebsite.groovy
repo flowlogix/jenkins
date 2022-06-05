@@ -44,6 +44,7 @@ pipeline {
                 lftp -u \$ftpcreds_USR,\$ftpcreds_PSW -e \
                 'mirror -R -P7 -x .git --overwrite --delete --delete-excluded \
                 output $website_root$website_subdir; exit top' $website_host
+                rsync -aEH --delete-after output/ $HOME/var/website-content
                 """
             }
         }
