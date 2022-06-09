@@ -1,6 +1,8 @@
 final def website_host = 'web154.dnchosting.com'
 def website_root = 'hope_website'
 def website_subdir = ''
+def targetUrlSuffix = 'hope.nyc.ny.us'
+def rsyncSuffix = ''
 
 pipeline {
     agent any
@@ -17,6 +19,12 @@ pipeline {
             steps {
                 script {
                     currentBuild.description = "Working on git commit ${env.GIT_COMMIT[0..7]} branch $env.GIT_BRANCH Node $env.NODE_NAME"
+                    if (!env.GIT_URL.contains('hope')) {
+                        echo 'Deploying Flow Logix web site'
+                        website_root = 'flowlogix_website'
+                        targetUrlSuffix = 'flowlogix.com'
+                        rsyncSuffix = '/flowlogix'
+                    }
                     switch (env.GIT_BRANCH) {
                         case ["master", "main"]:
                             break
@@ -44,7 +52,7 @@ pipeline {
                 lftp -u \$ftpcreds_USR,\$ftpcreds_PSW -e \
                 'mirror -R -P7 -x .git --overwrite --delete --delete-excluded \
                 output $website_root$website_subdir; exit top' $website_host
-                rsync -aEH --delete-after output/ $HOME/var/website-content
+                rsync -aEH --delete-after output/ $HOME/var/website-content$rsyncSuffix
                 """
             }
         }
@@ -55,7 +63,7 @@ pipeline {
             script {
                 if (website_subdir as boolean) {
                     githubNotify description: 'Preview Changes Link', context: 'CI/deploy-preview', status: 'SUCCESS',
-                        targetUrl: "https://pullrequest.hope.nyc.ny.us$website_subdir"
+                        targetUrl: "https://pullrequest.$targetUrlSuffix$website_subdir"
                 }
             }
         }
