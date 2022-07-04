@@ -13,29 +13,7 @@ pipeline {
         quietPeriod 0
     }
 
-    triggers {
-        issueCommentTrigger('(?i).*jenkins.*test.*')
-    }
-
     stages {
-        stage('Bootstrap Guard') {
-            when {
-                not {
-                    triggeredBy cause: 'UserIdCause'
-                }
-            }
-            steps {
-                script {
-                    if (env.CHANGE_ID && !env.GITHUB_COMMENT) {
-                        githubNotify description: 'Project Member can initiate a build and test cycle',
-                            context: ci_context + '/needs-build', status: 'SUCCESS'
-                        currentBuild.result = 'not_built'
-                        currentBuild.description = 'Boostrap Build Only - Initial Build Not Started'
-                        error currentBuild.description
-                    }
-                }
-            }
-        }
         stage('Maven Info') {
             steps {
                 githubNotify description: 'Build and Test Started',
