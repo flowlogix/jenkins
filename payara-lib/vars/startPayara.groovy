@@ -21,7 +21,7 @@ def call(def payara_config) {
         error 'domain_name not specified'
     }
 
-    sh "mvn -B dependency:unpack"
+    sh "mvn -B -C dependency:unpack"
     sh "$payara_config.asadmin create-domain --nopassword --portbase $portbase $payara_config.domain_name || exit 0"
     payara_config.admin_port = sh(
         script: "$payara_config.asadmin list-domains --long --header=false | fgrep $payara_config.domain_name | awk '{print \$3}'",
