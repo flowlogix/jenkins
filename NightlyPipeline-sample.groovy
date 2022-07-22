@@ -17,7 +17,7 @@ pipeline {
         }
         stage('Maven Info') {
             steps {
-                sh 'mvn -V -N help:all-profiles'
+                sh 'mvn -V -N -B -C help:all-profiles'
             }
         }
         stage('Maven Verify - Regular + Stress Tests') {
@@ -27,7 +27,7 @@ pipeline {
                     sdk current
                     export MAVEN_OPTS="\$MAVEN_OPTS $JAVA_TOOL_OPTIONS"
                     unset JAVA_TOOL_OPTIONS
-                    mvn -B verify -DforkCount=0 -Dsurefire.useSystemClassLoader=false \
+                    mvn -B -C verify -DforkCount=0 -Dsurefire.useSystemClassLoader=false \
                     -Dmaven.install.skip=true -Pall-tests -fae
                     """
                 }

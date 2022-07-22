@@ -16,7 +16,7 @@ pipeline {
     stages {
         stage('Maven Info') {
             steps {
-                sh "mvn -V -B -N -P$profiles help:all-profiles"
+                sh "mvn -V -B -C -N -P$profiles help:all-profiles"
                 script {
                     currentBuild.description = "Working on git commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
                 }
@@ -29,7 +29,7 @@ pipeline {
                     sh """
                        export MAVEN_OPTS="\$MAVEN_OPTS $JAVA_TOOL_OPTIONS"
                        unset JAVA_TOOL_OPTIONS
-                       mvn -B verify -P$profiles -fae \$(eval echo \$MAVEN_ADD_OPTIONS) \
+                       mvn -B -C verify -P$profiles -fae \$(eval echo \$MAVEN_ADD_OPTIONS) \
                        -Dwebdriver.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
                        -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
                        -Ddocs.phase=package -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port
@@ -43,7 +43,7 @@ pipeline {
             }
             steps {
                 sh """
-                mvn -B jar:jar javadoc:jar source:jar-no-fork \
+                mvn -B -C jar:jar javadoc:jar source:jar-no-fork \
                 org.sonatype.plugins:nexus-staging-maven-plugin:deploy \
                 -P$profiles -fae -Dmaven.install.skip=true
                 """

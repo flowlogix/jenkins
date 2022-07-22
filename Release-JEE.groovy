@@ -22,7 +22,7 @@ pipeline {
                         error 'Version cannot be empty'
                     }
                 }
-                sh "mvn -V -N -P$profiles help:all-profiles"
+                sh "mvn -V -N -B -C -P$profiles help:all-profiles"
                 script {
                     currentBuild.description = "Working on git commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
                 }
@@ -33,7 +33,7 @@ pipeline {
                 startPayara payara_config
                 withMaven {
                     sh """
-                    mvn -B -P$profiles release:prepare release:perform -DreleaseVersion=$Version \
+                    mvn -B -C -P$profiles release:prepare release:perform -DreleaseVersion=$Version \
                     -Darguments=\"-Dauto.release=$releaseInMaven -DtrimStackTrace=false \
                     \$(eval echo \$MAVEN_ADD_OPTIONS) -Dwebdriver.chrome.binary='\$(eval echo \$CHROME_BINARY)' \
                     -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port\"
