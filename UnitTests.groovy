@@ -41,6 +41,7 @@ pipeline {
     post {
         always {
             archiveArtifacts artifacts: '**/payara5/**/server.log*', allowEmptyArchive: true
+            recordIssues enabledForFailure: true, aggregatingResults: true, tool: java()
             stopPayara payara_config
         }
     }
