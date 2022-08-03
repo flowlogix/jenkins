@@ -1,4 +1,5 @@
-@Library('payara') _
+@Library('payara') _l1
+@Library('util') _l2
 def payara_config = [domain_name : 'test-domain']
 final def profiles = 'all-tests,payara-server-remote'
 
@@ -54,7 +55,7 @@ pipeline {
     post {
         always {
             archiveArtifacts artifacts: '**/payara5/**/server.log*'
-            recordIssues enabledForFailure: true, aggregatingResults: true, tool: java()
+            checkLogs()
             stopPayara payara_config
         }
         success {

@@ -1,4 +1,4 @@
-// Jenkins has a bug that triggers multiple builds via a single push randomly
+// github-pr-comment-plugin used to have a bug that triggers multiple builds via a single push randomly
 // this code aborts the duplicate build
 
 import groovy.transform.Field
