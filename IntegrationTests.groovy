@@ -1,7 +1,8 @@
 @Library('payara') _l1
 @Library('util') _l2
 def payara_config = [domain_name : 'test-domain']
-final def profiles = 'all-tests,payara-server-remote'
+final def profiles = 'payara-server-remote'
+def mvnCommandLine
 
 pipeline {
     agent any
@@ -23,22 +24,39 @@ pipeline {
                 }
             }
         }
-        stage('Maven Verify - All Tests') {
+        stage ('Set up Payara and Maven') {
             steps {
                 startPayara payara_config
                 withMaven {
-                    sh """
-                       export MAVEN_OPTS="\$MAVEN_OPTS $JAVA_TOOL_OPTIONS"
-                       unset JAVA_TOOL_OPTIONS
-                       mvn -B -C verify -P$profiles -fae \$(eval echo \$MAVEN_ADD_OPTIONS) \
-                       -Dwebdriver.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
-                       -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
-                       -Ddocs.phase=package -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port
-                       """
+                    script {
+                        mvnCommandLine =
+                            """
+                                export MAVEN_OPTS="\$(eval echo \$MAVEN_OPTS \$JAVA_TOOL_OPTIONS)"
+                                unset JAVA_TOOL_OPTIONS
+                                mvn -B -C -fae \$(eval echo \$MAVEN_ADD_OPTIONS) \
+                                -Dwebdriver.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
+                                -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
+                                -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port\
+                            """
+                    }
                 }
             }
         }
-        stage('Maven Deploy Snapshots') {
+        stage('Maven Verify - All Tests') {
+            steps {
+                withMaven {
+                    sh "$mvnCommandLine verify -P${profiles},all-tests"
+                }
+            }
+        }
+        stage('Maven Test - Client state saving') {
+            steps {
+                withMaven(options: [artifactsPublisher(disabled: true)]) {
+                    sh "$mvnCommandLine integration-test -P${profiles},ui-test -Dintegration.test.mode=clientStateSaving"
+                }
+            }
+        }
+        stage('Maven Deploy Docs and Snapshots') {
             when {
                 expression { currentBuild.currentResult == 'SUCCESS' }
             }
@@ -46,7 +64,7 @@ pipeline {
                 sh """
                 mvn -B -C jar:jar javadoc:jar source:jar-no-fork \
                 org.sonatype.plugins:nexus-staging-maven-plugin:deploy \
-                -P$profiles -fae -Dmaven.install.skip=true
+                -fae -Dmaven.install.skip=true
                 """
             }
         }
