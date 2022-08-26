@@ -22,7 +22,11 @@ def call(def payara_config) {
     }
 
     sh "mvn -B -C dependency:unpack"
-    sh "$payara_config.asadmin create-domain --nopassword --portbase $portbase $payara_config.domain_name || exit 0"
+    payara_config.ssl_port = sh(
+        script: """$payara_config.asadmin create-domain --nopassword --portbase $portbase $payara_config.domain_name \
+                | fgrep HTTP_SSL | awk '{print \$3}' || exit 0
+                """,
+        returnStdout: true).trim()
     payara_config.admin_port = sh(
         script: "$payara_config.asadmin list-domains --long --header=false | fgrep $payara_config.domain_name | awk '{print \$3}'",
         returnStdout: true).trim()

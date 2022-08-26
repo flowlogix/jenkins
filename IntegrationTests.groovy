@@ -36,7 +36,8 @@ pipeline {
                                 mvn -B -C -fae \$(eval echo \$MAVEN_ADD_OPTIONS) \
                                 -Dwebdriver.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
                                 -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
-                                -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port\
+                                -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port \
+                                -DsslPort=$payara_config.ssl_port \
                             """
                     }
                 }
