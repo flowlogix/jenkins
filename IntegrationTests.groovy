@@ -1,7 +1,8 @@
 @Library('payara') _l1
 @Library('util') _l2
 def payara_config = [domain_name : 'test-domain']
-final def profiles = 'payara-server-remote'
+final def profiles           = 'payara-server-remote,all-tests'
+final def profiles_no_stress = 'payara-server-remote,ui-test'
 def mvnCommandLine
 
 pipeline {
@@ -46,15 +47,35 @@ pipeline {
         stage('Maven Verify - All Tests') {
             steps {
                 withMaven {
-                    sh "$mvnCommandLine verify -P${profiles},all-tests"
+                    sh "$mvnCommandLine verify -P${profiles}"
                 }
             }
         }
         stage('Maven Test - Client state saving') {
             steps {
                 withMaven(options: [artifactsPublisher(disabled: true)]) {
-                    sh "$mvnCommandLine integration-test -P${profiles},ui-test -Dintegration.test.mode=clientStateSaving"
+                    sh "$mvnCommandLine verify -P${profiles_no_stress} -Dtest=none -Dsurefire.failIfNoSpecifiedTests=false \
+                    -Dintegration.test.mode=clientStateSaving"
                 }
+            }
+        }
+        stage('Maven Test - Shiro-native sessions') {
+            steps {
+                withMaven(options: [artifactsPublisher(disabled: true)]) {
+                    sh "$mvnCommandLine verify -P${profiles_no_stress} -Dtest=none -Dsurefire.failIfNoSpecifiedTests=false \
+                    -Dintegration.test.mode=shiroNativeSessions"
+                }
+            }
+        }
+        stage('Maven Test - Disable Shiro-EE') {
+            steps {
+                // care must be taken for this if tests are parallel - server is reconvfigured
+                sh "$payara_config.asadmin -p $payara_config.admin_port create-system-properties com.flowlogix.shiro.ee.disabled=true"
+                withMaven(options: [artifactsPublisher(disabled: true)]) {
+                    sh "$mvnCommandLine verify -P${profiles_no_stress} -Dtest=none -Dsurefire.failIfNoSpecifiedTests=false \
+                    -Dit.test=LookupIT,ExceptionPageIT"
+                }
+                sh "$payara_config.asadmin -p $payara_config.admin_port create-system-properties com.flowlogix.shiro.ee.disabled=false"
             }
         }
         stage('Maven Deploy Docs and Snapshots') {
