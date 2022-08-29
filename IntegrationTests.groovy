@@ -69,13 +69,10 @@ pipeline {
         }
         stage('Maven Test - Disable Shiro-EE') {
             steps {
-                // care must be taken for this if tests are parallel - server is reconvfigured
-                sh "$payara_config.asadmin -p $payara_config.admin_port create-system-properties com.flowlogix.shiro.ee.disabled=true"
                 withMaven(options: [artifactsPublisher(disabled: true)]) {
                     sh "$mvnCommandLine verify -P${profiles_no_stress} -Dtest=none -Dsurefire.failIfNoSpecifiedTests=false \
-                    -Dit.test=LookupIT,ExceptionPageIT"
+                    -Dit.test=LookupIT,ExceptionPageIT -Dintegration.test.mode=disableShiroEE"
                 }
-                sh "$payara_config.asadmin -p $payara_config.admin_port create-system-properties com.flowlogix.shiro.ee.disabled=false"
             }
         }
         stage('Maven Deploy Docs and Snapshots') {
