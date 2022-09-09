@@ -21,7 +21,12 @@ def call(def payara_config) {
         error 'domain_name not specified'
     }
 
-    sh "mvn -B -C dependency:unpack"
+    int result = sh(script: "mvn -B -C dependency:unpack", returnStatus: true)
+    if (result != 0) {
+        echo 'Not able to extract Payara'
+        payara_config.asadmin = null
+        return result
+    }
     payara_config.ssl_port = sh(
         script: """$payara_config.asadmin create-domain --nopassword --portbase $portbase $payara_config.domain_name \
                 | fgrep HTTP_SSL | awk '{print \$3}' || exit 0
