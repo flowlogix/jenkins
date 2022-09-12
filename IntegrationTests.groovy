@@ -91,9 +91,9 @@ pipeline {
 
     post {
         always {
-            archiveArtifacts artifacts: '**/payara5/**/server.log*'
-            checkLogs()
             stopPayara payara_config
+            archiveArtifacts artifacts: '**/payara5/**/server.log*'
+            checkLogs '**/payara5/**/server.log*'
         }
         success {
             githubNotify description: 'Deploy Snapshots', context: 'CI/Deploy', status: 'SUCCESS',
