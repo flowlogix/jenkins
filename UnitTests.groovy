@@ -42,8 +42,8 @@ pipeline {
     post {
         always {
             stopPayara payara_config
-            archiveArtifacts artifacts: '**/payara5/**/server.log*', allowEmptyArchive: true
-            checkLogs '**/payara5/**/server.log*'
+            archiveArtifacts artifacts: '**/logs/server.log*', allowEmptyArchive: true
+            checkLogs '**/logs/server.log*'
         }
     }
 }
