@@ -1,23 +1,27 @@
 // call the warnings-ng plugin
 
 def call(String log_pattern) {
+    def maximalQualityGates = [[ threshold: 1, type: 'TOTAL', unstable: true ]]
+
     recordIssues enabledForFailure: true, aggregatingResults: true, tool: java(),
         filters: [ excludeFile('.*/generated-sources/.*'), excludeMessage('cannot find symbol') ],
-        qualityGates: [[ threshold: 1, type: 'TOTAL', unstable: true ]]
+        qualityGates: maximalQualityGates
 
-    configParser()
-    recordIssues enabledForFailure: true, aggregatingResults: true,
-    tool: groovyScript(parserId: 'payara-logs', pattern: log_pattern),
-        filters: [ excludeMessage(/Local Exception Stack:[\s\S]*Exception \[EclipseLink-4002\][\s\S]*: / +
-        /org.eclipse.persistence.exceptions.DatabaseException[\s\S]*Internal Exception: java.sql.SQLException: / + 
-        /java.lang.reflect.UndeclaredThrowableException[\s\S]*Error C[\s\S]*/),
-        excludeMessage(/A system exception occurred during an invocation on EJB ProtectedStatelessBean, / + 
-        /method: public java.lang.String com.flowlogix.examples.shiro.ProtectedStatelessBean.hello()/),
-        excludeMessage(/javax.ejb.EJBException: Attempting to perform a user-only operation.[\s\S]*/ +
-        /The current Subject is not a user \(they haven't been authenticated or remembered from a previous login\)[\s\S]*/),
-        excludeMessage(/#\{exceptionBean.throwExceptionFromMethod\(\)}: java.sql.SQLException: sql-from-method[\s\S]*/ +
-        /javax.faces.FacesException: #\{exceptionBean.throwExceptionFromMethod\(\)}:[\s\S]*/) ],
-        qualityGates: [[ threshold: 1, type: 'TOTAL', unstable: true ]]
+    if (log_pattern) {
+        configParser()
+        recordIssues enabledForFailure: true, aggregatingResults: true,
+        tool: groovyScript(parserId: 'payara-logs', pattern: log_pattern),
+            filters: [ excludeMessage(/Local Exception Stack:[\s\S]*Exception \[EclipseLink-4002\][\s\S]*: / +
+            /org.eclipse.persistence.exceptions.DatabaseException[\s\S]*Internal Exception: java.sql.SQLException: / + 
+            /java.lang.reflect.UndeclaredThrowableException[\s\S]*Error C[\s\S]*/),
+            excludeMessage(/A system exception occurred during an invocation on EJB ProtectedStatelessBean, / + 
+            /method: public java.lang.String com.flowlogix.examples.shiro.ProtectedStatelessBean.hello()/),
+            excludeMessage(/javax.ejb.EJBException: Attempting to perform a user-only operation.[\s\S]*/ +
+            /The current Subject is not a user \(they haven't been authenticated or remembered from a previous login\)[\s\S]*/),
+            excludeMessage(/#\{exceptionBean.throwExceptionFromMethod\(\)}: java.sql.SQLException: sql-from-method[\s\S]*/ +
+            /javax.faces.FacesException: #\{exceptionBean.throwExceptionFromMethod\(\)}:[\s\S]*/) ],
+            qualityGates: maximalQualityGates
+    }
 }
 
 void configParser() {

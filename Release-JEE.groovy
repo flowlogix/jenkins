@@ -49,7 +49,7 @@ pipeline {
         always {
             stopPayara payara_config
             archiveArtifacts artifacts: '**/logs/server.log*'
-            checkLogs '**/logs/server.log*'
+            checkLogs payara_config.asadmin ? '**/logs/server.log*' : null
         }
         success {
             sh "git push origin Version-$Version"

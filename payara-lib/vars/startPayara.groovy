@@ -21,7 +21,10 @@ def call(def payara_config) {
     if (!payara_config.domain_name) {
         payara_config.asadmin = null
         error 'domain_name not specified'
-        return 1;
+        return 1
+    } else if (!fileExists("$WORKSPACE/.jenkins_payara")) {
+        payara_config.asadmin = null
+        return 0
     }
 
     int result = sh(script: "mvn -B -C dependency:unpack", returnStatus: true)
@@ -30,8 +33,7 @@ def call(def payara_config) {
         payara_config.asadmin = null
     }
 
-    result = sh(script: "$payara_config.asadmin -V", returnStatus: true)
-    if (result != 0) {
+    if (!fileExists(payara_config.asadmin)) {
         payara_config.asadmin = "$HOME/apps/payara/current/bin/asadmin"
         payara_config.domaindir_args = "--domaindir $workspace_base/payara_domaindir"
     }
