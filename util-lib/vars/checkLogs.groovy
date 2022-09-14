@@ -3,7 +3,7 @@
 def call(String log_pattern) {
     def maximalQualityGates = [[ threshold: 1, type: 'TOTAL', unstable: true ]]
 
-    recordIssues enabledForFailure: true, aggregatingResults: true, tool: java(),
+    recordIssues enabledForFailure: true, aggregatingResults: true, tools: [java(), javaDoc()],
         filters: [ excludeFile('.*/generated-sources/.*'), excludeMessage('cannot find symbol') ],
         qualityGates: maximalQualityGates
 
@@ -11,6 +11,7 @@ def call(String log_pattern) {
         configParser()
         recordIssues enabledForFailure: true, aggregatingResults: true,
         tool: groovyScript(parserId: 'payara-logs', pattern: log_pattern),
+            qualityGates: maximalQualityGates,
             filters: [ excludeMessage(/Local Exception Stack:[\s\S]*Exception \[EclipseLink-4002\][\s\S]*: / +
             /org.eclipse.persistence.exceptions.DatabaseException[\s\S]*Internal Exception: java.sql.SQLException: / + 
             /java.lang.reflect.UndeclaredThrowableException[\s\S]*Error C[\s\S]*/),
@@ -19,8 +20,8 @@ def call(String log_pattern) {
             excludeMessage(/javax.ejb.EJBException: Attempting to perform a user-only operation.[\s\S]*/ +
             /The current Subject is not a user \(they haven't been authenticated or remembered from a previous login\)[\s\S]*/),
             excludeMessage(/#\{exceptionBean.throwExceptionFromMethod\(\)}: java.sql.SQLException: sql-from-method[\s\S]*/ +
-            /javax.faces.FacesException: #\{exceptionBean.throwExceptionFromMethod\(\)}:[\s\S]*/) ],
-            qualityGates: maximalQualityGates
+            /javax.faces.FacesException: #\{exceptionBean.throwExceptionFromMethod\(\)}:[\s\S]*/),
+            excludeMessage(/The web application.*created a ThreadLocal.*value.*org.testng.internal.TestResult.*TestR.*/) ]
     }
 }
 
