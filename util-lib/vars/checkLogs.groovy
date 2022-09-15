@@ -5,7 +5,7 @@ def call(String log_pattern) {
 
     recordIssues enabledForFailure: true, aggregatingResults: true, tools: [java(), javaDoc()],
         filters: [ excludeFile('.*/generated-sources/.*'), excludeMessage('cannot find symbol') ],
-        qualityGates: maximalQualityGates
+        name: 'Java Compiler', qualityGates: maximalQualityGates
 
     if (log_pattern) {
         configParser()
