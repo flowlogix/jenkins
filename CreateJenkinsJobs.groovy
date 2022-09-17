@@ -6,7 +6,7 @@ def githubMain = {
         credentialsId personal ? personal_credential : org_credential
         repoOwner personal ? 'lprimak' : 'flowlogix'
         repository repoName
-        repositoryUrl null
+        repositoryUrl ''
         configuredByUrl false
     }
 }
@@ -42,10 +42,10 @@ def githubScriptSource = {
                     userRemoteConfig {
                         url 'git@github.com:flowlogix/jenkins.git'
                         credentialsId org_credential
-                        name null
-                        refspec null
-                        browser null
-                        gitTool null
+                        name ''
+                        refspec ''
+                        browser { }
+                        gitTool ''
                     }
                 }
                 branches {
@@ -175,6 +175,7 @@ multibranchPipelineJob('flowlogix-ee-integration') {
         branchSource {
             source {
                 github {
+                    id '7234871'
                     githubMain delegate, 'flowlogix'
                     githubParameters delegate, 'integration-tests', false, false
                 }
@@ -184,7 +185,7 @@ multibranchPipelineJob('flowlogix-ee-integration') {
                     props {
                         suppressAutomaticTriggering {
                             strategy 'NONE'
-                            triggeredBranchesRegex null
+                            triggeredBranchesRegex ''
                         }
                     }
                 }
@@ -222,6 +223,7 @@ multibranchPipelineJob('flowlogix-ee-release') {
         branchSource {
             source {
                 github {
+                    id '1948134'
                     githubMain delegate, 'flowlogix'
                     traits {
                         gitHubBranchDiscovery { strategyId 3 }
@@ -234,7 +236,7 @@ multibranchPipelineJob('flowlogix-ee-release') {
                     props {
                         suppressAutomaticTriggering {
                             strategy 'NONE'
-                            triggeredBranchesRegex null
+                            triggeredBranchesRegex ''
                         }
                     }
                 }
@@ -264,6 +266,7 @@ multibranchPipelineJob('flowlogix-website-builder') {
         branchSource {
             source {
                 github {
+                    id '41435354'
                     githubMain delegate, 'website'
                     githubParameters delegate, 'PublishWebsite', false, false
                 }
@@ -272,7 +275,7 @@ multibranchPipelineJob('flowlogix-website-builder') {
     }
     factory {
         remoteJenkinsFileWorkflowBranchProjectFactory {
-            githubScriptSource delegate, null, 'PublishWebsite.groovy'
+            githubScriptSource delegate, '', 'PublishWebsite.groovy'
         }
     }
     defaultOrphanItemStrategy delegate
@@ -286,6 +289,7 @@ multibranchPipelineJob('hope-website-builder') {
         branchSource {
             source {
                 github {
+                    id '3451246'
                     githubMain delegate, 'hope-website', true
                     githubParameters delegate, 'PublishWebsite', false, false
                 }
@@ -296,7 +300,7 @@ multibranchPipelineJob('hope-website-builder') {
                         wildcards {
                             caseSensitive false
                             includes 'main master'
-                            excludes null
+                            excludes ''
                         }
                     }
                 }
@@ -305,7 +309,7 @@ multibranchPipelineJob('hope-website-builder') {
     }
     factory {
         remoteJenkinsFileWorkflowBranchProjectFactory {
-            githubScriptSource delegate, null, 'PublishWebsite.groovy'
+            githubScriptSource delegate, '', 'PublishWebsite.groovy'
         }
     }
     defaultOrphanItemStrategy delegate
