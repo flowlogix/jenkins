@@ -46,14 +46,25 @@ pipeline {
                 """
             }
         }
-        stage('Publish') {
+        stage('Publish - Web Host') {
             steps {
                 sh """ \
                 lftp -u \$ftpcreds_USR,\$ftpcreds_PSW -e \
                 'mirror -R -P7 -x .git --overwrite --delete --delete-excluded \
                 output $website_root$website_subdir; exit top' $website_host
-                rsync -aEH --delete-after output/ $HOME/var/website-content$rsyncSuffix
                 """
+            }
+        }
+        stage('Publish - App server') {
+            when {
+                not {
+                    expression {
+                        website_subdir as boolean
+                    }
+                }
+            }
+            steps {
+                sh "rsync -aEH --delete-after output/ $HOME/var/website-content$rsyncSuffix"
             }
         }
     }
