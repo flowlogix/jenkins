@@ -26,6 +26,17 @@ def githubParameters = {
                 contextLabel "CI/$ctxLabel"
                 typeSuffix useTypeSuffix
             }
+            submoduleOptionTrait {
+                extension {
+                    recursiveSubmodules true
+                    trackingSubmodules true
+                    shallow true
+                    disableSubmodules false
+                    reference ''
+                    timeout null
+                    parentCredentials false
+                }
+            }
         }
     }
 }
@@ -51,6 +62,12 @@ def githubScriptSource = {
                 branches {
                     branchSpec {
                         name '*/main'
+                    }
+                }
+                extensions {
+                    gitSCMStatusChecksExtension {
+                        skip true
+                        skipProgressUpdates true
                     }
                 }
             }
@@ -92,6 +109,43 @@ def defaultOrphanItemStrategy = {
     }
 }
 
+def suppressBranchTriggers = {
+    ctx, String branches = '' -> ctx.with {
+        strategy {
+            allBranchesSame {
+                props {
+                    suppressAutomaticTriggering {
+                        strategy 'NONE'
+                        triggeredBranchesRegex branches
+                    }
+                }
+            }
+        }
+    }
+}
+
+def buildBranchesAndPullRequests = {
+    ctx, boolean ignoreUntrusted = true, String branches = '' -> ctx.with {
+        buildStrategies {
+            buildChangeRequests {
+                ignoreUntrustedChanges ignoreUntrusted
+                ignoreTargetOnlyChanges false
+            }
+            if (branches) {
+                buildNamedBranches {
+                    filters {
+                        wildcards {
+                            includes branches
+                            excludes ''
+                            caseSensitive false
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 def discoverPullRequestFromForks = {
     ctx, boolean isBranchSource, String trustStr ->
     ctx.with {
@@ -116,6 +170,22 @@ def discoverPullRequestFromForks = {
     }
 }
 
+def triggerPullRequestBuild = {
+    ctx, String branchPropType, String commentBodyStr ->
+    ctx.with {
+        configure {
+            it << strategy(class: 'jenkins.branch.DefaultBranchPropertyStrategy') {
+                properties {
+                "com.adobe.jenkins.github__pr__comment__build.$branchPropType" {
+                        commentBody commentBodyStr
+                        allowUntrusted false
+                    }
+                }
+            }
+        }
+    }
+}
+
 organizationFolder('flowlogix-org-repo') {
     displayName 'FlowLogix Org Unit Tests and PR Builder'
     organizations {
@@ -128,12 +198,6 @@ organizationFolder('flowlogix-org-repo') {
             repoOwner 'lprimak'
             credentialsId personal_credential
             githubParameters delegate, 'unit-tests', true
-        }
-        buildStrategies {
-            buildChangeRequests {
-                ignoreUntrustedChanges true
-                ignoreTargetOnlyChanges false
-            }
         }
         triggers {
             periodicFolderTrigger {
@@ -155,17 +219,9 @@ organizationFolder('flowlogix-org-repo') {
         }
     }
 
+    buildBranchesAndPullRequests delegate
     discoverPullRequestFromForks delegate, false, 'TrustContributors'
-    configure {
-        it << strategy(class: 'jenkins.branch.DefaultBranchPropertyStrategy') {
-            properties {
-            'com.adobe.jenkins.github__pr__comment__build.TriggerPRCommentBranchProperty' {
-                    commentBody '.*jenkins.*test.*'
-                    allowUntrusted false
-                }
-            }
-        }
-    }
+    triggerPullRequestBuild delegate, 'TriggerPRCommentBranchProperty', '.*jenkins.*test.*'
 }
 
 multibranchPipelineJob('flowlogix-ee-integration') {
@@ -180,16 +236,7 @@ multibranchPipelineJob('flowlogix-ee-integration') {
                     githubParameters delegate, 'integration-tests', false, false
                 }
             }
-            strategy {
-                allBranchesSame {
-                    props {
-                        suppressAutomaticTriggering {
-                            strategy 'NONE'
-                            triggeredBranchesRegex ''
-                        }
-                    }
-                }
-            }
+            suppressBranchTriggers delegate
             buildStrategies {
                 skipInitialBuildOnFirstBranchIndexing()
             }
@@ -222,25 +269,17 @@ multibranchPipelineJob('flowlogix-ee-release') {
     branchSources {
         branchSource {
             source {
-                github {
+                git {
                     id '1948134'
-                    githubMain delegate, 'flowlogix'
+                    remote 'git@github.com:flowlogix/flowlogix.git'
+                    credentialsId org_credential
                     traits {
-                        gitHubBranchDiscovery { strategyId 3 }
+                        gitBranchDiscovery()
                         wipeWorkspaceTrait()
                     }
                 }
             }
-            strategy {
-                allBranchesSame {
-                    props {
-                        suppressAutomaticTriggering {
-                            strategy 'NONE'
-                            triggeredBranchesRegex ''
-                        }
-                    }
-                }
-            }
+            suppressBranchTriggers delegate
         }
     }
     factory {
@@ -271,6 +310,7 @@ multibranchPipelineJob('flowlogix-website-builder') {
                     githubParameters delegate, 'PublishWebsite', false, false
                 }
             }
+            buildBranchesAndPullRequests delegate, false, 'main master'
         }
     }
     factory {
@@ -294,17 +334,7 @@ multibranchPipelineJob('hope-website-builder') {
                     githubParameters delegate, 'PublishWebsite', false, false
                 }
             }
-            buildStrategies {
-                buildNamedBranches {
-                    filters {
-                        wildcards {
-                            caseSensitive false
-                            includes 'main master'
-                            excludes ''
-                        }
-                    }
-                }
-            }
+            buildBranchesAndPullRequests delegate, false, 'main master'
         }
     }
     factory {
