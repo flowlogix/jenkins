@@ -3,6 +3,7 @@
 
 def payara_config = [domain_name : 'prod-domain']
 final def profiles = 'all-tests,payara-server-remote'
+def release_profile = 'release-flowlogix-to-central'
 
 pipeline {
     agent any
@@ -14,6 +15,8 @@ pipeline {
         booleanParam(name: 'releaseInMaven', defaultValue: true,
             description: 'Whether to release in Maven Central, or just close the repository')
         string(name: 'Version', description: 'Version number to release', trim: true)
+        choice(name: 'releaseToRepo', description: 'Which repository to publish the release',
+            choices: ['Maven Central', 'Hope Nexus'])
     }
 
     stages {
@@ -21,7 +24,12 @@ pipeline {
             steps {
                 script {
                     if (Version.empty) {
-                        error 'Version cannot be empty'
+                        def msg = 'Version cannot be empty'
+                        currentBuild.description = msg
+                        error msg
+                    }
+                    if (releaseToRepo.startsWith('Hope')) {
+                        release_profile = 'release-flowlogix-to-hope'
                     }
                 }
                 sh "mvn -V -N -B -C -P$profiles help:all-profiles"
@@ -35,7 +43,8 @@ pipeline {
                 startPayara payara_config
                 withMaven {
                     sh """
-                    mvn -B -C -P$profiles release:prepare release:perform -DreleaseVersion=$Version \
+                    mvn -B -C -P$profiles release:prepare release:perform \
+                    -DreleaseVersion=$Version -Drelease.profile=$release_profile \
                     -Darguments=\"-Dauto.release=$releaseInMaven -DtrimStackTrace=false \
                     \$(eval echo \$MAVEN_ADD_OPTIONS) -Dwebdriver.chrome.binary='\$(eval echo \$CHROME_BINARY)' \
                     -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port -DsslPort=$payara_config.ssl_port \"
