@@ -87,6 +87,12 @@ def libraryDef = {
                     scm {
                         github {
                             githubMain delegate, 'jenkins'
+                            traits {
+                                gitHubStatusChecks {
+                                    skip true
+                                    skipProgressUpdates true
+                                }
+                            }
                         }
                     }
                     libraryPath libraryPathP + '/'
