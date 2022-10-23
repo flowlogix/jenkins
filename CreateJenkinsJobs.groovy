@@ -88,9 +88,11 @@ def libraryDef = {
                         github {
                             githubMain delegate, 'jenkins'
                             traits {
+                                disableStatusUpdateTrait()
                                 gitHubStatusChecks {
                                     skip true
                                     skipProgressUpdates true
+                                    skipNotifications true
                                 }
                             }
                         }
