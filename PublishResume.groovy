@@ -16,8 +16,10 @@ pipeline {
                 withMaven {
                     sh """ \
                     set +x; . "$HOME/.sdkman/bin/sdkman-init.sh"
-                    export JBAKE_OPTS='--add-opens java.base/sun.nio.ch=ALL-UNNAMED \
-                        --add-opens java.base/java.io=ALL-UNNAMED'
+                    export MAVEN_OPTS="\$MAVEN_OPTS $JAVA_TOOL_OPTIONS \
+                        --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
+                        --add-opens java.base/java.io=ALL-UNNAMED"
+                    unset JAVA_TOOL_OPTIONS
                     set -x
                     mvn -B -C generate-resources
                     """
@@ -29,7 +31,7 @@ pipeline {
                 sh """ \
                 lftp -u \$ftpcreds_USR,\$ftpcreds_PSW -e \
                 'mirror -R -P7 -x .git --overwrite --delete --delete-excluded \
-                output hope_website/resume; exit top' $website_host
+                target/output hope_website/resume; exit top' $website_host
                 """
             }
         }
