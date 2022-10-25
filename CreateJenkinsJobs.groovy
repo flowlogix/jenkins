@@ -353,3 +353,26 @@ multibranchPipelineJob('hope-website-builder') {
     defaultOrphanItemStrategy delegate
     discoverPullRequestFromForks delegate, true, 'TrustContributors'
 }
+
+multibranchPipelineJob('resume-builder') {
+    displayName 'Resume Builder'
+    branchSources {
+        branchSource {
+            source {
+                github {
+                    id '15436536'
+                    githubMain delegate, 'resume', true
+                    githubParameters delegate, 'PublishResume', false, false
+                }
+            }
+            buildBranchesAndPullRequests delegate, false, 'main master'
+        }
+    }
+    factory {
+        remoteJenkinsFileWorkflowBranchProjectFactory {
+            githubScriptSource delegate, '', 'PublishResume.groovy'
+        }
+    }
+    defaultOrphanItemStrategy delegate
+    discoverPullRequestFromForks delegate, true, 'TrustContributors'
+}
