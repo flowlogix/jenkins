@@ -50,7 +50,7 @@ pipeline {
             steps {
                 sh """ \
                 lftp -u \$ftpcreds_USR,\$ftpcreds_PSW -e \
-                'mirror -R -P7 -x .git/ -x resume/ --overwrite --delete \
+                'mirror -R -P7 -x resume/ --overwrite --delete \
                 output $website_root$website_subdir; exit top' $website_host
                 """
             }
