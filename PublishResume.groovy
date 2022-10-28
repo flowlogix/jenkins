@@ -29,9 +29,11 @@ pipeline {
         stage('wkhtmltopdf - html-to-PDF') {
             steps {
                 sh """ \
+                rsync -aEH --delete-after target/output/ $HOME/var/website-content/resume/
                 for html_file in target/output/*.html
                 do
-                    wkhtmltopdf --enable-local-file-access --page-height 333mm --page-width 210mm \$html_file \
+                    wkhtmltopdf --page-height 333mm --page-width 210mm \
+                    https://apps.hope.nyc.ny.us/resume/`basename \$html_file` \
                     target/output/`basename \$html_file .html`.pdf
                 done
                 """

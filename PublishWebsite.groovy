@@ -64,7 +64,7 @@ pipeline {
                 }
             }
             steps {
-                sh "rsync -aEH --delete-after output/ $HOME/var/website-content$rsyncSuffix"
+                sh "rsync -aEH --exclude resume/ --delete-after output/ $HOME/var/website-content$rsyncSuffix"
             }
         }
     }
