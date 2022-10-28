@@ -26,6 +26,17 @@ pipeline {
                 }
             }
         }
+        stage('wkhtmltopdf - html-to-PDF') {
+            steps {
+                sh """ \
+                for html_file in target/output/*.html
+                do
+                    wkhtmltopdf --enable-local-file-access --page-height 333mm --page-width 210mm \$html_file \
+                    target/output/`basename \$html_file .html`.pdf
+                done
+                """
+            }
+        }
         stage('Publish - Web Host') {
             steps {
                 sh """ \
