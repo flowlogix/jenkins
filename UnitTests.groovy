@@ -1,6 +1,6 @@
 @Library('payara') _l1
-final def profiles = "payara-server-remote,ui-test"
-def payara_config = [domain_name : 'test-domain']
+final def profiles = "payara-server-remote,ui-test,coverage"
+def payara_config = [ domain_name : 'test-domain', jacoco_profile : profiles ]
 def ci_context = 'CI/unit-tests/pr-merge'
 
 @Library('util') _l2
@@ -25,7 +25,7 @@ pipeline {
         stage('Maven Verify - Tests') {
             steps {
                 startPayara payara_config
-                withMaven {
+                withMaven(options: [ jacocoPublisher(disabled: true) ]) {
                     sh """
                     export MAVEN_OPTS="\$MAVEN_OPTS $JAVA_TOOL_OPTIONS"
                     unset JAVA_TOOL_OPTIONS
@@ -33,7 +33,7 @@ pipeline {
                     -Dwebdriver.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
                     -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
                     -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port \
-                    -DsslPort=$payara_config.ssl_port
+                    -DsslPort=$payara_config.ssl_port -DjacocoPort=$payara_config.jacoco_port
                     """
                 }
             }

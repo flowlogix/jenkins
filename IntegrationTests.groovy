@@ -1,8 +1,8 @@
 @Library('payara') _l1
 @Library('util') _l2
-def payara_config = [domain_name : 'test-domain']
-final def profiles           = 'payara-server-remote,all-tests'
-final def profiles_no_stress = 'payara-server-remote,ui-test'
+final def profiles           = 'payara-server-remote,coverage,all-tests'
+final def profiles_no_stress = 'payara-server-remote,coverage,ui-test'
+def payara_config = [ domain_name : 'test-domain', jacoco_profile : profiles ]
 def mvnCommandLine
 
 pipeline {
@@ -38,7 +38,7 @@ pipeline {
                                 -Dwebdriver.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
                                 -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
                                 -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port \
-                                -DsslPort=$payara_config.ssl_port \
+                                -DsslPort=$payara_config.ssl_port -DjacocoPort=$payara_config.jacoco_port \
                             """
                     }
                 }
@@ -46,14 +46,14 @@ pipeline {
         }
         stage('Maven Verify - All Tests') {
             steps {
-                withMaven {
+                withMaven(options: [ jacocoPublisher(disabled: true) ]) {
                     sh "$mvnCommandLine verify -P${profiles}"
                 }
             }
         }
         stage('Maven Test - Client state saving') {
             steps {
-                withMaven(options: [artifactsPublisher(disabled: true)]) {
+                withMaven(options: [ artifactsPublisher(disabled: true), jacocoPublisher(disabled: true) ]) {
                     sh "$mvnCommandLine verify -P${profiles_no_stress} -Dtest=none -Dsurefire.failIfNoSpecifiedTests=false \
                     -Dintegration.test.mode=clientStateSaving"
                 }
@@ -61,7 +61,7 @@ pipeline {
         }
         stage('Maven Test - Shiro-native sessions') {
             steps {
-                withMaven(options: [artifactsPublisher(disabled: true)]) {
+                withMaven(options: [artifactsPublisher(disabled: true), jacocoPublisher(disabled: true) ]) {
                     sh "$mvnCommandLine verify -P${profiles_no_stress} -Dtest=none -Dsurefire.failIfNoSpecifiedTests=false \
                     -Dintegration.test.mode=shiroNativeSessions"
                 }
@@ -69,7 +69,7 @@ pipeline {
         }
         stage('Maven Test - Disable Shiro-EE') {
             steps {
-                withMaven(options: [artifactsPublisher(disabled: true)]) {
+                withMaven(options: [artifactsPublisher(disabled: true), jacocoPublisher(disabled: true) ]) {
                     sh "$mvnCommandLine verify -P${profiles_no_stress} -Dtest=none -Dsurefire.failIfNoSpecifiedTests=false \
                     -Dit.test=LookupIT,ExceptionPageIT -Dintegration.test.mode=disableShiroEE"
                 }

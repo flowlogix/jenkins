@@ -7,6 +7,15 @@ def call(String log_pattern) {
         filters: [ excludeFile('.*/generated-sources/.*'), excludeMessage('cannot find symbol') ],
         name: 'Java Compiler', qualityGates: maximalQualityGates
 
+    def jacocoExecFiles = findFiles glob: '**/jacoco*.exec'
+    if (jacocoExecFiles.length > 0) {
+        jacoco execPattern: '**/target/jacoco*.exec', classPattern: '**/target/classes-jacoco',
+            sourcePattern: '**/src/main/java', exclusionPattern: '**/src/test/java',
+            changeBuildStatus: true,
+            minimumLineCoverage: '60', maximumLineCoverage: '70',
+            minimumInstructionCoverage: '60', maximumInstructionCoverage: '70'
+    }
+
     if (log_pattern) {
         configParser()
         recordIssues enabledForFailure: true, aggregatingResults: true,
@@ -21,7 +30,8 @@ def call(String log_pattern) {
             /The current Subject is not a user \(they haven't been authenticated or remembered from a previous login\)[\s\S]*/),
             excludeMessage(/#\{exceptionBean.throwExceptionFromMethod\(\)}: java.sql.SQLException: sql-from-method[\s\S]*/ +
             /javax.faces.FacesException: #\{exceptionBean.throwExceptionFromMethod\(\)}:[\s\S]*/),
-            excludeMessage(/The web application.*created a ThreadLocal.*value.*org.testng.internal.TestResult.*TestR.*/) ]
+            excludeMessage(/The web application.*created a ThreadLocal.*value.*org.testng.internal.TestResult.*TestR.*/),
+            excludeMessage(/Unprocessed event : UnprocessedChangeEvent.*/) ]
     }
 }
 
