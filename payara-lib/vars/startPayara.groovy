@@ -16,8 +16,10 @@ final def payara_default_config =
       jacoco_profile : '' ]
 
 def call(def payara_config) {
+    boolean payara_version_overridden = false
     if (!payara_config.asadmin && payara_config.payara_version) {
         payara_default_config.asadmin = "$HOME/apps/payara/$payara_config.payara_version/bin/asadmin"
+        payara_version_overridden = true
     }
     payara_config << payara_default_config + payara_config
     if (!payara_config.domain_name) {
@@ -27,6 +29,12 @@ def call(def payara_config) {
     } else if (!fileExists("$WORKSPACE/.jenkins_payara")) {
         payara_config.asadmin = null
         return 0
+    } else {
+        def overridden_version = readFile(file: "$WORKSPACE/.jenkins_payara").trim()
+        if (overridden_version as boolean && !payara_version_overridden) {
+            payara_config.payara_version = "payara-$overridden_version"
+            payara_config.asadmin = "$HOME/apps/payara/$payara_config.payara_version/bin/asadmin"
+        }
     }
 
     payara_config.domaindir_args = "--domaindir $workspace_base/payara_domaindir"
