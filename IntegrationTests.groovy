@@ -19,7 +19,8 @@ pipeline {
     stages {
         stage('Maven Info') {
             steps {
-                sh "mvn -V -B -C -N -P$profiles help:all-profiles"
+                sh "mvn -V -B -C -N -P$profiles help:all-profiles \
+                    -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
                 script {
                     currentBuild.description = "Working on git commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
                 }
@@ -35,6 +36,7 @@ pipeline {
                                 export MAVEN_OPTS="\$(eval echo \$MAVEN_OPTS \$JAVA_TOOL_OPTIONS)"
                                 unset JAVA_TOOL_OPTIONS
                                 mvn -B -C -fae \$(eval echo \$MAVEN_ADD_OPTIONS) \
+                                -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
                                 -Dwebdriver.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
                                 -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
                                 -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port \

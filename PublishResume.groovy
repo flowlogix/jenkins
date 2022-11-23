@@ -21,7 +21,7 @@ pipeline {
                         --add-opens java.base/java.io=ALL-UNNAMED"
                     unset JAVA_TOOL_OPTIONS
                     set -x
-                    mvn -B -C generate-resources
+                    mvn -B -C -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn generate-resources
                     """
                 }
             }
