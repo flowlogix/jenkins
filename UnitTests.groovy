@@ -1,5 +1,5 @@
 @Library('payara') _l1
-final def profiles = "payara-server-remote,ui-test,coverage"
+final def profiles = "?payara-server-remote,?ui-test,?coverage"
 def payara_config = [ domain_name : 'test-domain', jacoco_profile : profiles ]
 def ci_context = 'CI/unit-tests/pr-merge'
 

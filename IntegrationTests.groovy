@@ -1,7 +1,7 @@
 @Library('payara') _l1
 @Library('util') _l2
-final def profiles           = 'payara-server-remote,coverage,all-tests'
-final def profiles_no_stress = 'payara-server-remote,coverage,ui-test'
+final def profiles           = '?payara-server-remote,?coverage,?all-tests'
+final def profiles_no_stress = '?payara-server-remote,?coverage,?ui-test'
 def payara_config = [ domain_name : 'test-domain', jacoco_profile : profiles ]
 def mvnCommandLine
 
