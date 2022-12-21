@@ -10,6 +10,7 @@ def call(String log_pattern, boolean checkConsole = true) {
     recordIssues enabledForFailure: true, aggregatingResults: true, tools: checkTools,
         filters: [ excludeFile('.*/generated-sources/.*'), excludeMessage('cannot find symbol'),
             excludeMessage('Skipping Delombok; no source to process.'),
+            excludeMessage(/Can.+t extract module name from .*pom:.*/),
             excludeMessage('No profiles detected!'), excludeMessage('Javadoc Warnings') ],
         name: 'Java Compiler', qualityGates: maximalQualityGates
 
