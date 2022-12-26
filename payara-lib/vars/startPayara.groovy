@@ -9,11 +9,13 @@ final def workspace_base = "$WORKSPACE/target/dependency"
 final def tmpdir = "$workspace_base/tmpdir"
 @Field
 final def portbase = 4900 + (env.EXECUTOR_NUMBER as int) * 100
+@Field
+final def jenkinsPayaraFileName = "$WORKSPACE/.jenkins_payara"
 
 @Field
 final def payara_default_config =
     [ domain_name : 'domain1', payara_version : 'current', asadmin : "$HOME/apps/payara/current/bin/asadmin",
-      jacoco_profile : '' ]
+      force_start : false, jacoco_profile : '', jacoco_tcp_server : true, jacoco_expr_args : '']
 
 def call(def payara_config) {
     boolean payara_version_overridden = false
@@ -26,11 +28,14 @@ def call(def payara_config) {
         payara_config.asadmin = null
         error 'domain_name not specified'
         return 1
-    } else if (!fileExists("$WORKSPACE/.jenkins_payara")) {
+    } else if (!payara_config.force_start && !fileExists(jenkinsPayaraFileName)) {
         payara_config.asadmin = null
         return 0
     } else {
-        def overridden_version = readFile(file: "$WORKSPACE/.jenkins_payara").trim()
+        def overridden_version
+        if (fileExists(jenkinsPayaraFileName)) {
+            overridden_version = readFile(file: jenkinsPayaraFileName).trim()
+        }
         if (overridden_version as boolean && !payara_version_overridden) {
             payara_config.payara_version = "payara-$overridden_version"
             payara_config.asadmin = "$HOME/apps/payara/$payara_config.payara_version/bin/asadmin"
@@ -61,12 +66,14 @@ def call(def payara_config) {
     }
     def jacoco_argline = sh(script: "mvn initialize help:evaluate $jacoco_profile_cmd \
         -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
-        -Dexpression=jacocoAgent -q -DforceStdout -DjacocoPort=$payara_config.jacoco_port -N",
+        -Dexpression=jacocoAgent -q -DforceStdout -DjacocoPort=$payara_config.jacoco_port -N \
+        $payara_config.jacoco_expr_args || exit 0",
         returnStdout: true).trim()
     if (jacoco_argline?.startsWith('-javaagent')) {
-        def escaped_argline = jacoco_argline.replaceAll(/[\/:=]/, /\\\\$0/)
+        def escaped_argline = jacoco_argline.replaceAll(/[\/:=]/, /\\\\$0/).replaceAll(/[$]/, /\\$0/)
+        def tcp_server_output = payara_config.jacoco_tcp_server ? ',output=tcpserver' : ''
         sh """
-            $payara_config.asadmin -p $payara_config.admin_port create-jvm-options $escaped_argline,output=tcpserver
+            $payara_config.asadmin -p $payara_config.admin_port create-jvm-options $escaped_argline$tcp_server_output
             $payara_config.asadmin -p $payara_config.admin_port restart-domain $payara_config.domaindir_args $payara_config.domain_name
         """
     }

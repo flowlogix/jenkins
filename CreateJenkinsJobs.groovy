@@ -376,3 +376,42 @@ multibranchPipelineJob('resume-builder') {
     defaultOrphanItemStrategy delegate
     discoverPullRequestFromForks delegate, true, 'TrustContributors'
 }
+
+multibranchPipelineJob('shiro') {
+    displayName 'Apache Shiro CI'
+    description 'Apache Shiro Continuous Integration'
+    branchSources {
+        branchSource {
+            source {
+                github {
+                    id '15413536'
+                    githubMain delegate, 'shiro', true
+                    githubParameters delegate, 'shiro-tests', false, false
+                }
+            }
+            suppressBranchTriggers delegate
+            buildStrategies {
+                skipInitialBuildOnFirstBranchIndexing()
+            }
+        }
+    }
+    factory {
+        remoteJenkinsFileWorkflowBranchProjectFactory {
+            githubScriptSource delegate, 'pom.xml', 'UnitTests.groovy'
+        }
+    }
+    triggers {
+        periodicFolderTrigger {
+            interval '1d'
+        }
+    }
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'payara', 'payara-lib'
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }
+    defaultOrphanItemStrategy delegate
+}

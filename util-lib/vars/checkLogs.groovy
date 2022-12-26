@@ -32,7 +32,7 @@ def call(String log_pattern, boolean checkConsole = true) {
             /org.eclipse.persistence.exceptions.DatabaseException[\s\S]*Internal Exception: java.sql.SQLException: / + 
             /java.lang.reflect.Undeclared[\s\S]*/),
             excludeMessage(/A system exception occurred during an invocation on EJB ProtectedStatelessBean, / + 
-            /method: public java.lang.String com.flowlogix.examples.shiro.ProtectedStatelessBean.hello()/),
+            /method: public java.lang.String .*ProtectedStatelessBean.hello()/),
             excludeMessage(/(javax|jakarta).ejb.EJBException: Attempting to perform a user-only operation.[\s\S]*/ +
             /The current Subject is not a user \(they haven't been authenticated or remembered from a previous login\)[\s\S]*/),
             excludeMessage(/#\{exceptionBean.throwExceptionFromMethod\(\)}: .*java.sql.SQLException: sql-from-method[\s\S]*/ +

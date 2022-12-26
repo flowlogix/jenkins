@@ -1,10 +1,9 @@
 @Library('payara') _l1
-final def profiles = "?payara-server-remote,?ui-test,?coverage"
+final def profiles = "?payara-server-remote,?ui-test,?coverage,?ci"
 def payara_config = [ domain_name : 'test-domain', jacoco_profile : profiles ]
-def ci_context = 'CI/unit-tests/pr-merge'
+def extra_build_options = ''
 
 @Library('util') _l2
-def guardParameters = [ : ]
 
 pipeline {
     agent any
@@ -20,6 +19,12 @@ pipeline {
                     -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
                 script {
                     currentBuild.description = "Working on git commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
+                    if (env.GIT_URL.contains('shiro')) {
+                        payara_config.jacoco_expr_args = '-pl :jakarta-ee-support'
+                        payara_config.force_start = true
+                        payara_config.jacoco_tcp_server = false
+                        extra_build_options = '-Djdk.version=11 -Dmaven.compiler.release=11'
+                    }
                 }
             }
         }
@@ -35,8 +40,8 @@ pipeline {
                     -Dwebdriver.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
                     -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
                     -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port \
-                    -DsslPort=$payara_config.ssl_port -DjacocoPort=$payara_config.jacoco_port
-                    """
+                    -DsslPort=$payara_config.ssl_port -DjacocoPort=$payara_config.jacoco_port \
+                    $extra_build_options"""
                 }
             }
         }
