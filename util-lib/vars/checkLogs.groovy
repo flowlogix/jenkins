@@ -11,7 +11,6 @@ def call(String log_pattern, boolean checkConsole = true) {
         filters: [ excludeFile('.*/generated-sources/.*'), excludeMessage('cannot find symbol'),
             excludeMessage('Skipping Delombok; no source to process.'),
             excludeMessage(/Can.+t extract module name from .*pom:.*/),
-            excludeMessage(/The POM for org.apache.maven.wagon:wagon-http-lightweight:jar:1.0-beta-2 is invalid,.*/),
             excludeMessage('No profiles detected!'), excludeMessage('Javadoc Warnings') ],
         name: 'Java Compiler', qualityGates: maximalQualityGates
 
