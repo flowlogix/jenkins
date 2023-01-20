@@ -23,7 +23,6 @@ pipeline {
                         payara_config.jacoco_expr_args = '-pl :jakarta-ee-support'
                         payara_config.force_start = true
                         payara_config.jacoco_tcp_server = false
-                        extra_build_options = '-Djdk.version=11 -Dmaven.compiler.release=11'
                     }
                 }
             }
