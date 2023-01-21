@@ -64,9 +64,8 @@ def call(def payara_config) {
     if (payara_config.jacoco_profile) {
         jacoco_profile_cmd = "-P$payara_config.jacoco_profile"
     }
-    def jacoco_argline = sh(script: "mvn initialize help:evaluate $jacoco_profile_cmd \
-        -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
-        -Dexpression=jacocoAgent -q -DforceStdout -DjacocoPort=$payara_config.jacoco_port -N \
+    def jacoco_argline = sh(script: "mvn -N -ntp initialize help:evaluate $jacoco_profile_cmd \
+        -Dexpression=jacocoAgent -q -DforceStdout -DjacocoPort=$payara_config.jacoco_port \
         $payara_config.jacoco_expr_args || exit 0",
         returnStdout: true).trim()
     if (jacoco_argline?.startsWith('-javaagent')) {

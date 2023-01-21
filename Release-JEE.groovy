@@ -32,8 +32,7 @@ pipeline {
                         release_profile = 'release-flowlogix-to-hope'
                     }
                 }
-                sh "mvn -V -N -B -C -P$profiles help:all-profiles \
-                    -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
+                sh "mvn -V -N -B -ntp -C -P$profiles help:all-profiles"
                 script {
                     currentBuild.description = "Working on git commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
                 }
@@ -44,8 +43,7 @@ pipeline {
                 startPayara payara_config
                 withMaven {
                     sh """
-                    mvn -B -C -P$profiles release:prepare release:perform \
-                    -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+                    mvn -B -ntp -C -P$profiles release:prepare release:perform \
                     -DreleaseVersion=$Version -Drelease.profile=$release_profile \
                     -Darguments=\"-Dauto.release=$releaseInMaven -DtrimStackTrace=false -Dcheckstyle.skip=true \
                     \$(eval echo \$MAVEN_ADD_OPTIONS) -Dwebdriver.chrome.binary='\$(eval echo \$CHROME_BINARY)' \
