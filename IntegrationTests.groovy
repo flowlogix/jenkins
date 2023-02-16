@@ -81,6 +81,9 @@ pipeline {
             }
             steps {
                 sh """
+                set +x; . "$HOME/.sdkman/bin/sdkman-init.sh"
+                sdk use maven 3.9.0
+                set -x
                 mvn -B -C jar:jar javadoc:jar source:jar-no-fork \
                 org.sonatype.plugins:nexus-staging-maven-plugin:deploy \
                 -fae -Dmaven.install.skip=true

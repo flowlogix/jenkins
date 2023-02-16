@@ -43,6 +43,9 @@ pipeline {
                 startPayara payara_config
                 withMaven {
                     sh """
+                    set +x; . "$HOME/.sdkman/bin/sdkman-init.sh"
+                    sdk use maven 3.9.0
+                    set -x
                     mvn -B -ntp -C -P$profiles release:prepare release:perform \
                     -DreleaseVersion=$Version -Drelease.profile=$release_profile \
                     -Darguments=\"-Dauto.release=$releaseInMaven -DtrimStackTrace=false -Dcheckstyle.skip=true \
