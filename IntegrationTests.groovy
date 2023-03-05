@@ -102,5 +102,10 @@ pipeline {
             githubNotify description: 'Deploy Snapshots', context: 'CI/Deploy', status: 'SUCCESS',
                 targetUrl: 'https://oss.sonatype.org/content/repositories/snapshots/com/flowlogix/'
         }
+        changed {
+            mail to: "lprimak@hope.nyc.ny.us", subject: "Jenkins: Project name -> ${env.JOB_NAME}",
+            body: "<b>Jenkins Status Change</b><br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br>Build URL: ${env.BUILD_URL}",
+            charset: 'UTF-8', mimeType: 'text/html'
+        }
     }
 }
