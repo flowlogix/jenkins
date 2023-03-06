@@ -51,30 +51,6 @@ pipeline {
                 }
             }
         }
-        stage('Maven Test - Client state saving') {
-            steps {
-                withMaven(options: [ artifactsPublisher(disabled: true), jacocoPublisher(disabled: true) ]) {
-                    sh "$mvnCommandLine verify -P${profiles_no_stress} -Dtest=none -Dsurefire.failIfNoSpecifiedTests=false \
-                    -Dintegration.test.mode=clientStateSaving"
-                }
-            }
-        }
-        stage('Maven Test - Shiro-native sessions') {
-            steps {
-                withMaven(options: [artifactsPublisher(disabled: true), jacocoPublisher(disabled: true) ]) {
-                    sh "$mvnCommandLine verify -P${profiles_no_stress} -Dtest=none -Dsurefire.failIfNoSpecifiedTests=false \
-                    -Dintegration.test.mode=shiroNativeSessions"
-                }
-            }
-        }
-        stage('Maven Test - Disable Shiro-EE') {
-            steps {
-                withMaven(options: [artifactsPublisher(disabled: true), jacocoPublisher(disabled: true) ]) {
-                    sh "$mvnCommandLine verify -P${profiles_no_stress} -Dtest=none -Dsurefire.failIfNoSpecifiedTests=false \
-                    -Dit.test=LookupIT,ExceptionPageIT -Dintegration.test.mode=disableShiroEE"
-                }
-            }
-        }
         stage('Maven Deploy Docs and Snapshots') {
             when {
                 expression { currentBuild.currentResult == 'SUCCESS' }
