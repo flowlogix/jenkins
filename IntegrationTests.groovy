@@ -80,7 +80,8 @@ pipeline {
         }
         changed {
             mail to: "lprimak@hope.nyc.ny.us", subject: "Jenkins: Project name -> ${env.JOB_NAME}",
-            body: "<b>Jenkins Status Change</b><br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br>Build URL: ${env.BUILD_URL}",
+            body: "<b>Jenkins Build Status Change [${currentBuild.currentResult}]</b><br>" +
+                  "Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br>Build URL: ${env.BUILD_URL}",
             charset: 'UTF-8', mimeType: 'text/html'
         }
     }
