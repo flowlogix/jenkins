@@ -43,7 +43,7 @@ pipeline {
                 startPayara payara_config
                 sh """
                 set +x; . "$HOME/.sdkman/bin/sdkman-init.sh"
-                sdk use maven 3.9.0
+                sdk use maven 3.9.1
                 set -x
                 mvn -B -ntp -C -P$profiles release:prepare release:perform \
                 -DreleaseVersion=$Version -Drelease.profile=$release_profile \
