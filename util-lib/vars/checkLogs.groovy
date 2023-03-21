@@ -11,6 +11,8 @@ def call(String log_pattern, boolean checkConsole = true) {
         filters: [ excludeFile('.*/generated-sources/.*'), excludeMessage('cannot find symbol'),
             excludeMessage('Skipping Delombok; no source to process.'),
             excludeMessage(/Can.+t extract module name from .*pom:.*/),
+            excludeMessage(/Parameter .+localRepository.+ is deprecated core expression.*/),
+            excludeMessage(/The requested profile .* could not be activated because it does not exist\./),
             excludeMessage('No profiles detected!'), excludeMessage('Javadoc Warnings') ],
         name: 'Java Compiler', qualityGates: maximalQualityGates
 
