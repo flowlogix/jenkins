@@ -43,16 +43,15 @@ def call(def payara_config) {
     }
 
     payara_config.domaindir_args = "--domaindir $workspace_base/payara_domaindir"
-    payara_config.ssl_port = sh(
-        script: """$payara_config.asadmin create-domain $payara_config.domaindir_args \
-                --nopassword --portbase $portbase $payara_config.domain_name \
-                | fgrep HTTP_SSL | awk '{print \$3}' || exit 0
-                """,
-        returnStdout: true).trim()
-    payara_config.admin_port = sh(
-        script: "$payara_config.asadmin list-domains $payara_config.domaindir_args --long --header=false \
-        | fgrep $payara_config.domain_name | awk '{print \$3}'",
-        returnStdout: true).trim()
+    sh """$payara_config.asadmin create-domain $payara_config.domaindir_args \
+       --nopassword --portbase $portbase $payara_config.domain_name"""
+
+    if (!payara_config.admin_port) {
+        payara_config.admin_port = portbase + 48
+    }
+    if (!payara_config.ssl_port) {
+        payara_config.ssl_port = portbase + 81
+    }
     sh """
         $payara_config.asadmin start-domain $payara_config.domaindir_args $payara_config.domain_name
         mkdir -p $tmpdir
