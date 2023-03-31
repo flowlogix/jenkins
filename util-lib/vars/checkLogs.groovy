@@ -41,7 +41,6 @@ def call(String log_pattern, boolean checkConsole = true) {
             /(javax|jakarta).faces.FacesException: #\{exceptionBean.throwExceptionFromMethod\(\)}:[\s\S]*/),
             excludeMessage(/The web application.*created a ThreadLocal.*value.*org.testng.internal.TestResult.*TestR.*/),
             excludeMessage(/Java SE.*is not fully supported yet.*Report this error to the EclipseLink.*/),
-            excludeMessage(/The .* class was compiled with an unsupported JDK. Report this error to the EclipseLink.*/),
             excludeMessage(/Exception while visiting sun\.security\.util\.KnownOIDs/),
             excludeMessage(/Unprocessed event : UnprocessedChangeEvent.*/) ]
     }
