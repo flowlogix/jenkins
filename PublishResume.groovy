@@ -15,7 +15,7 @@ pipeline {
             steps {
                 withMaven {
                     sh """ \
-                    set +x; . "$HOME/.sdkman/bin/sdkman-init.sh"
+                    set +x
                     export MAVEN_OPTS="\$MAVEN_OPTS $JAVA_TOOL_OPTIONS \
                         --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
                         --add-opens java.base/java.io=ALL-UNNAMED"
@@ -29,7 +29,6 @@ pipeline {
         stage('wkhtmltopdf - html-to-PDF') {
             steps {
                 sh """ \
-                rsync -aEH --delete-after target/output/ $HOME/var/website-content/resume/
                 for html_file in target/output/*.html
                 do
                     wkhtmltopdf --page-height 333mm --page-width 210mm \
@@ -46,6 +45,11 @@ pipeline {
                 'mirror -R -P7 -x .git --overwrite --delete --delete-excluded \
                 target/output hope_website/resume; exit top' $website_host
                 """
+            }
+        }
+        stage('Publish - App server') {
+            steps {
+                sh "rsync -aEH --delete-after target/output/ $HOME/var/website-content/resume/"
             }
         }
     }
