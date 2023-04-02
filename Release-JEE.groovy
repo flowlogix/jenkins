@@ -42,6 +42,7 @@ pipeline {
             steps {
                 startPayara payara_config
                 sh """
+                export MAVEN_OPTS="\$MAVEN_OPTS -Dsettings.security=$HOME/.m2/settings-security.xml"
                 mvn -B -ntp -C -P$profiles release:prepare release:perform \
                 -DreleaseVersion=$Version -Drelease.profile=$release_profile \
                 -Darguments=\"-Dauto.release=$releaseInMaven -DtrimStackTrace=false -Dcheckstyle.skip=true \
