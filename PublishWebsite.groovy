@@ -35,15 +35,20 @@ pipeline {
                 }
             }
         }
-        stage('JBake') {
+        stage('Maven - JBake') {
             steps {
-                sh """ \
-                set +x; . "$HOME/.sdkman/bin/sdkman-init.sh"
-                export JBAKE_OPTS='--add-opens java.base/sun.nio.ch=ALL-UNNAMED \
-                --add-opens java.base/java.io=ALL-UNNAMED'
-                set -x
-                jbake -b
-                """
+                withMaven {
+                    sh """ \
+                    set +x;
+                    export MAVEN_OPTS="\$MAVEN_OPTS $JAVA_TOOL_OPTIONS \
+                        --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
+                        --add-opens java.base/java.io=ALL-UNNAMED"
+                    unset JAVA_TOOL_OPTIONS
+                    cp -p ${env.WORKSPACE}/website-template/jbake-maven/pom.xml ${env.WORKSPACE}
+                    set -x
+                    mvn -B -C -ntp generate-resources
+                    """
+                }
             }
         }
         stage('Publish - Web Host') {
@@ -51,7 +56,7 @@ pipeline {
                 sh """ \
                 lftp -u \$ftpcreds_USR,\$ftpcreds_PSW -e \
                 'mirror -R -P7 -x resume/ --overwrite --delete \
-                output $website_root$website_subdir; exit top' $website_host
+                target/output $website_root$website_subdir; exit top' $website_host
                 """
             }
         }
@@ -64,7 +69,7 @@ pipeline {
                 }
             }
             steps {
-                sh "rsync -aEH --exclude resume/ --delete-after output/ $HOME/var/website-content$rsyncSuffix"
+                sh "rsync -aEH --exclude resume/ --delete-after target/output/ $HOME/var/website-content$rsyncSuffix"
             }
         }
     }
