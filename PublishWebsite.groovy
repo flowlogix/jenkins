@@ -44,7 +44,6 @@ pipeline {
                         --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
                         --add-opens java.base/java.io=ALL-UNNAMED"
                     unset JAVA_TOOL_OPTIONS
-                    cp -p ${env.WORKSPACE}/website-template/jbake-maven/pom.xml ${env.WORKSPACE}
                     set -x
                     mvn -B -C -ntp generate-resources
                     """
