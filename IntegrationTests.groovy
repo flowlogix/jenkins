@@ -51,16 +51,29 @@ pipeline {
                 }
             }
         }
-        stage('Maven Deploy Docs and Snapshots') {
+        stage('Maven Deploy Javadoc and Snapshots') {
             when {
                 expression { currentBuild.currentResult == 'SUCCESS' }
             }
             steps {
                 sh """
-                mvn -B -C jar:jar javadoc:jar source:jar-no-fork \
+                mvn -B -C -ntp jar:jar javadoc:jar source:jar-no-fork \
                 org.sonatype.plugins:nexus-staging-maven-plugin:deploy \
                 -fae -Dmaven.install.skip=true
                 """
+            }
+        }
+        stage('Maven Deploy documentation') {
+            when {
+                expression { currentBuild.currentResult == 'SUCCESS' && fileExists("${env.WORKSPACE}/docs/") }
+            }
+            steps {
+                sh """
+                export MAVEN_OPTS="\$MAVEN_OPTS --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
+                    --add-opens java.base/java.io=ALL-UNNAMED"
+                mvn -B -C -ntp process-resources -f ${env.WORKSPACE}/docs/
+                """
+                // TODO: deploy docs to the web site
             }
         }
     }
