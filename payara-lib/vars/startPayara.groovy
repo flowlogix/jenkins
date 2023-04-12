@@ -63,9 +63,9 @@ def call(def payara_config) {
     if (payara_config.jacoco_profile) {
         jacoco_profile_cmd = "-P$payara_config.jacoco_profile"
     }
-    def jacoco_argline = sh(script: "mvn -N -ntp initialize help:evaluate $jacoco_profile_cmd \
+    def jacoco_argline = sh(script: "mvn -ntp initialize help:evaluate $jacoco_profile_cmd \
         -Dexpression=jacocoAgent -q -DforceStdout -DjacocoPort=$payara_config.jacoco_port \
-        $payara_config.jacoco_expr_args || exit 0",
+        ${payara_config.jacoco_tcp_server ? '-N' : ''} $payara_config.jacoco_expr_args || exit 0",
         returnStdout: true).trim()
     if (jacoco_argline?.startsWith('-javaagent')) {
         def escaped_argline = jacoco_argline.replaceAll(/[\/:=]/, /\\\\$0/).replaceAll(/[$]/, /\\$0/)
