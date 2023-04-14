@@ -326,6 +326,13 @@ multibranchPipelineJob('flowlogix-website-builder') {
             githubScriptSource delegate, '', 'PublishWebsite.groovy'
         }
     }
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }
     defaultOrphanItemStrategy delegate
     discoverPullRequestFromForks delegate, true, 'TrustContributors'
 }
@@ -350,6 +357,13 @@ multibranchPipelineJob('hope-website-builder') {
             githubScriptSource delegate, '', 'PublishWebsite.groovy'
         }
     }
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }
     defaultOrphanItemStrategy delegate
     discoverPullRequestFromForks delegate, true, 'TrustContributors'
 }
@@ -371,6 +385,13 @@ multibranchPipelineJob('resume-builder') {
     factory {
         remoteJenkinsFileWorkflowBranchProjectFactory {
             githubScriptSource delegate, '', 'PublishResume.groovy'
+        }
+    }
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'util', 'util-lib'
+            }
         }
     }
     defaultOrphanItemStrategy delegate
