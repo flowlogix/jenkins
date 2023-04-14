@@ -1,4 +1,5 @@
-final def website_host = 'web154.dnchosting.com'
+@Library('util') _
+
 def website_root = 'hope_website'
 def website_subdir = ''
 def targetUrlSuffix = 'hope.nyc.ny.us'
@@ -55,7 +56,7 @@ pipeline {
                 sh """ \
                 lftp -u \$ftpcreds_USR,\$ftpcreds_PSW -e \
                 'mirror -R -P7 -x resume/ --overwrite --delete \
-                target/output $website_root$website_subdir; exit top' $website_host
+                target/output $website_root$website_subdir; exit top' ${websiteHost()}
                 """
             }
         }

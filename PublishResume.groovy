@@ -1,4 +1,4 @@
-final def website_host = 'web154.dnchosting.com'
+@Library('util') _
 
 pipeline {
     agent any
@@ -46,7 +46,7 @@ pipeline {
                 sh """ \
                 lftp -u \$ftpcreds_USR,\$ftpcreds_PSW -e \
                 'mirror -R -P7 -x .git --overwrite --delete --delete-excluded \
-                target/output hope_website/resume; exit top' $website_host
+                target/output hope_website/resume; exit top' ${websiteHost()}
                 """
             }
         }
