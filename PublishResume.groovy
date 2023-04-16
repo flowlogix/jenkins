@@ -23,6 +23,11 @@ pipeline {
                 }
             }
         }
+        stage('Intermediate - Publish Resume Locally') {
+            steps {
+                sh "rsync -aEH target/output/ $HOME/var/website-content/resume/"
+            }
+        }
         stage('wkhtmltopdf - html-to-PDF') {
             steps {
                 sh """ \
