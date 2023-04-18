@@ -43,7 +43,7 @@ pipeline {
                         --add-opens java.base/java.io=ALL-UNNAMED"
                     unset JAVA_TOOL_OPTIONS
                     set -x
-                    mvn -B -C -ntp generate-resources
+                    mvn -B -C -ntp -f jbake-maven generate-resources
                     """
                 }
             }
