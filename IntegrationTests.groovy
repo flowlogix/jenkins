@@ -71,7 +71,7 @@ pipeline {
                     sh """
                     export MAVEN_OPTS="\$MAVEN_OPTS --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
                         --add-opens java.base/java.io=ALL-UNNAMED"
-                    mvn -B -C -ntp process-resources -Dsass.skip=true -f ${env.WORKSPACE}/docs/
+                    mvn -B -C -ntp process-resources -Dsass.skip=true -f ${env.WORKSPACE}/docs/jbake-maven/
                     lftp -u \$ftpcreds_USR,\$ftpcreds_PSW -e 'mirror -R -P7 --overwrite --delete \
                     ${env.WORKSPACE}/docs/target/output flowlogix_docs; exit top' ${websiteHost()}
                     """
