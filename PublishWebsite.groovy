@@ -4,6 +4,7 @@ def website_root = 'hope_website'
 def website_subdir = ''
 def targetUrlSuffix = 'hope.nyc.ny.us'
 def rsyncSuffix = ''
+def mavenParamsFromFile = ''
 
 pipeline {
     agent any
@@ -30,6 +31,10 @@ pipeline {
                             website_root += '_pr'
                             website_subdir = "/$env.GIT_BRANCH"
                     }
+                    def mavenParamFileName = "$WORKSPACE/.jenkins_maven_args"
+                    if (fileExists(mavenParamFileName)) {
+                        mavenParamsFromFile = readFile(file: mavenParamFileName).trim()
+                    }
                 }
             }
         }
@@ -43,7 +48,7 @@ pipeline {
                         --add-opens java.base/java.io=ALL-UNNAMED"
                     unset JAVA_TOOL_OPTIONS
                     set -x
-                    mvn -B -C -ntp -f jbake-maven generate-resources
+                    mvn -B -C -ntp -f jbake-maven $mavenParamsFromFile generate-resources
                     """
                 }
             }
