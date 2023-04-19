@@ -186,7 +186,7 @@ def triggerPullRequestBuild = {
                 properties {
                 "com.adobe.jenkins.github__pr__comment__build.$branchPropType" {
                         commentBody commentBodyStr
-                        allowUntrusted false
+                        minimumPermissions 'WRITE'
                     }
                 }
             }
