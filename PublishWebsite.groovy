@@ -5,6 +5,7 @@ def website_subdir = ''
 def targetUrlSuffix = 'hope.nyc.ny.us'
 def rsyncSuffix = ''
 def mavenParamsFromFile = ''
+def jbake_maven_project = 'jbake-maven'
 
 pipeline {
     agent any
@@ -48,7 +49,7 @@ pipeline {
                         --add-opens java.base/java.io=ALL-UNNAMED"
                     unset JAVA_TOOL_OPTIONS
                     set -x
-                    mvn -B -C -ntp -f jbake-maven $mavenParamsFromFile generate-resources
+                    mvn -B -C -ntp -f $jbake_maven_project $mavenParamsFromFile generate-resources
                     """
                 }
             }
@@ -59,7 +60,7 @@ pipeline {
                     sh """ \
                     lftp -u \$ftpcreds_USR,\$ftpcreds_PSW -e \
                     'mirror -R -P7 -x resume/ --overwrite --delete \
-                    target/output $website_root$website_subdir; exit top' ${websiteHost()}
+                    $jbake_maven_project/target/output $website_root$website_subdir; exit top' ${websiteHost()}
                     """
                 }
             }
@@ -73,7 +74,8 @@ pipeline {
                 }
             }
             steps {
-                sh "rsync -aEH --exclude resume/ --delete-after target/output/ $HOME/var/website-content$rsyncSuffix"
+                sh "rsync -aEH --exclude resume/ --delete-after \
+                    $jbake_maven_project/target/output/ $HOME/var/website-content$rsyncSuffix"
             }
         }
     }
