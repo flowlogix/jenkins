@@ -6,6 +6,7 @@ def targetUrlSuffix = 'hope.nyc.ny.us'
 def rsyncSuffix = ''
 def mavenParamsFromFile = ''
 def jbake_maven_project = 'jbake-maven'
+def jbake_props_file = 'jbake.properties'
 
 pipeline {
     agent any
@@ -36,6 +37,9 @@ pipeline {
                     if (fileExists(mavenParamFileName)) {
                         mavenParamsFromFile = readFile(file: mavenParamFileName).trim()
                     }
+                    def configContent = readFile "${WORKSPACE}/${jbake_props_file}"
+                    writeFile file: "${WORKSPACE}/${jbake_props_file}",
+                            text: configContent + "\ngit.commit=${env.GIT_COMMIT[0..7]}"
                 }
             }
         }
