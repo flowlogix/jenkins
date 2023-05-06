@@ -74,7 +74,12 @@ pipeline {
                         --add-opens java.base/java.io=ALL-UNNAMED"
                     mvn -B -C -ntp process-resources -Dsass.skip=true -f ${env.WORKSPACE}/docs/${jbake_maven_project}/
                     lftp -u \$ftpcreds_USR,\$ftpcreds_PSW -e 'mirror -R -P7 --overwrite --delete \
-                    ${env.WORKSPACE}/docs/$jbake_maven_project/target/output flowlogix_docs; exit top' ${websiteHost()}
+                    ${env.WORKSPACE}/docs/$jbake_maven_project/target/output flowlogix_docs; \
+                    mirror -R -P7 --overwrite --delete \
+                    ${env.WORKSPACE}/jakarta-ee/flowlogix-jee/target/apidocs flowlogix_apidocs/jee-apidocs; \
+                    mirror -R -P7 --overwrite --delete \
+                    ${env.WORKSPACE}/jakarta-ee/flowlogix-datamodel/target/apidocs flowlogix_apidocs/datamodel-apidocs; \
+                    exit top' ${websiteHost()}
                     """
                 }
             }
