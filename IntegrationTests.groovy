@@ -57,7 +57,7 @@ pipeline {
             }
             steps {
                 sh """
-                mvn -B -C -ntp jar:jar javadoc:jar source:jar-no-fork \
+                mvn -B -C -ntp validate jar:jar javadoc:jar source:jar-no-fork \
                 org.sonatype.plugins:nexus-staging-maven-plugin:deploy \
                 -fae -Dmaven.install.skip=true
                 """
