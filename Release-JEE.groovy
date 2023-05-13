@@ -45,10 +45,20 @@ pipeline {
                 export MAVEN_OPTS="\$MAVEN_OPTS -Dsettings.security=$HOME/.m2/settings-security.xml"
                 mvn -B -ntp -C -P$profiles release:prepare release:perform \
                 -DreleaseVersion=$Version -Drelease.profile=$release_profile \
-                -Darguments=\"-Dauto.release=$releaseInMaven -DtrimStackTrace=false -Dcheckstyle.skip=true \
+                -Darguments=\"-DtrimStackTrace=false -Dcheckstyle.skip=true \
                 \$(eval echo \$MAVEN_ADD_OPTIONS) -Dwebdriver.chrome.binary='\$(eval echo \$CHROME_BINARY)' \
                 -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port -DsslPort=$payara_config.ssl_port \"
                 """
+            }
+        }
+        stage('Maven Central - Close (and optionally Release)') {
+            when {
+                expression { release_profile == 'release-flowlogix-to-central' }
+            }
+            steps {
+                mavenCentralCredentials {
+                    sh "$HOME/infra/scripts/nexus/maven-central-release.sh${releaseInMaven.toBoolean() ? ' --release' : ''}"
+                }
             }
         }
     }
