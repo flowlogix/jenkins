@@ -47,7 +47,7 @@ pipeline {
             steps {
                 ftpCredentials {
                     sh """ \
-                    lftp -u \$ftpcreds_USR,\$ftpcreds_PSW -e \
+                    lftp -u \$ftpcreds_USR --env-password -e \
                     'mirror -R -P7 -x .git --overwrite --delete --delete-excluded \
                     target/output hope_website/resume; exit top' ${websiteHost()}
                     """

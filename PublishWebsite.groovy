@@ -62,7 +62,7 @@ pipeline {
             steps {
                 ftpCredentials {
                     sh """ \
-                    lftp -u \$ftpcreds_USR,\$ftpcreds_PSW -e \
+                    lftp -u \$ftpcreds_USR --env-password -e \
                     'mirror -R -P7 -x resume/ --overwrite --delete \
                     $jbake_maven_project/target/output $website_root$website_subdir; exit top' ${websiteHost()}
                     """

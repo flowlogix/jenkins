@@ -6,7 +6,7 @@ final String credentialsId = '8695b924-52bd-4fc2-9752-42041489b734'
 
 void call(Closure cl) {
     withCredentials([usernamePassword(credentialsId: credentialsId,
-            usernameVariable: 'ftpcreds_USR', passwordVariable: 'ftpcreds_PSW')]) {
+            usernameVariable: 'ftpcreds_USR', passwordVariable: 'LFTP_PASSWORD')]) {
         cl.call()
     }
 }
