@@ -57,7 +57,7 @@ pipeline {
             }
             steps {
                 mavenCentralCredentials {
-                    sh "$HOME/infra/scripts/nexus/maven-central-release.sh${releaseInMaven.toBoolean() ? ' --release' : ''}"
+                    sh "$HOME/infra/scripts/nexus/maven-central-release.sh com.flowlogix${releaseInMaven.toBoolean() ? ' --release' : ''}"
                 }
             }
         }
