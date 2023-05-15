@@ -34,7 +34,7 @@ pipeline {
                 }
                 sh "mvn -V -N -B -ntp -C -P$profiles help:all-profiles"
                 script {
-                    currentBuild.description = "Working on git commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
+                    currentBuild.description = "Commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
                 }
             }
         }

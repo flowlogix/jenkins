@@ -17,7 +17,7 @@ pipeline {
             steps {
                 sh "mvn -V -B -ntp -C -N -P$profiles help:all-profiles"
                 script {
-                    currentBuild.description = "Working on git commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
+                    currentBuild.description = "Commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
                     if (env.GIT_URL.contains('shiro')) {
                         payara_config.jacoco_expr_args = '-pl :jakarta-ee-support'
                         payara_config.payara_version = 'payara-5'

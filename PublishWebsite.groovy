@@ -19,7 +19,7 @@ pipeline {
         stage('Prep') {
             steps {
                 script {
-                    currentBuild.description = "Working on git commit ${env.GIT_COMMIT[0..7]} branch $env.GIT_BRANCH Node $env.NODE_NAME"
+                    currentBuild.description = "Commit ${env.GIT_COMMIT[0..7]} branch $env.GIT_BRANCH Node $env.NODE_NAME"
                     if (!env.GIT_URL.contains('hope')) {
                         echo 'Deploying Flow Logix web site'
                         website_root = 'flowlogix_website'
