@@ -57,7 +57,7 @@ pipeline {
             }
             steps {
                 sh """
-                mvn -B -C validate jar:jar javadoc:jar source:jar-no-fork \
+                mvn -B -C validate jar:jar jar:test-jar javadoc:jar source:jar-no-fork \
                 deploy:deploy -fae -Dmaven.install.skip=true -Dcheckstyle.skip=true
                 """
             }
