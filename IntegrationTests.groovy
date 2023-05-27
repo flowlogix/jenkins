@@ -64,7 +64,13 @@ pipeline {
         }
         stage('Maven Deploy documentation') {
             when {
-                expression { currentBuild.currentResult == 'SUCCESS' && fileExists("${env.WORKSPACE}/docs/") }
+                allOf {
+                    anyOf {
+                        branch "main"
+                        branch "master"
+                    }
+                    expression { currentBuild.currentResult == 'SUCCESS' && fileExists("${env.WORKSPACE}/docs/") }
+                }
             }
             steps {
                 ftpCredentials {
