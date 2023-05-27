@@ -9,7 +9,6 @@ def call(String log_pattern, boolean checkConsole = true) {
     }
     recordIssues enabledForFailure: true, aggregatingResults: true, tools: checkTools,
         filters: [ excludeFile('.*/generated-sources/.*'),
-            excludeMessage('Skipping Delombok; no source to process.'),
             excludeMessage('Unsupported element'),
             excludeMessage(/Can.+t extract module name from .*pom:.*/),
             excludeMessage(/The requested profile .* could not be activated because it does not exist\./),
@@ -40,8 +39,6 @@ def call(String log_pattern, boolean checkConsole = true) {
             excludeMessage(/#\{exceptionBean.throwExceptionFromMethod\(\)}: .*java.sql.SQLException: sql-from-method[\s\S]*/ +
             /(javax|jakarta).faces.FacesException: #\{exceptionBean.throwExceptionFromMethod\(\)}:[\s\S]*/),
             excludeMessage(/The web application.*created a ThreadLocal.*value.*org.testng.internal.TestResult.*TestR.*/),
-            excludeMessage(/Java SE.*is not fully supported yet.*Report this error to the EclipseLink.*/),
-            excludeMessage(/Exception while visiting sun\.security\.util\.KnownOIDs/),
             excludeMessage(/Unprocessed event : UnprocessedChangeEvent.*/) ]
     }
 }
