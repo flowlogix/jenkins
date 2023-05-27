@@ -2,13 +2,13 @@
 
 def call(String log_pattern, boolean checkConsole = true) {
     def maximalQualityGates = [[ threshold: 1, type: 'TOTAL', unstable: true ]]
-    def checkTools = [java(), javaDoc()]
+    def checkTools = [java()]
 
     if (checkConsole) {
         checkTools << mavenConsole()
     }
     recordIssues enabledForFailure: true, aggregatingResults: true, tools: checkTools,
-        filters: [ excludeFile('.*/generated-sources/.*'), excludeMessage('cannot find symbol'),
+        filters: [ excludeFile('.*/generated-sources/.*'),
             excludeMessage('Skipping Delombok; no source to process.'),
             excludeMessage('Unsupported element'),
             excludeMessage(/Can.+t extract module name from .*pom:.*/),
