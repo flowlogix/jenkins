@@ -12,11 +12,18 @@ def githubMain = {
 }
 
 def githubParameters = {
-    ctx, String ctxLabel, boolean useTypeSuffix = true, boolean excludeForks = true -> ctx.with {
+    ctx, String ctxLabel, String excludeWildcard, boolean useTypeSuffix = true,
+    boolean excludeForks = true -> ctx.with {
         apiUri 'https://api.github.com'
         traits {
             if (excludeForks) {
                 gitHubExcludeForkedRepositories()
+            }
+            if (excludeWildcard?.trim()) {
+                sourceWildcardFilter {
+                    includes '*'
+                    excludes excludeWildcard
+                }
             }
             gitHubBranchDiscovery { strategyId 1 }
             gitHubPullRequestDiscovery { strategyId 1 }
@@ -200,12 +207,12 @@ organizationFolder('flowlogix-org-repo') {
         github {
             repoOwner 'flowlogix'
             credentialsId org_credential
-            githubParameters delegate, 'unit-tests', true
+            githubParameters delegate, 'unit-tests', 'jbake-maven', true
         }
         github {
             repoOwner 'lprimak'
             credentialsId personal_credential
-            githubParameters delegate, 'unit-tests', true
+            githubParameters delegate, 'unit-tests', null, true
         }
         triggers {
             periodicFolderTrigger {
@@ -241,7 +248,7 @@ multibranchPipelineJob('flowlogix-ee-integration') {
                 github {
                     id '7234871'
                     githubMain delegate, 'flowlogix'
-                    githubParameters delegate, 'integration-tests', false, false
+                    githubParameters delegate, 'integration-tests', null, false, false
                 }
             }
             suppressBranchTriggers delegate
@@ -315,7 +322,7 @@ multibranchPipelineJob('flowlogix-website-builder') {
                 github {
                     id '41435354'
                     githubMain delegate, 'website'
-                    githubParameters delegate, 'PublishWebsite', false, false
+                    githubParameters delegate, 'PublishWebsite', null, false, false
                 }
             }
             buildBranchesAndPullRequests delegate, false, 'main master'
@@ -346,7 +353,7 @@ multibranchPipelineJob('hope-website-builder') {
                 github {
                     id '3451246'
                     githubMain delegate, 'hope-website', true
-                    githubParameters delegate, 'PublishWebsite', false, false
+                    githubParameters delegate, 'PublishWebsite', null, false, false
                 }
             }
             buildBranchesAndPullRequests delegate, false, 'main master'
@@ -376,7 +383,7 @@ multibranchPipelineJob('resume-builder') {
                 github {
                     id '15436536'
                     githubMain delegate, 'resume', true
-                    githubParameters delegate, 'PublishResume', false, false
+                    githubParameters delegate, 'PublishResume', null, false, false
                 }
             }
             buildBranchesAndPullRequests delegate, false, 'main master'
@@ -407,7 +414,7 @@ multibranchPipelineJob('shiro') {
                 github {
                     id '15413536'
                     githubMain delegate, 'shiro', true
-                    githubParameters delegate, 'shiro-tests', false, false
+                    githubParameters delegate, 'shiro-tests', null, false, false
                 }
             }
             suppressBranchTriggers delegate
