@@ -56,7 +56,8 @@ def call(def payara_config) {
         $payara_config.asadmin start-domain $payara_config.domaindir_args $payara_config.domain_name
         mkdir -p $tmpdir
         $payara_config.asadmin -p $payara_config.admin_port create-system-properties java.io.tmpdir=$tmpdir
-        """
+        $payara_config.asadmin -p $payara_config.admin_port create-jvm-options --add-opens=java.base/java.io=ALL-UNNAMED
+    """
 
     payara_config.jacoco_port = (payara_config.admin_port as int) + 10000
     def jacoco_profile_cmd = ''
@@ -72,7 +73,7 @@ def call(def payara_config) {
         def tcp_server_output = payara_config.jacoco_tcp_server ? ',output=tcpserver' : ''
         sh """
             $payara_config.asadmin -p $payara_config.admin_port create-jvm-options $escaped_argline$tcp_server_output
-            $payara_config.asadmin -p $payara_config.admin_port restart-domain $payara_config.domaindir_args $payara_config.domain_name
         """
     }
+    sh "$payara_config.asadmin -p $payara_config.admin_port restart-domain $payara_config.domaindir_args $payara_config.domain_name"
 }
