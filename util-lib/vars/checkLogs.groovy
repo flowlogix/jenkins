@@ -1,7 +1,7 @@
 // call the warnings-ng plugin
 
-def call(String log_pattern, boolean checkConsole = true) {
-    def maximalQualityGates = [[ threshold: 1, type: 'TOTAL', unstable: true ]]
+def call(String log_pattern, boolean checkConsole = true, qualityThreshold = 1) {
+    def maximalQualityGates = [[ threshold: qualityThreshold, type: 'TOTAL', unstable: true ]]
     def checkTools = [java()]
 
     if (checkConsole) {
