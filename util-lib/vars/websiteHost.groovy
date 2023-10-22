@@ -1,5 +1,5 @@
 // returns hosting provider hostname
 
 String call() {
-    'web154.dnchosting.com'
+    'flowlogix@web1.flowlogix.com'
 }

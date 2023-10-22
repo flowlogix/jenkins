@@ -73,20 +73,20 @@ pipeline {
                 }
             }
             steps {
-                ftpCredentials {
-                    sh """
-                    export MAVEN_OPTS="\$MAVEN_OPTS --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
-                        --add-opens java.base/java.io=ALL-UNNAMED"
-                    mvn -B -C -ntp process-resources -Dsass.skip=true -f ${env.WORKSPACE}/docs/${jbake_maven_project}/
-                    lftp -u \$ftpcreds_USR --env-password -e 'mirror -R -P7 --overwrite --delete \
-                    ${env.WORKSPACE}/docs/$jbake_maven_project/target/output flowlogix_docs; \
-                    mirror -R -P7 --overwrite --delete \
-                    ${env.WORKSPACE}/jakarta-ee/flowlogix-jee/target/apidocs flowlogix_apidocs/jee-apidocs; \
-                    mirror -R -P7 --overwrite --delete \
-                    ${env.WORKSPACE}/jakarta-ee/flowlogix-datamodel/target/apidocs flowlogix_apidocs/datamodel-apidocs; \
-                    exit top' ${websiteHost()}
-                    """
-                }
+                sh """
+                export MAVEN_OPTS="\$MAVEN_OPTS --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
+                    --add-opens java.base/java.io=ALL-UNNAMED"
+                mvn -B -C -ntp process-resources -Dsass.skip=true -f ${env.WORKSPACE}/docs/${jbake_maven_project}/
+
+                ssh ${websiteHost()} mkdir -p /var/flowlogix/html/javadoc/jee-apidocs \
+                                              /var/flowlogix/html/javadoc/datamodel-apidocs
+                rsync -aH --delete-after ${env.WORKSPACE}/docs/$jbake_maven_project/target/output/ \
+                    ${websiteHost()}:/var/flowlogix/html/docs/
+                rsync -aH --delete-after ${env.WORKSPACE}/jakarta-ee/flowlogix-jee/target/apidocs/ \
+                    ${websiteHost()}:/var/flowlogix/html/javadoc/jee-apidocs/
+                rsync -aH --delete-after ${env.WORKSPACE}/jakarta-ee/flowlogix-datamodel/target/apidocs/ \
+                    ${websiteHost()}:/var/flowlogix/html/javadoc/datamodel-apidocs/
+                """
             }
         }
     }
@@ -99,7 +99,7 @@ pipeline {
         }
         success {
             githubNotify description: 'Deploy Snapshots', context: 'CI/Deploy', status: 'SUCCESS',
-                targetUrl: 'https://oss.sonatype.org/content/repositories/snapshots/com/flowlogix/'
+                targetUrl: 'https://s01.oss.sonatype.org/content/repositories/snapshots/com/flowlogix/'
         }
         changed {
             mail to: "lprimak@hope.nyc.ny.us", subject: "Jenkins: Project name -> ${env.JOB_NAME}",

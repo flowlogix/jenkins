@@ -1,6 +1,6 @@
 @Library('util') _
 
-def website_root = 'hope_website'
+def website_root = 'hope'
 def website_subdir = ''
 def targetUrlSuffix = 'hope.nyc.ny.us'
 def rsyncSuffix = ''
@@ -22,7 +22,7 @@ pipeline {
                     currentBuild.description = "Commit ${env.GIT_COMMIT[0..7]} branch $env.GIT_BRANCH Node $env.NODE_NAME"
                     if (!env.GIT_URL.contains('hope')) {
                         echo 'Deploying Flow Logix web site'
-                        website_root = 'flowlogix_website'
+                        website_root = 'flowlogix'
                         targetUrlSuffix = 'flowlogix.com'
                         rsyncSuffix = '/flowlogix'
                     }
@@ -30,7 +30,7 @@ pipeline {
                         case ["master", "main"]:
                             break
                         default:
-                            website_root += '_pr'
+                            website_root = "pullrequest_" + website_root
                             website_subdir = "/$env.GIT_BRANCH"
                     }
                     def mavenParamFileName = "$WORKSPACE/.jenkins_maven_args"
@@ -60,13 +60,11 @@ pipeline {
         }
         stage('Publish - Web Host') {
             steps {
-                ftpCredentials {
-                    sh """ \
-                    lftp -u \$ftpcreds_USR --env-password -e \
-                    'mirror -R -P7 -x resume/ --overwrite --delete \
-                    $jbake_maven_project/target/output $website_root$website_subdir; exit top' ${websiteHost()}
-                    """
-                }
+                sh """
+                ssh ${websiteHost()} mkdir -p /var/flowlogix/html/${website_root}${website_subdir}
+                rsync -aH --exclude resume/ --delete-after $jbake_maven_project/target/output/ \
+                    ${websiteHost()}:/var/flowlogix/html/${website_root}${website_subdir}/
+                """
             }
         }
         stage('Publish - App server') {

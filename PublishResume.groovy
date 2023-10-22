@@ -45,13 +45,7 @@ pipeline {
         }
         stage('Publish - Web Host') {
             steps {
-                ftpCredentials {
-                    sh """ \
-                    lftp -u \$ftpcreds_USR --env-password -e \
-                    'mirror -R -P7 -x .git --overwrite --delete --delete-excluded \
-                    target/output hope_website/resume; exit top' ${websiteHost()}
-                    """
-                }
+                sh "rsync -aH --delete-after target/output/ ${websiteHost()}:/var/flowlogix/html/hope/resume/"
             }
         }
         stage('Publish - App server') {
