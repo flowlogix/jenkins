@@ -241,7 +241,7 @@ organizationFolder('flowlogix-org-repo') {
 
 multibranchPipelineJob('flowlogix-ee-integration') {
     displayName 'FlowLogix JEE Integration Tests'
-    description 'Flow Logix JavaEE Utility Libraries for Shiro and PrimeFaces'
+    description 'Flow Logix Components for Jakarta EE and PrimeFaces'
     branchSources {
         branchSource {
             source {
