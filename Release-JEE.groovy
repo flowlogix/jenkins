@@ -45,9 +45,9 @@ pipeline {
                 export MAVEN_OPTS="\$MAVEN_OPTS -Dsettings.security=$HOME/.m2/settings-security.xml"
                 mvn -B -ntp -C -P$profiles release:prepare release:perform \
                 -DreleaseVersion=$Version -Drelease.profile=$release_profile \
-                -Darguments=\"-DtrimStackTrace=false -Dcheckstyle.skip=true \
+                -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true \
                 \$(eval echo \$MAVEN_ADD_OPTIONS) -Dwebdriver.chrome.binary='\$(eval echo \$CHROME_BINARY)' \
-                -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port -DsslPort=$payara_config.ssl_port \"
+                -DadminPort=$payara_config.admin_port -DsslPort=$payara_config.ssl_port \"
                 """
             }
         }

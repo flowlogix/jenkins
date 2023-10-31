@@ -405,7 +405,7 @@ multibranchPipelineJob('resume-builder') {
     discoverPullRequestFromForks delegate, true, 'TrustContributors'
 }
 
-multibranchPipelineJob('shiro') {
+multibranchPipelineJob('apache-shiro-ci') {
     displayName 'Apache Shiro CI'
     description 'Apache Shiro Continuous Integration'
     branchSources {
@@ -442,4 +442,38 @@ multibranchPipelineJob('shiro') {
         }
     }
     defaultOrphanItemStrategy delegate
+}
+
+multibranchPipelineJob('apache-shiro-release') {
+    displayName 'Apache Shiro - Release'
+    branchSources {
+        branchSource {
+            source {
+                git {
+                    id '1948045'
+                    remote 'git@github.com:lprimak/shiro.git'
+                    credentialsId personal_credential
+                    traits {
+                        gitBranchDiscovery()
+                        wipeWorkspaceTrait()
+                    }
+                }
+            }
+            suppressBranchTriggers delegate
+        }
+    }
+    factory {
+        remoteJenkinsFileWorkflowBranchProjectFactory {
+            githubScriptSource delegate, 'pom.xml', 'Release-apache-shiro.groovy'
+        }
+    }
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'payara', 'payara-lib'
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }
+    defaultOrphanItemStrategy delegate, '1', '2'
 }
