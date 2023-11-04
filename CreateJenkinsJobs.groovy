@@ -477,3 +477,36 @@ multibranchPipelineJob('apache-shiro-release') {
     }
     defaultOrphanItemStrategy delegate, '1', '2'
 }
+
+multibranchPipelineJob('jakartaee-api-release') {
+    displayName 'Jakarta EE API - Release'
+    branchSources {
+        branchSource {
+            source {
+                git {
+                    id '1918647'
+                    remote 'git@github.com:flowlogix/jakartaee-api.git'
+                    credentialsId org_credential
+                    traits {
+                        gitBranchDiscovery()
+                        wipeWorkspaceTrait()
+                    }
+                }
+            }
+            suppressBranchTriggers delegate
+        }
+    }
+    factory {
+        remoteJenkinsFileWorkflowBranchProjectFactory {
+            githubScriptSource delegate, 'pom.xml', 'Release-jakartaee-api.groovy'
+        }
+    }
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }
+    defaultOrphanItemStrategy delegate, '1', '2'
+}

@@ -21,7 +21,7 @@ pipeline {
                         currentBuild.description = msg
                         error msg
                     }
-                    tag_name = "shiro-root-$Version"
+                    tag_name = "jakartaee-api-$Version"
                 }
                 sh "mvn -V -N -B -ntp -C help:all-profiles"
                 script {
@@ -29,13 +29,26 @@ pipeline {
                 }
             }
         }
-        stage('Maven - Release') {
+        stage('Maven - Update Versions') {
             steps {
                 sh """
-                mvn -B -ntp -C release:prepare release:perform -Dnexus-staging-profile= \
-                -DreleaseVersion=$Version -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true \
-                -DskipTests -Dgpg.skip -Djakartaee.it.skip=true -Dpayara.start.skip=true -Dpayara.restart.skip=true \
-                -DaltDeploymentRepository=hope-nexus-artifacts::https://nexus.hope.nyc.ny.us/repository/maven-releases/\"
+                gsed -ie "s/<skip>true<\\/skip>/<skip>false<\\/skip>/" pom.xml
+                mvn -B -ntp -C versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=$Version versions:set
+                git commit -am "[Release Version]"
+                """
+            }
+        }
+        stage('Tag Release') {
+            steps {
+                sh "git tag $tag_name"
+            }
+        }
+        stage('Maven - Deploy') {
+            steps {
+                sh """
+                mvn -B -ntp -C -Dmaven.install.skip=true -DtrimStackTrace=false \
+                -DaltDeploymentRepository=hope-nexus-artifacts::default::https://nexus.hope.nyc.ny.us/repository/maven-releases/ \
+                -Pdocs-profile deploy
                 """
             }
         }
