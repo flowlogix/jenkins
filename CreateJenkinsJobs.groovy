@@ -510,3 +510,36 @@ multibranchPipelineJob('jakartaee-api-release') {
     }
     defaultOrphanItemStrategy delegate, '1', '2'
 }
+
+multibranchPipelineJob('arquillian-dron-release') {
+    displayName 'Arquillian Drone - Release'
+    branchSources {
+        branchSource {
+            source {
+                git {
+                    id '1915412'
+                    remote 'git@github.com:flowlogix/arquillian-extension-drone.git'
+                    credentialsId org_credential
+                    traits {
+                        gitBranchDiscovery()
+                        wipeWorkspaceTrait()
+                    }
+                }
+            }
+            suppressBranchTriggers delegate
+        }
+    }
+    factory {
+        remoteJenkinsFileWorkflowBranchProjectFactory {
+            githubScriptSource delegate, 'pom.xml', 'Release-arquillian-drone.groovy'
+        }
+    }
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }
+    defaultOrphanItemStrategy delegate, '1', '2'
+}
