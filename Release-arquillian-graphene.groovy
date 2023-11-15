@@ -32,7 +32,7 @@ pipeline {
         stage('Maven - Update Versions') {
             steps {
                 sh """
-                mvn -B -ntp -C versions:set-property -DgenerateBackupPoms=false -Dversion.arquillian.drone=$droneVersion \
+                mvn -B -ntp -C -N versions:set-property -DgenerateBackupPoms=false -Dversion.arquillian.drone=$droneVersion \
                 -Dproperty=version.arquillian.drone -DnewVersion=$droneVersion
                 mvn -B -ntp -C versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=$Version versions:set
                 git commit -am "[Release Version]"

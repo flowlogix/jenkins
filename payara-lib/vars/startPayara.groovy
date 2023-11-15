@@ -72,7 +72,9 @@ def call(def payara_config) {
         def tcp_server_output = payara_config.jacoco_tcp_server ? ',output=tcpserver' : ''
         sh """
             $payara_config.asadmin -p $payara_config.admin_port create-jvm-options $escaped_argline$tcp_server_output
-            $payara_config.asadmin -p $payara_config.admin_port restart-domain $payara_config.domaindir_args $payara_config.domain_name
+            $payara_config.asadmin -p $payara_config.admin_port stop-domain $payara_config.domaindir_args $payara_config.domain_name
+            rm -rf $tmpdir/* $workspace_base/payara_domaindir/$payara_config.domain_name/osgi-cache/
+            $payara_config.asadmin -p $payara_config.admin_port start-domain $payara_config.domaindir_args $payara_config.domain_name
         """
     }
 }
