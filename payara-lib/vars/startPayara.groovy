@@ -56,6 +56,10 @@ def call(def payara_config) {
         $payara_config.asadmin start-domain $payara_config.domaindir_args $payara_config.domain_name
         mkdir -p $tmpdir
         $payara_config.asadmin -p $payara_config.admin_port create-system-properties java.io.tmpdir=$tmpdir
+        $payara_config.asadmin -p $payara_config.admin_port set \
+            configs.config.server-config.network-config.protocols.protocol.http-listener-1.http.http2-enabled=false
+        $payara_config.asadmin -p $payara_config.admin_port set \
+            configs.config.server-config.network-config.protocols.protocol.http-listener-2.http.http2-enabled=false
         """
 
     payara_config.jacoco_port = (payara_config.admin_port as int) + 10000
