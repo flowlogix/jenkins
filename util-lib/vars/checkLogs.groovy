@@ -38,6 +38,8 @@ def call(String log_pattern, boolean checkConsole = true, qualityThreshold = 1) 
             /The current Subject is not a user \(they haven't been authenticated or remembered from a previous login\)[\s\S]*/),
             excludeMessage(/#\{exceptionBean.throwExceptionFromMethod\(\)}: .*java.sql.SQLException: sql-from-method[\s\S]*/ +
             /(javax|jakarta).faces.FacesException: #\{exceptionBean.throwExceptionFromMethod\(\)}:[\s\S]*/),
+            excludeMessage(/WARNING: java.io.IOException: Connection is closed/),
+            excludeMessage(/JSF1064: Unable to find or serve resource.*/),
             excludeMessage(/The web application.*created a ThreadLocal.*value.*org.testng.internal.TestResult.*TestR.*/),
             excludeMessage(/Unprocessed event : UnprocessedChangeEvent.*/) ]
     }
