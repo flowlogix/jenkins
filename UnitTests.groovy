@@ -1,10 +1,9 @@
 @Library('payara') _l1
 @Library('util') _l2
 
-def profiles = "payara-server-remote,ui-test,coverage,ci"
+def profiles = 'payara-server-remote,ui-test,coverage,ci'
 def payara_config = [ domain_name : 'test-domain' ]
 def extra_build_options = ''
-
 
 payara_config << [ jacoco_profile : profiles ]
 
