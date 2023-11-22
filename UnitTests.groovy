@@ -24,9 +24,13 @@ pipeline {
                 }
             }
         }
-        stage('Maven Verify - Tests') {
+        stage('Start Payara') {
             steps {
                 startPayara payara_config
+            }
+        }
+        stage('Maven Verify - Tests') {
+            steps {
                 withMaven(options: [ jacocoPublisher(disabled: true) ]) {
                     sh """
                     export MAVEN_OPTS="\$MAVEN_OPTS $JAVA_TOOL_OPTIONS"
