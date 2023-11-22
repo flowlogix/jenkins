@@ -4,18 +4,16 @@
 import groovy.transform.Field
 
 @Field
-final def workspace_base = "$WORKSPACE/target/dependency"
-@Field
-final def tmpdir = "$workspace_base/tmpdir"
-@Field
 final def portbase = 4900 + (env.EXECUTOR_NUMBER as int) * 100
 @Field
 final def jenkinsPayaraFileName = "$WORKSPACE/.jenkins_payara"
 
 @Field
 final def payara_default_config =
-    [ domain_name : 'domain1', payara_version : 'current', asadmin : "$HOME/apps/payara/current/bin/asadmin",
-      force_start : false, jacoco_profile : '', jacoco_tcp_server : true, jacoco_expr_args : '']
+    [ domain_name : 'domain1', payara_version : 'current',
+      asadmin : "$HOME/apps/payara/current/bin/asadmin",
+      force_start : false, workspace_base : "$WORKSPACE/target/dependency",
+      jacoco_profile : '', jacoco_tcp_server : true, jacoco_expr_args : '' ]
 
 def call(def payara_config) {
     boolean payara_version_overridden = false
@@ -42,7 +40,7 @@ def call(def payara_config) {
         }
     }
 
-    payara_config.domaindir_args = "--domaindir $workspace_base/payara_domaindir"
+    payara_config.domaindir_args = "--domaindir $payara_config.workspace_base/payara_domaindir"
     sh """$payara_config.asadmin create-domain $payara_config.domaindir_args \
        --nopassword --portbase $portbase $payara_config.domain_name"""
 
@@ -54,8 +52,9 @@ def call(def payara_config) {
     }
     sh """
         $payara_config.asadmin start-domain $payara_config.domaindir_args $payara_config.domain_name
-        mkdir -p $tmpdir
-        $payara_config.asadmin -p $payara_config.admin_port create-system-properties java.io.tmpdir=$tmpdir
+        mkdir -p $payara_config.workspace_base/tmpdir
+        $payara_config.asadmin -p $payara_config.admin_port create-system-properties\
+            java.io.tmpdir=$payara_config.workspace_base/tmpdir
         """
 
     payara_config.jacoco_port = (payara_config.admin_port as int) + 10000

@@ -1,9 +1,12 @@
 @Library('payara') _l1
-final def profiles = "payara-server-remote,ui-test,coverage,ci"
-def payara_config = [ domain_name : 'test-domain', jacoco_profile : profiles ]
+@Library('util') _l2
+
+def profiles = "payara-server-remote,ui-test,coverage,ci"
+def payara_config = [ domain_name : 'test-domain' ]
 def extra_build_options = ''
 
-@Library('util') _l2
+
+payara_config << [ jacoco_profile : profiles ]
 
 pipeline {
     agent any
