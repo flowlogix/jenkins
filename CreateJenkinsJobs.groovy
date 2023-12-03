@@ -576,3 +576,36 @@ multibranchPipelineJob('arquillian-graphene-release') {
     }
     defaultOrphanItemStrategy delegate, '1', '2'
 }
+
+multibranchPipelineJob('weld-se-native-release') {
+    displayName 'Weld SE Native - Release'
+    branchSources {
+        branchSource {
+            source {
+                git {
+                    id '2944124'
+                    remote 'git@github.com:flowlogix/weld-se-native.git'
+                    credentialsId org_credential
+                    traits {
+                        gitBranchDiscovery()
+                        wipeWorkspaceTrait()
+                    }
+                }
+            }
+            suppressBranchTriggers delegate
+        }
+    }
+    factory {
+        remoteJenkinsFileWorkflowBranchProjectFactory {
+            githubScriptSource delegate, 'pom.xml', 'Release-weld-native.groovy'
+        }
+    }
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }
+    defaultOrphanItemStrategy delegate, '1', '2'
+}
