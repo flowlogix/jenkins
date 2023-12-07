@@ -11,15 +11,14 @@ pipeline {
     parameters {
         string(name: 'Version', description: 'Version number to release', trim: true)
         string(name: 'weldVersion', description: 'Weld version', trim: true)
-        string(name: 'weldSPIVersion', description: 'Weld SPI version', trim: true)
     }
 
     stages {
         stage('Check Versions') {
             steps {
                 script {
-                    if (Version.empty || weldVersion.empty || weldSPIVersion.empty) {
-                        def msg = 'Version, Weld/SPI versions cannot be empty'
+                    if (Version.empty || weldVersion.empty) {
+                        def msg = 'Version, Weld versions cannot be empty'
                         currentBuild.description = msg
                         error msg
                     }
@@ -35,8 +34,6 @@ pipeline {
                 sh """
                 mvn -B -ntp -C -N versions:set-property -DgenerateBackupPoms=false -Dweld.version=$weldVersion \
                 -Dproperty=weld.version -DnewVersion=$weldVersion
-                mvn -B -ntp -C -N versions:set-property -DgenerateBackupPoms=false -Dweld.spi.version=$weldSPIVersion \
-                -Dproperty=weld.spi.version -DnewVersion=$weldSPIVersion
                 mvn -B -ntp -C versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=$Version versions:set
                 git commit -am "[Release Version]"
                 """
