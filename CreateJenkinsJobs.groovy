@@ -13,7 +13,7 @@ def githubMain = {
 
 def githubParameters = {
     ctx, String ctxLabel, String excludeWildcard, boolean useTypeSuffix = true,
-    boolean excludeForks = true -> ctx.with {
+    boolean excludeForks = true, boolean trustPermissions = false -> ctx.with {
         apiUri 'https://api.github.com'
         traits {
             if (excludeForks) {
@@ -27,6 +27,16 @@ def githubParameters = {
             }
             gitHubBranchDiscovery { strategyId 1 }
             gitHubPullRequestDiscovery { strategyId 1 }
+            gitHubForkDiscovery {
+                strategyId 1
+                trust {
+                    if (trustPermissions) {
+                        gitHubTrustPermissions()
+                    } else {
+                        gitHubTrustContributors()
+                    }
+                }
+            }
             gitHubStatusChecks { name "CI/$ctxLabel/status" }
             cleanBeforeCheckoutTrait { extension { deleteUntrackedNestedRepositories true } }
             notificationContextTrait {
@@ -161,30 +171,6 @@ def buildBranchesAndPullRequests = {
     }
 }
 
-def discoverPullRequestFromForks = {
-    ctx, boolean isBranchSource, String trustStr ->
-    ctx.with {
-        configure {
-            def doTraits = {
-                def traits = it / 'traits'
-                traits << 'org.jenkinsci.plugins.github__branch__source.ForkPullRequestDiscoveryTrait' {
-                    strategyId 1
-                    trust(class: 'org.jenkinsci.plugins.github_branch_source.ForkPullRequestDiscoveryTrait$' + trustStr)
-                }
-            }
-            if (isBranchSource) {
-                (it / sources / data / 'jenkins.branch.BranchSource').findAll { it.name() == 'source' }.each {
-                    doTraits it
-                }
-            } else {
-                (it / navigators).findAll { it.name() == 'org.jenkinsci.plugins.github__branch__source.GitHubSCMNavigator' }.each {
-                    doTraits it
-                }
-            }
-        }
-    }
-}
-
 def triggerPullRequestBuild = {
     ctx, String branchPropType, String commentBodyStr ->
     ctx.with {
@@ -235,7 +221,6 @@ organizationFolder('flowlogix-org-repo') {
     }
 
     buildBranchesAndPullRequests delegate
-    discoverPullRequestFromForks delegate, false, 'TrustContributors'
     triggerPullRequestBuild delegate, 'TriggerPRCommentBranchProperty', '.*jenkins.*test.*'
 }
 
@@ -248,7 +233,7 @@ multibranchPipelineJob('flowlogix-ee-integration') {
                 github {
                     id '7234871'
                     githubMain delegate, 'flowlogix'
-                    githubParameters delegate, 'integration-tests', null, false, false
+                    githubParameters delegate, 'integration-tests', null, false, false, true
                 }
             }
             suppressBranchTriggers delegate
@@ -276,7 +261,6 @@ multibranchPipelineJob('flowlogix-ee-integration') {
         }
     }
     defaultOrphanItemStrategy delegate
-    discoverPullRequestFromForks delegate, true, 'TrustPermission'
 }
 
 multibranchPipelineJob('flowlogix-ee-release') {
@@ -341,7 +325,6 @@ multibranchPipelineJob('flowlogix-website-builder') {
         }
     }
     defaultOrphanItemStrategy delegate
-    discoverPullRequestFromForks delegate, true, 'TrustContributors'
 }
 
 multibranchPipelineJob('hope-website-builder') {
@@ -372,7 +355,6 @@ multibranchPipelineJob('hope-website-builder') {
         }
     }
     defaultOrphanItemStrategy delegate
-    discoverPullRequestFromForks delegate, true, 'TrustContributors'
 }
 
 multibranchPipelineJob('resume-builder') {
@@ -402,7 +384,6 @@ multibranchPipelineJob('resume-builder') {
         }
     }
     defaultOrphanItemStrategy delegate
-    discoverPullRequestFromForks delegate, true, 'TrustContributors'
 }
 
 multibranchPipelineJob('apache-shiro-ci') {
