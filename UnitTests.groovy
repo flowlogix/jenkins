@@ -22,6 +22,8 @@ pipeline {
                     currentBuild.description = "Commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
                     if (env.GIT_URL.contains('shiro')) {
                         shiroPayaraConfig payara_config
+                        // suppress OpenLiberty plugin warnings
+                        extra_build_options = '-Dorg.slf4j.simpleLogger.log.io.openliberty.tools.maven=error'
                     }
                 }
             }
