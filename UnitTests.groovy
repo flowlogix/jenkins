@@ -5,6 +5,7 @@ def profiles = 'payara-server-remote,ui-test,coverage,ci'
 def payara_config = [ domain_name : 'test-domain' ]
 def mvn_cmd = 'mvn'
 def extra_build_options = ''
+def mavenParamsFromFile = ''
 
 pipeline {
     agent any
@@ -24,6 +25,10 @@ pipeline {
                         extra_build_options = '-Dorg.slf4j.simpleLogger.log.io.openliberty.tools.maven=error'
                     }
                     payara_config << [ jacoco_profile : profiles ]
+                    def mavenParamFileName = "$WORKSPACE/.jenkins_maven_args"
+                    if (fileExists(mavenParamFileName)) {
+                        mavenParamsFromFile = readFile(file: mavenParamFileName).trim()
+                    }
                 }
             }
         }
@@ -48,7 +53,7 @@ pipeline {
                     -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
                     -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port \
                     -DsslPort=$payara_config.ssl_port -DjacocoPort=$payara_config.jacoco_port \
-                    $extra_build_options"""
+                    $extra_build_options $mavenParamsFromFile"""
                 }
             }
         }
