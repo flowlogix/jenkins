@@ -22,7 +22,7 @@ pipeline {
                         currentBuild.description = msg
                         error msg
                     }
-                    tag_name = "weld-se-native-$Version"
+                    tag_name = "weld-native-$Version"
                 }
                 script {
                     currentBuild.description = "Commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"

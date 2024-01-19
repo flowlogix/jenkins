@@ -558,14 +558,14 @@ multibranchPipelineJob('arquillian-graphene-release') {
     defaultOrphanItemStrategy delegate, '1', '2'
 }
 
-multibranchPipelineJob('weld-se-native-release') {
-    displayName 'Weld SE Native - Release'
+multibranchPipelineJob('weld-native-release') {
+    displayName 'Weld Native - Release'
     branchSources {
         branchSource {
             source {
                 git {
                     id '2944124'
-                    remote 'git@github.com:flowlogix/weld-se-native.git'
+                    remote 'git@github.com:flowlogix/weld-native.git'
                     credentialsId org_credential
                     traits {
                         gitBranchDiscovery()
