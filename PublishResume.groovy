@@ -45,6 +45,7 @@ pipeline {
         }
         stage('Publish - Web Host') {
             steps {
+                sh "ssh ${websiteHost()} mkdir -p /var/flowlogix/html/hope/resume"
                 sh "rsync -aH --delete-after target/output/ ${websiteHost()}:/var/flowlogix/html/hope/resume/"
             }
         }
