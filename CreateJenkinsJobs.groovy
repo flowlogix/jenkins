@@ -590,3 +590,36 @@ multibranchPipelineJob('weld-native-release') {
     }
     defaultOrphanItemStrategy delegate, '1', '2'
 }
+
+multibranchPipelineJob('payara-arquillian-release') {
+    displayName 'Payara Arquillian Connector - Release'
+    branchSources {
+        branchSource {
+            source {
+                git {
+                    id '2944633'
+                    remote 'git@github.com:flowlogix/ecosystem-arquillian-connectors.git'
+                    credentialsId org_credential
+                    traits {
+                        gitBranchDiscovery()
+                        wipeWorkspaceTrait()
+                    }
+                }
+            }
+            suppressBranchTriggers delegate
+        }
+    }
+    factory {
+        remoteJenkinsFileWorkflowBranchProjectFactory {
+            githubScriptSource delegate, 'pom.xml', 'Release-payara-arquillian.groovy'
+        }
+    }
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }
+    defaultOrphanItemStrategy delegate, '1', '2'
+}
