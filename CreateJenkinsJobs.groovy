@@ -578,7 +578,7 @@ multibranchPipelineJob('weld-native-release') {
     }
     factory {
         remoteJenkinsFileWorkflowBranchProjectFactory {
-            githubScriptSource delegate, 'pom.xml', 'Release-weld-native.groovy'
+            githubScriptSource delegate, 'pom.xml', 'Release-without-payara.groovy'
         }
     }
     properties {
