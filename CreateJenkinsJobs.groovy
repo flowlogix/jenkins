@@ -187,6 +187,16 @@ def triggerPullRequestBuild = {
     }
 }
 
+folder ('release-jobs') {
+    displayName('Software Release Jobs')
+    description('All Release Jobs go here')
+}
+
+folder ('content') {
+    displayName('Content Builders')
+    description('Web Sites, Resume, other content')
+}
+
 organizationFolder('flowlogix-org-repo') {
     displayName 'FlowLogix Org Unit Tests and PR Builder'
     organizations {
@@ -263,7 +273,7 @@ multibranchPipelineJob('flowlogix-ee-integration') {
     defaultOrphanItemStrategy delegate
 }
 
-multibranchPipelineJob('flowlogix-ee-release') {
+multibranchPipelineJob('release-jobs/flowlogix-ee-release') {
     displayName 'Release FlowLogix JEE'
     branchSources {
         branchSource {
@@ -297,7 +307,7 @@ multibranchPipelineJob('flowlogix-ee-release') {
     defaultOrphanItemStrategy delegate, '1', '2'
 }
 
-multibranchPipelineJob('flowlogix-website-builder') {
+multibranchPipelineJob('content/flowlogix-website-builder') {
     displayName 'Flow Logix Web Site Publisher'
     description 'Hope and Flow Logix Web Site Publisher'
     branchSources {
@@ -327,7 +337,7 @@ multibranchPipelineJob('flowlogix-website-builder') {
     defaultOrphanItemStrategy delegate
 }
 
-multibranchPipelineJob('hope-website-builder') {
+multibranchPipelineJob('content/hope-website-builder') {
     displayName 'Hope Web Site Publisher'
     description 'Hope and Flow Logix Web Site Publisher'
     branchSources {
@@ -357,7 +367,7 @@ multibranchPipelineJob('hope-website-builder') {
     defaultOrphanItemStrategy delegate
 }
 
-multibranchPipelineJob('resume-builder') {
+multibranchPipelineJob('content/resume-builder') {
     displayName 'Resume Builder'
     branchSources {
         branchSource {
@@ -425,7 +435,7 @@ multibranchPipelineJob('apache-shiro-ci') {
     defaultOrphanItemStrategy delegate
 }
 
-multibranchPipelineJob('apache-shiro-release') {
+multibranchPipelineJob('release-jobs/apache-shiro-release') {
     displayName 'Apache Shiro - Release'
     branchSources {
         branchSource {
@@ -459,7 +469,7 @@ multibranchPipelineJob('apache-shiro-release') {
     defaultOrphanItemStrategy delegate, '1', '2'
 }
 
-multibranchPipelineJob('jakartaee-api-release') {
+multibranchPipelineJob('release-jobs/jakartaee-api-release') {
     displayName 'Jakarta EE API - Release'
     branchSources {
         branchSource {
@@ -492,7 +502,7 @@ multibranchPipelineJob('jakartaee-api-release') {
     defaultOrphanItemStrategy delegate, '1', '2'
 }
 
-multibranchPipelineJob('arquillian-drone-release') {
+multibranchPipelineJob('release-jobs/arquillian-drone-release') {
     displayName 'Arquillian Drone - Release'
     branchSources {
         branchSource {
@@ -525,7 +535,7 @@ multibranchPipelineJob('arquillian-drone-release') {
     defaultOrphanItemStrategy delegate, '1', '2'
 }
 
-multibranchPipelineJob('arquillian-graphene-release') {
+multibranchPipelineJob('release-jobs/arquillian-graphene-release') {
     displayName 'Arquillian Graphene - Release'
     branchSources {
         branchSource {
@@ -558,7 +568,7 @@ multibranchPipelineJob('arquillian-graphene-release') {
     defaultOrphanItemStrategy delegate, '1', '2'
 }
 
-multibranchPipelineJob('weld-native-release') {
+multibranchPipelineJob('release-jobs/weld-native-release') {
     displayName 'Weld Native - Release'
     branchSources {
         branchSource {
@@ -591,7 +601,7 @@ multibranchPipelineJob('weld-native-release') {
     defaultOrphanItemStrategy delegate, '1', '2'
 }
 
-multibranchPipelineJob('payara-arquillian-release') {
+multibranchPipelineJob('release-jobs/payara-arquillian-release') {
     displayName 'Payara Arquillian Connector - Release'
     branchSources {
         branchSource {
@@ -624,7 +634,7 @@ multibranchPipelineJob('payara-arquillian-release') {
     defaultOrphanItemStrategy delegate, '1', '2'
 }
 
-multibranchPipelineJob('base-pom-release') {
+multibranchPipelineJob('release-jobs/base-pom-release') {
     displayName 'Base Maven POM - Release'
     branchSources {
         branchSource {
@@ -657,7 +667,7 @@ multibranchPipelineJob('base-pom-release') {
     defaultOrphanItemStrategy delegate, '1', '2'
 }
 
-multibranchPipelineJob('faces-affinity-release') {
+multibranchPipelineJob('release-jobs/faces-affinity-release') {
     displayName 'Jakarta Faces Affinity - Release'
     branchSources {
         branchSource {
