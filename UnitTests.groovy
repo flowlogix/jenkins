@@ -1,9 +1,10 @@
 @Library('payara') _l1
 @Library('util') _l2
 
-def profiles = 'payara-server-remote,ui-test,coverage,ci'
+def profiles = 'payara-server-remote,ui-test,ci'
 def payara_config = [ domain_name : 'test-domain' ]
 def mvn_cmd = 'mvn'
+def payara_build_options = ''
 def extra_build_options = ''
 def mavenParamsFromFile = ''
 
@@ -24,7 +25,7 @@ pipeline {
                         // suppress OpenLiberty plugin warnings
                         extra_build_options = '-Dorg.slf4j.simpleLogger.log.io.openliberty.tools.maven=error'
                     }
-                    payara_config << [ jacoco_profile : profiles ]
+                    payara_config << [ jacoco_profile : profiles + ',coverage' ]
                     def mavenParamFileName = "$WORKSPACE/.jenkins_maven_args"
                     if (fileExists(mavenParamFileName)) {
                         mavenParamsFromFile = readFile(file: mavenParamFileName).trim()
@@ -40,6 +41,15 @@ pipeline {
         stage('Start Payara') {
             steps {
                 startPayara payara_config
+                script {
+                    if (payara_config.asadmin) {
+                        profiles += ',coverage-remote'
+                        payara_build_options = "-DadminPort=$payara_config.admin_port -DsslPort=$payara_config.ssl_port \
+                                                -DjacocoPort=$payara_config.jacoco_port"
+                    } else {
+                        profiles += ',coverage'
+                    }
+                }
             }
         }
         stage('Maven Verify - Tests') {
@@ -51,8 +61,7 @@ pipeline {
                     $mvn_cmd -B -ntp -C verify -fae -P$profiles \$(eval echo \$MAVEN_ADD_OPTIONS) \
                     -Dwebdriver.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
                     -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
-                    -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port \
-                    -DsslPort=$payara_config.ssl_port -DjacocoPort=$payara_config.jacoco_port \
+                    -Dmaven.install.skip=true $payara_build_options \
                     $extra_build_options $mavenParamsFromFile"""
                 }
             }
