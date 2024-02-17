@@ -656,3 +656,36 @@ multibranchPipelineJob('base-pom-release') {
     }
     defaultOrphanItemStrategy delegate, '1', '2'
 }
+
+multibranchPipelineJob('faces-affinity-release') {
+    displayName 'Jakarta Faces Affinity - Release'
+    branchSources {
+        branchSource {
+            source {
+                git {
+                    id '28438712'
+                    remote 'git@github.com:flowlogix/faces-affinity.git'
+                    credentialsId org_credential
+                    traits {
+                        gitBranchDiscovery()
+                        wipeWorkspaceTrait()
+                    }
+                }
+            }
+            suppressBranchTriggers delegate
+        }
+    }
+    factory {
+        remoteJenkinsFileWorkflowBranchProjectFactory {
+            githubScriptSource delegate, 'pom.xml', 'Release-without-payara.groovy'
+        }
+    }
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }
+    defaultOrphanItemStrategy delegate, '1', '2'
+}
