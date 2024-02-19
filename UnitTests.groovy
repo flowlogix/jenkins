@@ -42,7 +42,7 @@ pipeline {
             steps {
                 startPayara payara_config
                 script {
-                    if (payara_config.asadmin) {
+                    if (payara_config.jacoco_started) {
                         profiles += ',coverage-remote'
                         payara_build_options = "-DadminPort=$payara_config.admin_port -DsslPort=$payara_config.ssl_port \
                                                 -DjacocoPort=$payara_config.jacoco_port"

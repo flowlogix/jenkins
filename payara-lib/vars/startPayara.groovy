@@ -13,6 +13,7 @@ final def payara_default_config =
     [ domain_name : 'domain1', payara_version : 'current',
       asadmin : "$HOME/apps/payara/current/bin/asadmin",
       force_start : false, workspace_base : "$WORKSPACE/target/dependency",
+      jacoco_started: false,
       jacoco_profile : '', jacoco_tcp_server : true, jacoco_expr_args : '' ]
 
 def call(def payara_config) {
@@ -73,5 +74,6 @@ def call(def payara_config) {
             $payara_config.asadmin -p $payara_config.admin_port create-jvm-options $escaped_argline$tcp_server_output
             $payara_config.asadmin -p $payara_config.admin_port restart-domain $payara_config.domaindir_args $payara_config.domain_name
         """
+        payara_config.jacoco_started = true
     }
 }
