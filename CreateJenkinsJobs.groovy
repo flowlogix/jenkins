@@ -435,8 +435,8 @@ multibranchPipelineJob('apache-shiro-ci') {
     defaultOrphanItemStrategy delegate
 }
 
-multibranchPipelineJob('release-jobs/apache-shiro-release') {
-    displayName 'Apache Shiro - Release'
+multibranchPipelineJob('release-jobs/apache-shiro-fork-release') {
+    displayName 'Apache Shiro (fork) - Release'
     branchSources {
         branchSource {
             source {
@@ -461,7 +461,39 @@ multibranchPipelineJob('release-jobs/apache-shiro-release') {
     properties {
         folderLibraries {
             libraries {
-                libraryDef delegate, 'payara', 'payara-lib'
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }
+    defaultOrphanItemStrategy delegate, '1', '2'
+}
+
+multibranchPipelineJob('release-jobs/apache-shiro-release') {
+    displayName 'Apache Shiro - Release'
+    branchSources {
+        branchSource {
+            source {
+                git {
+                    id '1948073'
+                    remote 'git@github.com:apache/shiro.git'
+                    credentialsId personal_credential
+                    traits {
+                        gitBranchDiscovery()
+                        wipeWorkspaceTrait()
+                    }
+                }
+            }
+            suppressBranchTriggers delegate
+        }
+    }
+    factory {
+        remoteJenkinsFileWorkflowBranchProjectFactory {
+            githubScriptSource delegate, 'pom.xml', 'Release-apache-shiro.groovy'
+        }
+    }
+    properties {
+        folderLibraries {
+            libraries {
                 libraryDef delegate, 'util', 'util-lib'
             }
         }
