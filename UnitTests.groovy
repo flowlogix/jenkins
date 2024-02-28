@@ -6,6 +6,7 @@ def payara_config = [ domain_name : 'test-domain' ]
 def mvn_cmd = 'mvn'
 def payara_build_options = ''
 def mavenParamsFromFile = ''
+def qualityThreshold = 1
 
 pipeline {
     agent any
@@ -21,6 +22,7 @@ pipeline {
                     currentBuild.description = "Commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
                     if (env.GIT_URL.contains('shiro')) {
                         shiroPayaraConfig payara_config
+                        qualityThreshold = 2
                     }
                     payara_config << [ jacoco_profile : profiles + ',coverage' ]
                     def mavenParamFileName = "$WORKSPACE/.jenkins_maven_args"
@@ -67,7 +69,7 @@ pipeline {
         always {
             stopPayara payara_config
             archiveArtifacts artifacts: '**/logs/server.log*', allowEmptyArchive: true
-            checkLogs payara_config.asadmin ? '**/logs/server.log*' : null
+            checkLogs payara_config.asadmin ? '**/logs/server.log*' : null, true, qualityThreshold
         }
     }
 }
