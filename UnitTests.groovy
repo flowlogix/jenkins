@@ -5,7 +5,6 @@ def profiles = 'payara-server-remote,ui-test,ci'
 def payara_config = [ domain_name : 'test-domain' ]
 def mvn_cmd = 'mvn'
 def payara_build_options = ''
-def extra_build_options = ''
 def mavenParamsFromFile = ''
 
 pipeline {
@@ -22,8 +21,6 @@ pipeline {
                     currentBuild.description = "Commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
                     if (env.GIT_URL.contains('shiro')) {
                         shiroPayaraConfig payara_config
-                        // suppress OpenLiberty plugin warnings
-                        extra_build_options = '-Dorg.slf4j.simpleLogger.log.io.openliberty.tools.maven=error'
                     }
                     payara_config << [ jacoco_profile : profiles + ',coverage' ]
                     def mavenParamFileName = "$WORKSPACE/.jenkins_maven_args"
@@ -61,8 +58,7 @@ pipeline {
                     $mvn_cmd -B -ntp -C verify -fae -P$profiles \$(eval echo \$MAVEN_ADD_OPTIONS) \
                     -Dwebdriver.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
                     -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
-                    -Dmaven.install.skip=true $payara_build_options \
-                    $extra_build_options $mavenParamsFromFile"""
+                    -Dmaven.install.skip=true $payara_build_options $mavenParamsFromFile"""
                 }
             }
         }
