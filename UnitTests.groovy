@@ -1,7 +1,8 @@
 @Library('payara') _l1
 @Library('util') _l2
 
-def profiles = 'payara-server-remote,ui-test,ci'
+def mavenVersion = 3
+def profiles = optionalMavenProfiles mavenVersion, 'payara-server-remote,ui-test,ci'
 def payara_config = [ domain_name : 'test-domain' ]
 def mvn_cmd = 'mvn'
 def payara_build_options = ''
@@ -24,7 +25,7 @@ pipeline {
                         shiroPayaraConfig payara_config
                         qualityThreshold = 2
                     }
-                    payara_config << [ jacoco_profile : profiles + ',coverage' ]
+                    payara_config << [ jacoco_profile : profiles + optionalMavenProfiles(mavenVersion, ',coverage') ]
                     def mavenParamFileName = "$WORKSPACE/.jenkins_maven_args"
                     if (fileExists(mavenParamFileName)) {
                         mavenParamsFromFile = readFile(file: mavenParamFileName).trim()
@@ -42,11 +43,11 @@ pipeline {
                 startPayara payara_config
                 script {
                     if (payara_config.jacoco_started) {
-                        profiles += ',coverage-remote'
+                        profiles += optionalMavenProfiles mavenVersion, ',coverage-remote'
                         payara_build_options = "-DadminPort=$payara_config.admin_port -DsslPort=$payara_config.ssl_port \
                                                 -DjacocoPort=$payara_config.jacoco_port"
                     } else {
-                        profiles += ',coverage'
+                        profiles += optionalMavenProfiles mavenVersion, ',coverage'
                     }
                 }
             }
