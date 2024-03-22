@@ -3,5 +3,5 @@ def call(int mavenVersion, String profiles) {
     if (mavenVersion < 4) {
         return profiles
     }
-    '?' + profiles.replaceAll(',', ',?')
+    (profiles.startsWith(',') ? '' : '?') + profiles.replaceAll(',', ',?')
 }
