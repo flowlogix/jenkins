@@ -1,16 +1,22 @@
 @Library('payara') _l1
 @Library('util') _l2
 
-def mavenVersion = 3
+def mavenVersion = 4
 def profiles = optionalMavenProfiles mavenVersion, 'payara-server-remote,ui-test,ci'
-def payara_config = [ domain_name : 'test-domain' ]
+def payara_config = [ domain_name : 'test-domain', asadmin : '/usr/share/payara/bin/asadmin' ]
 def mvn_cmd = 'mvn'
 def payara_build_options = ''
 def mavenParamsFromFile = ''
 def qualityThreshold = 1
 
 pipeline {
-    agent any
+    agent {
+        docker {
+            label 'docker-agent'
+            reuseNode true
+            image 'lprimak/jenkins-agent'
+        }
+    }
 
     options {
         quietPeriod 0
