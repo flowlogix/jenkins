@@ -41,7 +41,8 @@ pipeline {
                 export MAVEN_OPTS="\$MAVEN_OPTS -Dsettings.security=$HOME/.m2/settings-security.xml"
                 mvn -B -ntp -C release:prepare release:perform \
                 -DreleaseVersion=$Version -Drelease.profile=$release_profile \
-                -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true \"
+                -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true \
+                -Dmaven.buildconsumer=false \"
                 """
             }
         }

@@ -43,7 +43,7 @@ pipeline {
                 mvn -B -ntp -C release:prepare release:perform -Dnexus-staging-profile=$nexus_staging_profile \
                 -DreleaseVersion=$Version -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true \
                 -DskipTests -Djakartaee.it.skip=true -Dpayara.start.skip=true -Dpayara.restart.skip=true \
-                $alt_repository \"
+                -Dmaven.buildconsumer=false $alt_repository \"
                 """
             }
         }

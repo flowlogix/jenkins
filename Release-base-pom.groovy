@@ -39,7 +39,7 @@ pipeline {
                 -DreleaseVersion=$Version -DtagNameFormat=Version-$Version \
                 -Dgoals=\"resources:resources jar:jar org.simplify4u.plugins:sign-maven-plugin:1.0.1:sign deploy\" \
                 -Darguments=\"-Dsign.serverId=\\"Flow Logix, Inc.\\" -Djar.skip-if-empty=true \
-                -Dmaven.install.skip=true -Dpayara.start.skip=true \
+                -Dmaven.install.skip=true -Dpayara.start.skip=true -Dmaven.buildconsumer=false \
                 -DaltDeploymentRepository=$repository_name::$repository_url \"
                 """
             }
