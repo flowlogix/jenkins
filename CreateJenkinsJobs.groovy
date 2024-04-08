@@ -699,6 +699,39 @@ multibranchPipelineJob('release-jobs/base-pom-release') {
     defaultOrphanItemStrategy delegate, '1', '2'
 }
 
+multibranchPipelineJob('release-jobs/depchain-release') {
+    displayName 'Dependency Chain - Release'
+    branchSources {
+        branchSource {
+            source {
+                git {
+                    id '28441297'
+                    remote 'git@github.com:flowlogix/depchain.git'
+                    credentialsId org_credential
+                    traits {
+                        gitBranchDiscovery()
+                        wipeWorkspaceTrait()
+                    }
+                }
+            }
+            suppressBranchTriggers delegate
+        }
+    }
+    factory {
+        remoteJenkinsFileWorkflowBranchProjectFactory {
+            githubScriptSource delegate, 'pom.xml', 'Release-base-pom.groovy'
+        }
+    }
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }
+    defaultOrphanItemStrategy delegate, '1', '2'
+}
+
 multibranchPipelineJob('release-jobs/faces-affinity-release') {
     displayName 'Jakarta Faces Affinity - Release'
     branchSources {
