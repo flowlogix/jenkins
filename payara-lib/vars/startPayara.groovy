@@ -7,6 +7,8 @@ import groovy.transform.Field
 final def portbase = 4900 + (env.EXECUTOR_NUMBER as int) * 100
 @Field
 final def jenkinsPayaraFileName = "$WORKSPACE/.jenkins_payara"
+@Field
+final def jenkinsJacocoFileName = "$WORKSPACE/.jenkins_no_remote_jacoco"
 
 @Field
 final def payara_default_config =
@@ -57,6 +59,10 @@ def call(def payara_config) {
         $payara_config.asadmin -p $payara_config.admin_port create-system-properties\
             java.io.tmpdir=$payara_config.workspace_base/tmpdir
         """
+
+    if (fileExists(jenkinsJacocoFileName)) {
+        return
+    }
 
     payara_config.jacoco_port = (payara_config.admin_port as int) + 10000
     def jacoco_profile_cmd = ''
