@@ -2,6 +2,7 @@
 
 def tag_name = ""
 def arquillian_version = '1.8.0.Final'
+def payara_version = '6.2024.4'
 
 pipeline {
     agent any
@@ -23,6 +24,9 @@ pipeline {
                         error msg
                     }
                     tag_name = "parent-payara-containers-$Version"
+                    if (env.GIT_BRANCH.contains('payara5')) {
+                        payara_version = '5.2022.5'
+                    }
                 }
                 sh "mvn -V -N -B -ntp -C help:all-profiles"
                 script {
@@ -45,7 +49,7 @@ pipeline {
                 sh """
                 mvn -B -ntp -C release:prepare release:perform \
                 -DreleaseVersion=$Version -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true \
-                -DskipTests -Dgpg.skip -Dversion.maven.enforcer.java.limit=28 -Dversion.payara=6.2024.1 \
+                -DskipTests -Dgpg.skip -Dversion.maven.enforcer.java.limit=28 -Dversion.payara=$payara_version \
                 -DaltDeploymentRepository=hope-nexus-artifacts::https://nexus.hope.nyc.ny.us/repository/maven-releases/\"
                 """
             }
