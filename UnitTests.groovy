@@ -2,7 +2,7 @@
 @Library('util') _l2
 
 def mavenVersion = 3
-def profiles = optionalMavenProfiles mavenVersion, 'payara-server-remote,ui-test,ci'
+def profiles = optionalMavenProfiles mavenVersion, 'payara-server-local,ui-test,ci'
 def payara_config = [ domain_name : 'test-domain' ]
 def mvn_cmd = 'mvn'
 def payara_build_options = ''
