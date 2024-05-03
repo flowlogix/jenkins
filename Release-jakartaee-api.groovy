@@ -54,7 +54,7 @@ pipeline {
                 sh """
                 mvn -B -ntp -C -Dmaven.install.skip=true -DtrimStackTrace=false \
                 -DaltDeploymentRepository=hope-nexus-artifacts::default::https://nexus.hope.nyc.ny.us/repository/maven-releases/ \
-                -Dparent.deploy.skip=false -Pdocs-profile deploy
+                -Dparent.deploy.skip=false -Pdocs-profile,staging deploy
                 """
             }
         }
