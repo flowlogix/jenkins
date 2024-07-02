@@ -1,8 +1,8 @@
 @Library('util') _l1
 
 def tag_name = ""
-def arquillian_version = '1.8.0.Final'
-def payara_version = '6.2024.4'
+def arquillian_version = '1.8.1.Final'
+def payara_version = '6.2024.6'
 
 pipeline {
     agent any
