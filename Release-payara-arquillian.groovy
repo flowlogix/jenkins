@@ -36,6 +36,13 @@ pipeline {
         }
         stage('Maven - Update Versions') {
             steps {
+                // use the following until source is restored to -SNAPSHOT version
+                sh """
+                mvn -B -ntp -C versions:set -DprocessAllModules=true -DgenerateBackupPoms=false \
+                -DoldVersion=3.0 -DnewVersion=3.x-SNAPSHOT versions:set
+                git commit -am "[Use SNAPSHOT version]"
+                """
+
                 sh """
                 mvn -B -ntp -C -N versions:set-property -DgenerateBackupPoms=false \
                 -Dversion.arquillian_core=$arquillian_version \
