@@ -1,8 +1,7 @@
 @Library('util') _l1
 
 def tag_name = ""
-def arquillian_version = '1.8.0.Final'
-def payara_version = '6.2024.4'
+def payara_version = '6.2024.6'
 
 pipeline {
     agent any
@@ -12,14 +11,15 @@ pipeline {
     }
     parameters {
         string(name: 'Version', description: 'Version number to release', trim: true)
+        string(name: 'arquillian_version', description: 'Arquillian Core version', trim: true)
     }
 
     stages {
         stage('Maven Info') {
             steps {
                 script {
-                    if (Version.empty) {
-                        def msg = 'Version cannot be empty'
+                    if (Version.empty || arquillian_version.empty) {
+                        def msg = 'Version or Arquillian Core version cannot be empty'
                         currentBuild.description = msg
                         error msg
                     }
