@@ -40,7 +40,7 @@ pipeline {
                 mvn -B -ntp -C -N versions:set-property -DgenerateBackupPoms=false \
                 -Dversion.arquillian_core=$arquillian_version \
                 -Dproperty=version.arquillian_core -DnewVersion=$arquillian_version
-                git commit -am "[Update Arquillian Core]"
+                git commit -am "[Update Arquillian Core]" || exit 0
                 """
             }
         }
