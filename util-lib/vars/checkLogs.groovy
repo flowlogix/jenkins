@@ -42,6 +42,7 @@ def call(String log_pattern, boolean checkConsole = true, qualityThreshold = 1) 
             excludeMessage(/java.io.IOException: Connection is closed/),
             excludeMessage(/JSF1064: Unable to find or serve resource.*/),
             excludeMessage(/The web application.*created a ThreadLocal.*value.*org.testng.internal.TestResult.*TestR.*/),
+            excludeMessage(/Setting .* is unknown and will be ignored/),
             excludeMessage(/Unprocessed event : UnprocessedChangeEvent.*/) ]
     }
 }
