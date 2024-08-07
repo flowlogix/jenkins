@@ -12,6 +12,7 @@ def call(String log_pattern, boolean checkConsole = true, qualityThreshold = 1) 
             excludeMessage('Unsupported element'),
             excludeMessage(/Can.+t extract module name from .*pom:.*/),
             excludeMessage(/The requested profile .* could not be activated because it does not exist\./),
+            excludeMessage(/.*problem.* was encountered while building the effective model.*/),
             excludeMessage('No profiles detected!'), excludeMessage('Javadoc Warnings') ],
         name: 'Java Compiler', qualityGates: maximalQualityGates
 
@@ -40,7 +41,9 @@ def call(String log_pattern, boolean checkConsole = true, qualityThreshold = 1) 
             /(javax|jakarta).faces.FacesException: #\{exceptionBean.throwExceptionFromMethod\(\)}:[\s\S]*/),
             excludeMessage(/java.io.IOException: Connection is closed/),
             excludeMessage(/JSF1064: Unable to find or serve resource.*/),
+            excludeMessage(/SLF4J\(I\): Connected with provider of type.*/),
             excludeMessage(/The web application.*created a ThreadLocal.*value.*org.testng.internal.TestResult.*TestR.*/),
+            excludeMessage(/Setting .* is unknown and will be ignored/),
             excludeMessage(/Unprocessed event : UnprocessedChangeEvent.*/) ]
     }
 }
