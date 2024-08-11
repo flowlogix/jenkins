@@ -719,7 +719,7 @@ multibranchPipelineJob('release-jobs/depchain-release') {
     }
     factory {
         remoteJenkinsFileWorkflowBranchProjectFactory {
-            githubScriptSource delegate, 'pom.xml', 'Release-base-pom.groovy'
+            githubScriptSource delegate, 'pom.xml', 'Release-without-payara.groovy'
         }
     }
     properties {
