@@ -13,6 +13,7 @@ def call(String log_pattern, boolean checkConsole = true, qualityThreshold = 1) 
             excludeMessage(/Can.+t extract module name from .*pom:.*/),
             excludeMessage(/The requested profile .* could not be activated because it does not exist\./),
             excludeMessage(/.*problem.* was encountered while building the effective model.*/),
+            excludeMessage(/JAR will be empty - no content was marked for inclusion!/),
             excludeMessage('No profiles detected!'), excludeMessage('Javadoc Warnings') ],
         name: 'Java Compiler', qualityGates: maximalQualityGates
 
