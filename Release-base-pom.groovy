@@ -32,16 +32,18 @@ pipeline {
                         repository_url = 'https://nexus.hope.nyc.ny.us/repository/maven-releases'
                     }
                 }
-                sh """
-                export MAVEN_OPTS="\$MAVEN_OPTS -Dsettings.security=$HOME/.m2/settings-security.xml"
-                mvn -B -ntp -C release:prepare release:perform \
-                -DpushChanges=false -DlocalCheckout=true \
-                -DreleaseVersion=$Version -DtagNameFormat=Version-$Version \
-                -Dgoals=\"resources:resources jar:jar org.simplify4u.plugins:sign-maven-plugin:1.0.1:sign deploy\" \
-                -Darguments=\"-Dsign.serverId=\\"Flow Logix, Inc.\\" -Djar.skip-if-empty=true \
-                -Dmaven.install.skip=true -Dpayara.start.skip=true \
-                -DaltDeploymentRepository=$repository_name::$repository_url \"
-                """
+                gpgSigningCredentials false, {
+                    sh """
+                    export MAVEN_OPTS="\$MAVEN_OPTS -Dsettings.security=$HOME/.m2/settings-security.xml"
+                    mvn -B -ntp -C release:prepare release:perform \
+                    -DpushChanges=false -DlocalCheckout=true \
+                    -DreleaseVersion=$Version -DtagNameFormat=Version-$Version \
+                    -Dgoals=\"resources:resources jar:jar gpg:sign deploy\" \
+                    -Darguments=\"-Dgpg.keyname=\\"Flow Logix, Inc.\\" -Djar.skip-if-empty=true \
+                    -Dmaven.install.skip=true -Dpayara.start.skip=true \
+                    -DaltDeploymentRepository=$repository_name::$repository_url \"
+                    """
+                }
             }
         }
         stage('Maven Central - Close (and optionally Release)') {
