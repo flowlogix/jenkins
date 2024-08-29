@@ -36,7 +36,7 @@ pipeline {
                                 export MAVEN_OPTS="\$(eval echo \$MAVEN_OPTS \$JAVA_TOOL_OPTIONS)"
                                 unset JAVA_TOOL_OPTIONS
                                 mvn -B -ntp -C -fae \$(eval echo \$MAVEN_ADD_OPTIONS) \
-                                -Dwebdriver.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
+                                -Ddrone.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
                                 -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
                                 -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port \
                                 -DsslPort=$payara_config.ssl_port -DjacocoPort=$payara_config.jacoco_port \
