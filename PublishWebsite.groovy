@@ -48,12 +48,13 @@ pipeline {
                 withMaven {
                     sh """ \
                     set +x;
-                    export MAVEN_OPTS="\$MAVEN_OPTS $JAVA_TOOL_OPTIONS \
+                    maven_interceptor_opts="$JAVA_TOOL_OPTIONS"
+                    export MAVEN_OPTS="\$MAVEN_OPTS \
                         --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
                         --add-opens java.base/java.io=ALL-UNNAMED"
                     unset JAVA_TOOL_OPTIONS
                     set -x
-                    mvn -B -C -ntp -f $jbake_maven_project $mavenParamsFromFile generate-resources
+                    mvn -B -C -ntp -f $jbake_maven_project $mavenParamsFromFile generate-resources \$maven_interceptor_opts
                     """
                 }
             }

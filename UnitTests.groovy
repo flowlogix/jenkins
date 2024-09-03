@@ -56,9 +56,9 @@ pipeline {
             steps {
                 withMaven(options: [ jacocoPublisher(disabled: true) ]) {
                     sh """
-                    export MAVEN_OPTS="\$MAVEN_OPTS $JAVA_TOOL_OPTIONS"
+                    maven_interceptor_opts="$JAVA_TOOL_OPTIONS"
                     unset JAVA_TOOL_OPTIONS
-                    $mvn_cmd -B -ntp -C verify -fae -P$profiles \$(eval echo \$MAVEN_ADD_OPTIONS) \
+                    $mvn_cmd -B -ntp -C verify -fae -P$profiles \$(eval echo \$MAVEN_ADD_OPTIONS) \$maven_interceptor_opts \
                     -Ddrone.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
                     -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
                     -Dmaven.install.skip=true $payara_build_options $mavenParamsFromFile"""
