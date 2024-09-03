@@ -33,10 +33,11 @@ pipeline {
                     script {
                         mvnCommandLine =
                             """
-                                export MAVEN_OPTS="\$(eval echo \$MAVEN_OPTS \$JAVA_TOOL_OPTIONS)"
+                                export MAVEN_OPTS="\$(eval echo \$MAVEN_OPTS)"
+                                maven_interceptor_opts="\$(eval echo \$JAVA_TOOL_OPTIONS)"
                                 unset JAVA_TOOL_OPTIONS
-                                mvn -B -ntp -C -fae \$(eval echo \$MAVEN_ADD_OPTIONS) \
-                                -Dwebdriver.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
+                                mvn -B -ntp -C -fae \$(eval echo \$MAVEN_ADD_OPTIONS) \$maven_interceptor_opts \
+                                -Ddrone.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
                                 -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
                                 -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port \
                                 -DsslPort=$payara_config.ssl_port -DjacocoPort=$payara_config.jacoco_port \
@@ -83,9 +84,9 @@ pipeline {
                                               /var/flowlogix/html/javadoc/datamodel-apidocs
                 rsync -aH --delete-after ${env.WORKSPACE}/docs/$jbake_maven_project/target/output/ \
                     ${websiteHost()}:/var/flowlogix/html/docs/
-                rsync -aH --delete-after ${env.WORKSPACE}/jakarta-ee/flowlogix-jee/target/apidocs/ \
+                rsync -aH --delete-after ${env.WORKSPACE}/jakarta-ee/flowlogix-jee/target/reports/apidocs/ \
                     ${websiteHost()}:/var/flowlogix/html/javadoc/jee-apidocs/
-                rsync -aH --delete-after ${env.WORKSPACE}/jakarta-ee/flowlogix-datamodel/target/apidocs/ \
+                rsync -aH --delete-after ${env.WORKSPACE}/jakarta-ee/flowlogix-datamodel/target/reports/apidocs/ \
                     ${websiteHost()}:/var/flowlogix/html/javadoc/datamodel-apidocs/
                 """
             }
