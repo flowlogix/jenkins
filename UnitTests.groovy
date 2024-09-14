@@ -3,14 +3,20 @@
 
 def mavenVersion = 4
 def profiles = optionalMavenProfiles mavenVersion, 'payara-server-local,ui-test,ci'
-def payara_config = [ domain_name : 'test-domain' ]
+def payara_config = [ domain_name : 'test-domain', asadmin : '/usr/share/payara/bin/asadmin' ]
 def mvn_cmd = 'mvn'
 def payara_build_options = ''
 def mavenParamsFromFile = ''
 def qualityThreshold = 1
 
 pipeline {
-    agent any
+    agent {
+        docker {
+            label 'docker-agent'
+            reuseNode true
+            image 'lprimak/jenkins-agent:m4-p5-jdk21'
+        }
+    }
 
     options {
         quietPeriod 0
@@ -23,7 +29,7 @@ pipeline {
                     currentBuild.description = "Commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
                     if (env.GIT_URL.contains('shiro')) {
                         shiroPayaraConfig payara_config
-                        qualityThreshold = 2
+                        qualityThreshold = 3
                     }
                     payara_config << [ jacoco_profile : profiles + optionalMavenProfiles(mavenVersion, ',coverage') ]
                     def mavenParamFileName = "$WORKSPACE/.jenkins_maven_args"
