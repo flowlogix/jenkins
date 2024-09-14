@@ -764,3 +764,36 @@ multibranchPipelineJob('release-jobs/faces-affinity-release') {
     }
     defaultOrphanItemStrategy delegate, '1', '2'
 }
+
+multibranchPipelineJob('release-jobs/shrinkwrap-resolver-release') {
+    displayName 'ShrinkWrap Resolver - Release'
+    branchSources {
+        branchSource {
+            source {
+                git {
+                    id '25464563'
+                    remote 'git@github.com:flowlogix/resolver.git'
+                    credentialsId org_credential
+                    traits {
+                        gitBranchDiscovery()
+                        wipeWorkspaceTrait()
+                    }
+                }
+            }
+            suppressBranchTriggers delegate
+        }
+    }
+    factory {
+        remoteJenkinsFileWorkflowBranchProjectFactory {
+            githubScriptSource delegate, 'pom.xml', 'Release-shrinkwrap-resolver.groovy'
+        }
+    }
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }
+    defaultOrphanItemStrategy delegate, '1', '2'
+}
