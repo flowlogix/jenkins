@@ -23,7 +23,7 @@ pipeline {
                     currentBuild.description = "Commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
                     if (env.GIT_URL.contains('shiro')) {
                         shiroPayaraConfig payara_config
-                        qualityThreshold = 2
+                        qualityThreshold = 3
                     }
                     payara_config << [ jacoco_profile : profiles + optionalMavenProfiles(mavenVersion, ',coverage') ]
                     def mavenParamFileName = "$WORKSPACE/.jenkins_maven_args"
