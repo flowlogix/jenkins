@@ -48,7 +48,7 @@ pipeline {
                     -DreleaseVersion=$Version -Drelease.profile=$release_profile -Dgoals=deploy \
                     -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true \
                     \$(eval echo \$MAVEN_ADD_OPTIONS) -Ddrone.chrome.binary='\$(eval echo \$CHROME_BINARY)' \
-                    -DadminPort=$payara_config.admin_port -DsslPort=$payara_config.ssl_port \"
+                    -DadminPort=$payara_config.admin_port -DhttpsPort=$payara_config.ssl_port \"
                     """
                 }
             }

@@ -40,7 +40,7 @@ pipeline {
                                 -Ddrone.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
                                 -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
                                 -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port \
-                                -DsslPort=$payara_config.ssl_port -DjacocoPort=$payara_config.jacoco_port \
+                                -DhttpsPort=$payara_config.ssl_port -DjacocoPort=$payara_config.jacoco_port \
                             """
                     }
                 }
