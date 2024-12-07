@@ -18,11 +18,14 @@ def call(String log_pattern, boolean checkConsole = true, qualityThreshold = 1) 
 
     def jacocoExecFiles = findFiles glob: '**/jacoco*.exec'
     if (jacocoExecFiles.length > 0) {
-        jacoco execPattern: '**/target/jacoco*.exec', classPattern: '**/target/classes-jacoco',
-            sourcePattern: '**/src/main/java', exclusionPattern: '**/src/test/java',
-            changeBuildStatus: true,
-            minimumLineCoverage: '60', maximumLineCoverage: '70',
-            minimumInstructionCoverage: '60', maximumInstructionCoverage: '70'
+        recordCoverage(tools: [[parser: 'JACOCO']],
+                id: 'jacoco', name: 'JaCoCo Coverage',
+                sourceCodeRetention: 'EVERY_BUILD',
+                sourceDirectories: [[path: 'glob:**/src/main/java']],
+                qualityGates: [
+                        [threshold: 80.0, metric: 'LINE', baseline: 'PROJECT', criticality: 'UNSTABLE'],
+                        [threshold: 70.0, metric: 'INSTRUCTION', baseline: 'PROJECT', criticality: 'UNSTABLE'],
+                        [threshold: 70.0, metric: 'BRANCH', baseline: 'PROJECT', criticality: 'UNSTABLE']])
     }
 
     if (log_pattern) {
