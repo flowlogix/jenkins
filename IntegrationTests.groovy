@@ -6,7 +6,6 @@ final def profiles_no_stress = optionalMavenProfiles mavenVersion, 'payara-serve
 def payara_config = [ domain_name : 'test-domain', jacoco_profile : profiles ]
 def mvnCommandLine
 def jbake_maven_project = 'jbake-maven'
-def jacoco_dump_cmd = ''
 
 pipeline {
     agent any
@@ -32,9 +31,6 @@ pipeline {
                 startPayara payara_config
                 withMaven {
                     script {
-                        if (payara_config.jacoco_started) {
-                            jacoco_dump_cmd = 'jacoco:dump'
-                        }
                         mvnCommandLine =
                             """
                                 export MAVEN_OPTS="\$(eval echo \$MAVEN_OPTS)"
@@ -59,7 +55,14 @@ pipeline {
         }
         stage('Maven - JaCoCo Coverage') {
             steps {
-                sh """mvn -B -ntp -C initialize $jacoco_dump_cmd jacoco:merge jacoco:report \
+                script {
+                    if (payara_config.jacoco_started) {
+                        sh """mvn -B -ntp -C initialize jacoco:dump \
+                              -Djacoco.destFile=$WORKSPACE/target/jacoco-it.exec \\
+                              -DjacocoPort=$payara_config.jacoco_port -N -P$profiles"""
+                    }
+                }
+                sh """mvn -B -ntp -C initialize jacoco:merge jacoco:report \
                     -DjacocoPort=$payara_config.jacoco_port -N -P$profiles"""
             }
         }

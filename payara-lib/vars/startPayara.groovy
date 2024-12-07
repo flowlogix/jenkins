@@ -71,7 +71,6 @@ def call(def payara_config) {
     }
     def jacoco_argline = sh(script: "mvn -ntp initialize help:evaluate $jacoco_profile_cmd \
         -Dexpression=jacocoAgent -q -DforceStdout -DjacocoPort=$payara_config.jacoco_port \
-        -Djacoco.destFile=$WORKSPACE/target/jacoco-it.exec \
         ${payara_config.jacoco_tcp_server ? '-N' : ''} $payara_config.jacoco_expr_args || exit 0",
         returnStdout: true).trim()
     if (jacoco_argline?.startsWith('-javaagent')) {
