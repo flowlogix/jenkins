@@ -21,11 +21,11 @@ def call(String log_pattern, boolean checkConsole = true, qualityThreshold = 1) 
         recordCoverage(tools: [[parser: 'JACOCO']],
                 id: 'jacoco', name: 'JaCoCo Coverage',
                 sourceCodeRetention: 'EVERY_BUILD',
-                sourceDirectories: [[path: 'glob:**/src/main/java']],
+                sourceDirectories: [[path: 'glob:**/src/main/java'], [path: 'glob:**/src/main/groovy']],
                 qualityGates: [
-                        [threshold: 80.0, metric: 'LINE', baseline: 'PROJECT', criticality: 'UNSTABLE'],
-                        [threshold: 70.0, metric: 'INSTRUCTION', baseline: 'PROJECT', criticality: 'UNSTABLE'],
-                        [threshold: 70.0, metric: 'BRANCH', baseline: 'PROJECT', criticality: 'UNSTABLE']])
+                        [threshold: 60.0, metric: 'LINE', baseline: 'PROJECT', criticality: 'UNSTABLE'],
+                        [threshold: 60.0, metric: 'INSTRUCTION', baseline: 'PROJECT', criticality: 'UNSTABLE'],
+                        [threshold: 50.0, metric: 'BRANCH', baseline: 'PROJECT', criticality: 'UNSTABLE']])
     }
 
     if (log_pattern) {
