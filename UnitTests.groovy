@@ -71,6 +71,11 @@ pipeline {
                 }
             }
         }
+        stage('Maven - JaCoCo Coverage') {
+            steps {
+                sh "$mvn_cmd -B -ntp -C initialize jacoco:report -N -P$profiles"
+            }
+        }
     }
     post {
         always {

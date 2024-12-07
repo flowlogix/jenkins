@@ -53,6 +53,11 @@ pipeline {
                 }
             }
         }
+        stage('Maven - JaCoCo Coverage') {
+            steps {
+                sh "$mvn_cmd -B -ntp -C initialize jacoco:report -N -P$profiles"
+            }
+        }
         stage('Maven Deploy Javadoc and Snapshots') {
             when {
                 expression { currentBuild.currentResult == 'SUCCESS' }

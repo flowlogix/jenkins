@@ -1,7 +1,7 @@
 @Library('util') _l1
 
 def tag_name = ""
-def nexus_staging_profile = "nexus-staging"
+def nexus_staging_profile = ""
 def alt_repository = ""
 
 pipeline {
@@ -26,8 +26,10 @@ pipeline {
                         error msg
                     }
                     if (releaseToRepo.startsWith('Hope')) {
-                        nexus_staging_profile = ""
                         alt_repository = "-DaltDeploymentRepository=hope-nexus-artifacts::https://nexus.hope.nyc.ny.us/repository/maven-releases"
+                    } else {
+                        // nexus_staging_profile = "nexus-staging"
+                        alt_repository = "-DaltDeploymentRepository=apache.releases.https::https://repository.apache.org/service/local/staging/deploy/maven2"
                     }
                     tag_name = "shiro-root-$Version"
                 }
