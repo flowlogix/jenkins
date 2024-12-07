@@ -49,11 +49,10 @@ pipeline {
                 startPayara payara_config
                 script {
                     payara_build_options = "-DadminPort=$payara_config.admin_port -Dpayara.https.port=$payara_config.ssl_port"
+                    profiles += optionalMavenProfiles mavenVersion, ',coverage'
                     if (payara_config.jacoco_started) {
                         profiles += optionalMavenProfiles mavenVersion, ',coverage-remote'
                         payara_build_options += " -DjacocoPort=$payara_config.jacoco_port"
-                    } else {
-                        profiles += optionalMavenProfiles mavenVersion, ',coverage'
                     }
                 }
             }
@@ -73,7 +72,16 @@ pipeline {
         }
         stage('Maven - JaCoCo Coverage') {
             steps {
-                sh "$mvn_cmd -B -ntp -C initialize jacoco:report -N -P$profiles"
+                script {
+                    if (payara_config.jacoco_started) {
+                        sh """$mvn_cmd -B -ntp -C initialize jacoco:dump -Djacoco.destFile=$WORKSPACE/target/jacoco-it.exec \
+                              $payara_build_options -N -P$profiles"""
+                    }
+                    def jacocoExecFiles = findFiles glob: '**/jacoco*.exec'
+                    if (jacocoExecFiles.length > 0) {
+                        sh "$mvn_cmd -B -ntp -C initialize jacoco:merge jacoco:report $payara_build_options -N -P$profiles"
+                    }
+                }
             }
         }
     }
