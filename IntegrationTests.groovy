@@ -61,9 +61,12 @@ pipeline {
                               -Djacoco.destFile=$WORKSPACE/target/jacoco-it.exec \\
                               -DjacocoPort=$payara_config.jacoco_port -N -P$profiles"""
                     }
+                    def jacocoExecFiles = findFiles glob: '**/jacoco*.exec'
+                    if (jacocoExecFiles.length > 0) {
+                        sh """mvn -B -ntp -C initialize jacoco:merge jacoco:report \
+                             -DjacocoPort=$payara_config.jacoco_port -N -P$profiles"""
+                    }
                 }
-                sh """mvn -B -ntp -C initialize jacoco:merge jacoco:report \
-                    -DjacocoPort=$payara_config.jacoco_port -N -P$profiles"""
             }
         }
         stage('Maven Deploy Javadoc and Snapshots') {

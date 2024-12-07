@@ -71,8 +71,11 @@ pipeline {
                         sh """$mvn_cmd -B -ntp -C initialize jacoco:dump -Djacoco.destFile=$WORKSPACE/target/jacoco-it.exec \
                               $payara_build_options -N -P$profiles"""
                     }
+                    def jacocoExecFiles = findFiles glob: '**/jacoco*.exec'
+                    if (jacocoExecFiles.length > 0) {
+                        sh "$mvn_cmd -B -ntp -C initialize jacoco:merge jacoco:report $payara_build_options -N -P$profiles"
+                    }
                 }
-                sh "$mvn_cmd -B -ntp -C initialize jacoco:merge jacoco:report $payara_build_options -N -P$profiles"
             }
         }
     }
