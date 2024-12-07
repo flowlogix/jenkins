@@ -1,11 +1,12 @@
 @Library('payara') _l1
 @Library('util') _l2
 def mavenVersion = 4
-final def profiles           = optionalMavenProfiles mavenVersion, 'payara-server-local,coverage-remote,all-tests'
-final def profiles_no_stress = optionalMavenProfiles mavenVersion, 'payara-server-local,coverage-remote,ui-test'
+final def profiles           = optionalMavenProfiles mavenVersion, 'payara-server-local,coverage,all-tests'
+final def profiles_no_stress = optionalMavenProfiles mavenVersion, 'payara-server-local,coverage,ui-test'
 def payara_config = [ domain_name : 'test-domain', jacoco_profile : profiles ]
 def mvnCommandLine
 def jbake_maven_project = 'jbake-maven'
+def jacoco_dump_cmd = ''
 
 pipeline {
     agent any
@@ -31,6 +32,9 @@ pipeline {
                 startPayara payara_config
                 withMaven {
                     script {
+                        if (payara_config.jacoco_started) {
+                            jacoco_dump_cmd = 'jacoco:dump'
+                        }
                         mvnCommandLine =
                             """
                                 export MAVEN_OPTS="\$(eval echo \$MAVEN_OPTS)"
@@ -55,7 +59,8 @@ pipeline {
         }
         stage('Maven - JaCoCo Coverage') {
             steps {
-                sh "mvn -B -ntp -C initialize jacoco:report -N -P$profiles"
+                sh """mvn -B -ntp -C initialize $jacoco_dump_cmd jacoco:merge jacoco:report \
+                    -DjacocoPort=$payara_config.jacoco_port -N -P$profiles"""
             }
         }
         stage('Maven Deploy Javadoc and Snapshots') {

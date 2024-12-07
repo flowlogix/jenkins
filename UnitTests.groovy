@@ -6,6 +6,7 @@ def profiles = optionalMavenProfiles mavenVersion, 'payara-server-local,ui-test,
 def payara_config = [ domain_name : 'test-domain' ]
 def mvn_cmd = 'mvn'
 def payara_build_options = ''
+def jacoco_dump_cmd = ''
 def mavenParamsFromFile = ''
 def qualityThreshold = 1
 
@@ -43,11 +44,11 @@ pipeline {
                 startPayara payara_config
                 script {
                     payara_build_options = "-DadminPort=$payara_config.admin_port -Dpayara.https.port=$payara_config.ssl_port"
+                    profiles += optionalMavenProfiles mavenVersion, ',coverage'
                     if (payara_config.jacoco_started) {
                         profiles += optionalMavenProfiles mavenVersion, ',coverage-remote'
                         payara_build_options += " -DjacocoPort=$payara_config.jacoco_port"
-                    } else {
-                        profiles += optionalMavenProfiles mavenVersion, ',coverage'
+                        jacoco_dump_cmd = 'jacoco:dump'
                     }
                 }
             }
@@ -67,7 +68,7 @@ pipeline {
         }
         stage('Maven - JaCoCo Coverage') {
             steps {
-                sh "$mvn_cmd -B -ntp -C initialize jacoco:report -N -P$profiles"
+                sh "$mvn_cmd -B -ntp -C initialize $jacoco_dump_cmd jacoco:merge jacoco:report $payara_build_options -N -P$profiles"
             }
         }
     }
