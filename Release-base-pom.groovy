@@ -32,7 +32,7 @@ pipeline {
                         repository_url = 'https://nexus.hope.nyc.ny.us/repository/maven-releases'
                     }
                 }
-                gpgSigningCredentials false, {
+                mavenSettingsCredentials false, {
                     sh """
                     export MAVEN_OPTS="\$MAVEN_OPTS -Dsettings.security=$HOME/.m2/settings-security.xml"
                     mvn -B -ntp -C release:prepare release:perform \

@@ -41,7 +41,7 @@ pipeline {
         }
         stage('Maven - Release') {
             steps {
-                gpgSigningCredentials true, {
+                mavenSettingsCredentials true, {
                     sh """
                     mvn -B -ntp -C release:prepare release:perform -Dnexus-staging-profile=$nexus_staging_profile \
                     -DreleaseVersion=$Version -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true \
