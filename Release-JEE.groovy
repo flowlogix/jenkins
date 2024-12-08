@@ -41,7 +41,7 @@ pipeline {
         stage('Maven - Release') {
             steps {
                 startPayara payara_config
-                gpgSigningCredentials false, {
+                mavenSettingsCredentials false, {
                     sh """
                     export MAVEN_OPTS="\$MAVEN_OPTS -Dsettings.security=$HOME/.m2/settings-security.xml"
                     mvn -B -ntp -C -P$profiles release:prepare release:perform \
