@@ -11,9 +11,11 @@ final String mavenSettingsCredentialsId = 'a2decb6f-0847-4fa4-8cd1-57acee932efc'
 void call(boolean isApache, Closure cl) {
     withCredentials(
             [string(credentialsId: isApache ? apacheCredentialsId : flowlogixCredentialsId,
-                    variable: 'MAVEN_GPG_PASSPHRASE')],
-            [string(credentialsId: mavenSettingsCredentialsId,
-                    variable: 'MAVEN_SETTINGS_MASTER_PASSWORD')]) {
-        cl.call()
+                    variable: 'MAVEN_GPG_PASSPHRASE')]) {
+        withCredentials(
+                [string(credentialsId: mavenSettingsCredentialsId,
+                        variable: 'MAVEN_SETTINGS_MASTER_PASSWORD')]) {
+            cl.call()
+        }
     }
 }
