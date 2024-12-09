@@ -31,6 +31,9 @@ pipeline {
                         shiroPayaraConfig payara_config
                         qualityThreshold = 3
                     }
+                    if (env.GIT_URL.contains('flowlogix/flowlogix') && env.CHANGE_TARGET == '5.x') {
+                        qualityThreshold = 2
+                    }
                     payara_config << [ jacoco_profile : profiles + optionalMavenProfiles(mavenVersion, ',coverage') ]
                     def mavenParamFileName = "$WORKSPACE/.jenkins_maven_args"
                     if (fileExists(mavenParamFileName)) {
@@ -51,7 +54,6 @@ pipeline {
                     payara_build_options = "-DadminPort=$payara_config.admin_port -Dpayara.https.port=$payara_config.ssl_port"
                     profiles += optionalMavenProfiles mavenVersion, ',coverage'
                     if (payara_config.jacoco_started) {
-                        profiles += optionalMavenProfiles mavenVersion, ',coverage-remote'
                         payara_build_options += " -DjacocoPort=$payara_config.jacoco_port"
                     }
                 }
