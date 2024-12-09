@@ -28,7 +28,7 @@ pipeline {
                     }
                     if (env.GIT_URL.contains('shiro')) {
                         shiroPayaraConfig payara_config
-                        qualityThreshold = 5
+                        qualityThreshold = 6
                     }
                     if (env.GIT_URL.contains('flowlogix/flowlogix') && env.CHANGE_TARGET == '5.x') {
                         qualityThreshold = 2
