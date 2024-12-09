@@ -6,6 +6,7 @@ final def profiles_no_stress = optionalMavenProfiles mavenVersion, 'payara-serve
 def payara_config = [ domain_name : 'test-domain', jacoco_profile : profiles ]
 def mvnCommandLine
 def jbake_maven_project = 'jbake-maven'
+def qualityThreshold = 1
 
 pipeline {
     agent any
@@ -23,6 +24,9 @@ pipeline {
                 sh "mvn -V -B -ntp -C -N -P$profiles help:all-profiles"
                 script {
                     currentBuild.description = "Commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
+                    if (env.GIT_URL.contains('flowlogix/flowlogix') && env.CHANGE_TARGET == '5.x') {
+                        qualityThreshold = 2
+                    }
                 }
             }
         }
@@ -113,7 +117,7 @@ pipeline {
         always {
             stopPayara payara_config
             archiveArtifacts artifacts: '**/logs/server.log*'
-            checkLogs payara_config.asadmin ? '**/logs/server.log*' : null
+            checkLogs payara_config.asadmin ? '**/logs/server.log*' : null, true, qualityThreshold
         }
         success {
             githubNotify description: 'Deploy Snapshots', context: 'CI/Deploy', status: 'SUCCESS',
