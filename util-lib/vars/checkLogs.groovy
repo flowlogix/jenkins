@@ -15,6 +15,7 @@ def call(String log_pattern, boolean checkConsole = true, qualityThreshold = 1) 
             excludeMessage(/JAR will be empty - no content was marked for inclusion!/),
             excludeMessage(/.*com.orientechnologies.common.log.*/),
             excludeMessage(/.*INFO: arquillian-suite-deployment: Found class annotated.*/),
+            excludeMessage(/Unable to find the root directory\. Create a \.mvn directory in the root directory or add.*/),
             excludeMessage('No profiles detected!'), excludeMessage('Javadoc Warnings') ],
         name: 'Java Compiler', qualityGates: maximalQualityGates
 
