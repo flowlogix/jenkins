@@ -45,7 +45,6 @@ pipeline {
                     payara_build_options = "-DadminPort=$payara_config.admin_port -Dpayara.https.port=$payara_config.ssl_port"
                     profiles += optionalMavenProfiles mavenVersion, ',coverage'
                     if (payara_config.jacoco_started) {
-                        profiles += optionalMavenProfiles mavenVersion, ',coverage-remote'
                         payara_build_options += " -DjacocoPort=$payara_config.jacoco_port"
                     }
                 }
