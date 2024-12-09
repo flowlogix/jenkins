@@ -21,6 +21,11 @@ pipeline {
             steps {
                 script {
                     currentBuild.description = "Commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
+
+                    def mavenParamFileName = "$WORKSPACE/.jenkins_maven_args"
+                    if (fileExists(mavenParamFileName)) {
+                        mavenParamsFromFile = readFile(file: mavenParamFileName).trim()
+                    }
                     if (env.GIT_URL.contains('shiro')) {
                         shiroPayaraConfig payara_config
                         qualityThreshold = 3
@@ -29,16 +34,13 @@ pipeline {
                         qualityThreshold = 2
                     }
                     payara_config << [ jacoco_profile : profiles + optionalMavenProfiles(mavenVersion, ',coverage') ]
-                    def mavenParamFileName = "$WORKSPACE/.jenkins_maven_args"
-                    if (fileExists(mavenParamFileName)) {
-                        mavenParamsFromFile = readFile(file: mavenParamFileName).trim()
-                    }
+                    payara_config << [ jacoco_expr_args : mavenParamsFromFile ]
                 }
             }
         }
         stage('Maven Info') {
             steps {
-                sh "$mvn_cmd -V -B -ntp -C -N -P$profiles help:all-profiles"
+                sh "$mvn_cmd -V -B -ntp -C -N -P$profiles $mavenParamsFromFile help:all-profiles"
             }
         }
         stage('Start Payara') {
