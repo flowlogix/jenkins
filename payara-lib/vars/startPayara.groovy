@@ -69,11 +69,17 @@ def call(def payara_config) {
     if (payara_config.jacoco_profile) {
         jacoco_profile_cmd = "-P$payara_config.jacoco_profile"
     }
-    def jacoco_argline = sh(script: "mvn -ntp initialize help:evaluate $jacoco_profile_cmd \
-        -Dexpression=jacocoAgent -q -DforceStdout -DjacocoPort=$payara_config.jacoco_port \
-        -Djacoco.destFile=$WORKSPACE/target/jacoco-it.exec \
-        ${payara_config.jacoco_tcp_server ? '-N' : ''} $payara_config.jacoco_expr_args || exit 0",
-        returnStdout: true).trim()
+
+    def jacoco_argline = ''
+    def jacocoConfigOutput = "$WORKSPACE/target/jacoco-agent-config.txt"
+    sh "mvn -ntp initialize help:evaluate $jacoco_profile_cmd \
+        -Dexpression=jacocoAgent -q -DjacocoPort=$payara_config.jacoco_port \
+        -Djacoco.destFile=$WORKSPACE/target/jacoco-it.exec -Doutput=$jacocoConfigOutput \
+        ${payara_config.jacoco_tcp_server ? '-N' : ''} $payara_config.jacoco_expr_args || exit 0"
+    if (fileExists(jacocoConfigOutput)) {
+        jacoco_argline = readFile(file: jacocoConfigOutput).trim()
+    }
+
     if (jacoco_argline?.startsWith('-javaagent')) {
         def escaped_argline = jacoco_argline.replaceAll(/[\/:=]/, /\\\\$0/).replaceAll(/[$]/, /\\$0/)
         def tcp_server_output = payara_config.jacoco_tcp_server ? ',output=tcpserver' : ''
