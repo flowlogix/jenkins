@@ -30,7 +30,8 @@ pipeline {
                         shiroPayaraConfig payara_config
                         qualityThreshold = 6
                     }
-                    if (env.GIT_URL.contains('flowlogix/flowlogix') && env.CHANGE_TARGET == '5.x') {
+                    if (env.GIT_URL.contains('flowlogix/flowlogix')
+                          && (env.CHANGE_TARGET == '5.x' || env.GIT_BRANCH == '5.x')) {
                         qualityThreshold = 2
                     }
                     payara_config << [ jacoco_profile : profiles + optionalMavenProfiles(mavenVersion, ',coverage') ]
