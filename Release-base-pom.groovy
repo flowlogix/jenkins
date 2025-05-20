@@ -34,7 +34,6 @@ pipeline {
                 }
                 mavenSettingsCredentials false, {
                     sh """
-                    export MAVEN_OPTS="\$MAVEN_OPTS -Dsettings.security=$HOME/.m2/settings-security.xml"
                     mvn -B -ntp -C release:prepare release:perform \
                     -DpushChanges=false -DlocalCheckout=true \
                     -DreleaseVersion=$Version -DtagNameFormat=Version-$Version \
