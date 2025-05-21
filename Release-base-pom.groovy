@@ -1,7 +1,7 @@
 @Library('util') _l1
 
-def repository_name = 'flowlogix-maven-central-s01'
-def repository_url = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2'
+def repository_name = 'flowlogix-maven-central-portal'
+def repository_url = 'njord:'
 
 pipeline {
     agent any
@@ -40,18 +40,10 @@ pipeline {
                     -Dgoals=\"resources:resources jar:jar gpg:sign deploy\" \
                     -Darguments=\"-Dgpg.keyname=\\"Flow Logix, Inc.\\" -Djar.skip-if-empty=true \
                     -Dmaven.install.skip=true -Dpayara.start.skip=true \
+                    -Dnjord.publisher=sonatype-cp -Dnjord.autoPublish=true \
+                    -Dnjord.publisher.sonatype-cp.releaseRepositoryId=$repository_name \
                     -DaltDeploymentRepository=$repository_name::$repository_url \"
                     """
-                }
-            }
-        }
-        stage('Maven Central - Close (and optionally Release)') {
-            when {
-                expression { repository_name != 'hope-nexus-artifacts' }
-            }
-            steps {
-                mavenCentralCredentials {
-                    sh "$HOME/infra/scripts/nexus/maven-central-release.sh com.flowlogix${releaseInMaven.toBoolean() ? ' --release' : ''}"
                 }
             }
         }

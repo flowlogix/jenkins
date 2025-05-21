@@ -3,7 +3,7 @@
 
 def payara_config = [domain_name : 'prod-domain']
 final def profiles = 'all-tests,payara-server-local'
-def release_profile = 'release-flowlogix-to-central'
+def release_profile = 'flowlogix-central-portal'
 
 pipeline {
     agent any
@@ -45,20 +45,10 @@ pipeline {
                     sh """
                     mvn -B -ntp -C -P$profiles release:prepare release:perform \
                     -DreleaseVersion=$Version -Drelease.profile=$release_profile -Dgoals=deploy \
-                    -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true \
+                    -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true -Dnjord.autoPublish=true \
                     \$(eval echo \$MAVEN_ADD_OPTIONS) -Ddrone.chrome.binary='\$(eval echo \$CHROME_BINARY)' \
                     -DadminPort=$payara_config.admin_port -Dpayara.https.port=$payara_config.ssl_port \"
                     """
-                }
-            }
-        }
-        stage('Maven Central - Close (and optionally Release)') {
-            when {
-                expression { release_profile == 'release-flowlogix-to-central' }
-            }
-            steps {
-                mavenCentralCredentials {
-                    sh "$HOME/infra/scripts/nexus/maven-central-release.sh com.flowlogix${releaseInMaven.toBoolean() ? ' --release' : ''}"
                 }
             }
         }

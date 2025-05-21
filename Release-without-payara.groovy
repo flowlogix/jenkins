@@ -1,6 +1,6 @@
 @Library('util') _l1
 
-def release_profile = 'release-flowlogix-to-central'
+def release_profile = 'flowlogix-central-portal'
 
 pipeline {
     agent any
@@ -41,18 +41,8 @@ pipeline {
                     sh """
                     mvn -B -ntp -C release:prepare release:perform \
                     -DreleaseVersion=$Version -Drelease.profile=$release_profile -Dgoals=deploy \
-                    -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true \"
+                    -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true -Dnjord.autoPublish=true \"
                     """
-                }
-            }
-        }
-        stage('Maven Central - Close (and optionally Release)') {
-            when {
-                expression { release_profile == 'release-flowlogix-to-central' }
-            }
-            steps {
-                mavenCentralCredentials {
-                    sh "$HOME/infra/scripts/nexus/maven-central-release.sh com.flowlogix${releaseInMaven.toBoolean() ? ' --release' : ''}"
                 }
             }
         }
