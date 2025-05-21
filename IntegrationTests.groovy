@@ -25,7 +25,7 @@ pipeline {
                 script {
                     currentBuild.description = "Commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
                     if (env.GIT_URL.contains('flowlogix/flowlogix') && env.GIT_BRANCH == '5.x') {
-                        qualityThreshold = 2
+                        qualityThreshold = 3
                     }
                 }
             }
@@ -78,10 +78,7 @@ pipeline {
                 expression { currentBuild.currentResult == 'SUCCESS' }
             }
             steps {
-                sh """
-                mvn -B -C validate jar:jar jar:test-jar javadoc:jar source:jar-no-fork \
-                deploy:deploy -fae -Dmaven.install.skip=true -Dcheckstyle.skip=true
-                """
+                sh "mvn -B -C -fae deploy -Dmaven.install.skip=true -Dcheckstyle.skip=true -DskipTests"
             }
         }
         stage('Maven Deploy documentation') {
@@ -121,7 +118,7 @@ pipeline {
         }
         success {
             githubNotify description: 'Deploy Snapshots', context: 'CI/Deploy', status: 'SUCCESS',
-                targetUrl: 'https://s01.oss.sonatype.org/content/repositories/snapshots/com/flowlogix/'
+                targetUrl: 'https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/com/flowlogix'
         }
         changed {
             mail to: "lprimak@hope.nyc.ny.us", subject: "Jenkins: Project name -> ${env.JOB_NAME}",
