@@ -1,6 +1,7 @@
 @Library('payara') _l1
 @Library('util') _l2
 
+def skipPipeline = false
 def mavenVersion = 4
 def profiles = optionalMavenProfiles mavenVersion, 'payara-server-local,ui-test,ci'
 def payara_config = [ domain_name : 'test-domain' ]
@@ -22,6 +23,10 @@ pipeline {
                 script {
                     currentBuild.description = "Commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
 
+                    if (fileExists("$WORKSPACE/.jenkins_skip")) {
+                        skipPipeline = true
+                        return
+                    }
                     def mavenParamFileName = "$WORKSPACE/.jenkins_maven_args"
                     if (fileExists(mavenParamFileName)) {
                         mavenParamsFromFile = readFile(file: mavenParamFileName).trim()
@@ -40,11 +45,17 @@ pipeline {
             }
         }
         stage('Maven Info') {
+            when {
+                expression { !skipPipeline }
+            }
             steps {
                 sh "$mvn_cmd -V -B -ntp -C -N -P$profiles $mavenParamsFromFile help:all-profiles"
             }
         }
         stage('Start Payara') {
+            when {
+                expression { !skipPipeline }
+            }
             steps {
                 startPayara payara_config
                 script {
@@ -57,6 +68,9 @@ pipeline {
             }
         }
         stage('Maven Verify - Tests') {
+            when {
+                expression { !skipPipeline }
+            }
             steps {
                 withMaven(options: [ jacocoPublisher(disabled: true) ]) {
                     sh """
@@ -70,6 +84,9 @@ pipeline {
             }
         }
         stage('Maven - JaCoCo Coverage') {
+            when {
+                expression { !skipPipeline }
+            }
             steps {
                 script {
                     if (payara_config.jacoco_started) {
