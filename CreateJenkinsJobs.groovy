@@ -235,36 +235,36 @@ organizationFolder('flowlogix-org-repo') {
     triggerPullRequestBuild delegate, 'TriggerPRCommentBranchProperty', '.*jenkins.*test.*'
 }
 
-organizationFolder('lprimak-private-org-repo') {
-    displayName 'Lenny Private Apps Unit Tests and PR Builder'
-    organizations {
-        github {
-            repoOwner 'lprimak'
-            credentialsId private_repository_credential
-            githubParameters delegate, 'unit-tests', '*', 'myonlinelogbook', true
-        }
-        triggers {
-            periodicFolderTrigger {
-                interval '1d'
-            }
-        }
-        projectFactories {
-            remoteJenkinsFileWorkflowMultiBranchProjectFactory {
-                githubScriptSource delegate, 'pom.xml', 'UnitTests.groovy'
-            }
-        }
-        properties {
-            folderLibraries {
-                libraries {
-                    libraryDef delegate, 'payara', 'payara-lib'
-                    libraryDef delegate, 'util', 'util-lib'
+multibranchPipelineJob('my-online-logbook') {
+    displayName 'Logbook Unit Tests and PR Builder'
+    description 'Logbook Unit Tests and PR Builder'
+
+    branchSources {
+        branchSource {
+            source {
+                github {
+                    id '3451064'
+                    githubMain delegate, 'myonlinelogbook', private_repository_credential, true
+                    githubParameters delegate, 'unit-tests', null, null, true
                 }
             }
+            buildBranchesAndPullRequests delegate, false, 'main master'
         }
     }
 
-    buildBranchesAndPullRequests delegate
-    triggerPullRequestBuild delegate, 'TriggerPRCommentBranchProperty', '.*jenkins.*test.*'
+    remoteJenkinsFileWorkflowMultiBranchProjectFactory {
+        githubScriptSource delegate, 'pom.xml', 'UnitTests.groovy'
+    }
+
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'payara', 'payara-lib'
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }gi
+    defaultOrphanItemStrategy delegate
 }
 
 multibranchPipelineJob('flowlogix-ee-integration') {
