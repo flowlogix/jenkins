@@ -34,12 +34,12 @@ pipeline {
                 }
                 mavenSettingsCredentials false, {
                     sh """
-                    mvn -B -ntp -C release:prepare release:perform \
+                    mvn -B -ntp -C -Pflowlogix-base-release release:prepare release:perform \
                     -DpushChanges=false -DlocalCheckout=true \
                     -DreleaseVersion=$Version -DtagNameFormat=Version-$Version \
                     -Dgoals=\"resources:resources jar:jar gpg:sign deploy\" \
-                    -Darguments=\"-Dgpg.keyname=\\"Flow Logix, Inc.\\" -Djar.skip-if-empty=true \
-                    -Dmaven.install.skip=true -Dpayara.start.skip=true \
+                    -Darguments=\"-Djar.skip-if-empty=true -Dmaven.install.skip=true \
+                    -Dpayara.start.skip=true \
                     -Dnjord.publisher=sonatype-cp -Dnjord.autoPublish=true \
                     -Dnjord.publisher.sonatype-cp.releaseRepositoryId=$repository_name \
                     -DaltDeploymentRepository=$repository_name::$repository_url \"
