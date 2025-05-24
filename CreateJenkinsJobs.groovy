@@ -241,7 +241,7 @@ organizationFolder('lprimak-private-org-repo') {
         github {
             repoOwner 'lprimak'
             credentialsId private_repository_credential
-            githubParameters delegate, 'unit-tests', '', 'myonlinelogbook', true
+            githubParameters delegate, 'unit-tests', '*', 'myonlinelogbook', true
         }
         triggers {
             periodicFolderTrigger {
