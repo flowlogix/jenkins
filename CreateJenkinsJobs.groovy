@@ -264,7 +264,7 @@ multibranchPipelineJob('my-online-logbook') {
             }
         }
     }
-g    defaultOrphanItemStrategy delegate
+ g   defaultOrphanItemStrategy delegate
 }
 
 multibranchPipelineJob('flowlogix-ee-integration') {
