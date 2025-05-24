@@ -1,9 +1,10 @@
 def org_credential = 'bacccb11-36f5-4f8f-b45e-26b123a438b0'
 def personal_credential = '187c3f6e-6b13-4024-8df2-10e702f213f8'
+def private_repository_credential = '574af081-7c70-4e3f-8446-5f04a837a53f'
 
 def githubMain = {
-    ctx, String repoName, boolean personal = false -> ctx.with {
-        credentialsId personal ? personal_credential : org_credential
+    ctx, String repoName, String credential = org_credential, boolean personal = false -> ctx.with {
+        credentialsId credential
         repoOwner personal ? 'lprimak' : 'flowlogix'
         repository repoName
         repositoryUrl ''
@@ -12,7 +13,7 @@ def githubMain = {
 }
 
 def githubParameters = {
-    ctx, String ctxLabel, String excludeWildcard, boolean useTypeSuffix = true,
+    ctx, String ctxLabel, String excludeWildcard, String includeWildcard, boolean useTypeSuffix = true,
     boolean excludeForks = true, boolean trustPermissions = false -> ctx.with {
         apiUri 'https://api.github.com'
         traits {
@@ -21,7 +22,7 @@ def githubParameters = {
             }
             if (excludeWildcard?.trim()) {
                 sourceWildcardFilter {
-                    includes '*'
+                    includes includeWildcard
                     excludes excludeWildcard
                 }
             }
@@ -203,12 +204,17 @@ organizationFolder('flowlogix-org-repo') {
         github {
             repoOwner 'flowlogix'
             credentialsId org_credential
-            githubParameters delegate, 'unit-tests', 'jbake-maven', true
+            githubParameters delegate, 'unit-tests', 'jbake-maven', '*', true
         }
         github {
             repoOwner 'lprimak'
             credentialsId personal_credential
-            githubParameters delegate, 'unit-tests', 'resume myonlinelogbook', true
+            githubParameters delegate, 'unit-tests', 'resume myonlinelogbook', '*', true
+        }
+        github {
+            repoOwner 'lprimak'
+            credentialsId private_repository_credential
+            githubParameters delegate, 'unit-tests', '', 'myonlinelogbook', true
         }
         triggers {
             periodicFolderTrigger {
@@ -243,7 +249,7 @@ multibranchPipelineJob('flowlogix-ee-integration') {
                 github {
                     id '7234871'
                     githubMain delegate, 'flowlogix'
-                    githubParameters delegate, 'integration-tests', null, false, false, true
+                    githubParameters delegate, 'integration-tests', null, null, false, false, true
                 }
             }
             suppressBranchTriggers delegate
@@ -316,7 +322,7 @@ multibranchPipelineJob('content/flowlogix-website-builder') {
                 github {
                     id '41435354'
                     githubMain delegate, 'website'
-                    githubParameters delegate, 'PublishWebsite', null, false, false
+                    githubParameters delegate, 'PublishWebsite', null, null, false, false
                 }
             }
             buildBranchesAndPullRequests delegate, false, 'main master'
@@ -345,8 +351,8 @@ multibranchPipelineJob('content/hope-website-builder') {
             source {
                 github {
                     id '3451246'
-                    githubMain delegate, 'hope-website', true
-                    githubParameters delegate, 'PublishWebsite', null, false, false
+                    githubMain delegate, 'hope-website', personal_credential, true
+                    githubParameters delegate, 'PublishWebsite', null, null, false, false
                 }
             }
             buildBranchesAndPullRequests delegate, false, 'main master'
@@ -374,8 +380,8 @@ multibranchPipelineJob('content/resume-builder') {
             source {
                 github {
                     id '15436536'
-                    githubMain delegate, 'resume', true
-                    githubParameters delegate, 'PublishResume', null, false, false
+                    githubMain delegate, 'resume', personal_credential, true
+                    githubParameters delegate, 'PublishResume', null, null, false, false
                 }
             }
             buildBranchesAndPullRequests delegate, false, 'main master'
@@ -404,8 +410,8 @@ multibranchPipelineJob('apache-shiro-ci') {
             source {
                 github {
                     id '15413536'
-                    githubMain delegate, 'shiro', true
-                    githubParameters delegate, 'shiro-tests', null, false, false
+                    githubMain delegate, 'shiro', personal_credential, true
+                    githubParameters delegate, 'shiro-tests', null, null, false, false
                 }
             }
             suppressBranchTriggers delegate
