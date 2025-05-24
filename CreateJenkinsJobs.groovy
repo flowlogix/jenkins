@@ -252,8 +252,10 @@ multibranchPipelineJob('my-online-logbook') {
         }
     }
 
-    remoteJenkinsFileWorkflowBranchProjectFactory {
-        githubScriptSource delegate, 'pom.xml', 'UnitTests.groovy'
+    factory {
+        remoteJenkinsFileWorkflowBranchProjectFactory {
+            githubScriptSource delegate, 'pom.xml', 'UnitTests.groovy'
+        }
     }
 
     properties {
