@@ -245,7 +245,7 @@ multibranchPipelineJob('my-online-logbook') {
                 github {
                     id '3451064'
                     githubMain delegate, 'myonlinelogbook', private_repository_credential, true
-                    githubParameters delegate, 'unit-tests', null, null, true
+                    githubParameters delegate, 'unit-tests', null, null, true, false
                 }
             }
             buildBranchesAndPullRequests delegate, false, 'main master'
