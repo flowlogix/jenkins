@@ -211,6 +211,33 @@ organizationFolder('flowlogix-org-repo') {
             credentialsId personal_credential
             githubParameters delegate, 'unit-tests', 'resume myonlinelogbook', '*', true
         }
+        triggers {
+            periodicFolderTrigger {
+                interval '1d'
+            }
+        }
+        projectFactories {
+            remoteJenkinsFileWorkflowMultiBranchProjectFactory {
+                githubScriptSource delegate, 'pom.xml', 'UnitTests.groovy'
+            }
+        }
+        properties {
+            folderLibraries {
+                libraries {
+                    libraryDef delegate, 'payara', 'payara-lib'
+                    libraryDef delegate, 'util', 'util-lib'
+                }
+            }
+        }
+    }
+
+    buildBranchesAndPullRequests delegate
+    triggerPullRequestBuild delegate, 'TriggerPRCommentBranchProperty', '.*jenkins.*test.*'
+}
+
+organizationFolder('lprimak-private-org-repo') {
+    displayName 'Lenny Private Apps Unit Tests and PR Builder'
+    organizations {
         github {
             repoOwner 'lprimak'
             credentialsId private_repository_credential
