@@ -208,7 +208,7 @@ organizationFolder('flowlogix-org-repo') {
         github {
             repoOwner 'lprimak'
             credentialsId personal_credential
-            githubParameters delegate, 'unit-tests', 'resume', true
+            githubParameters delegate, 'unit-tests', 'resume myonlinelogbook', true
         }
         triggers {
             periodicFolderTrigger {
