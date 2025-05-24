@@ -35,6 +35,9 @@ pipeline {
                         shiroPayaraConfig payara_config
                         qualityThreshold = 3
                     }
+                    if (env.GIT_URL.contains('myonlinelogbook')) {
+                        qualityThreshold = 136
+                    }
                     if (env.GIT_URL.contains('flowlogix/flowlogix')
                           && (env.CHANGE_TARGET == '5.x' || env.GIT_BRANCH == '5.x')) {
                         qualityThreshold = 2
