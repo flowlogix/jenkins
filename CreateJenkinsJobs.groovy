@@ -263,8 +263,8 @@ multibranchPipelineJob('my-online-logbook') {
                 libraryDef delegate, 'util', 'util-lib'
             }
         }
-    }gi
-    defaultOrphanItemStrategy delegate
+    }
+g    defaultOrphanItemStrategy delegate
 }
 
 multibranchPipelineJob('flowlogix-ee-integration') {
