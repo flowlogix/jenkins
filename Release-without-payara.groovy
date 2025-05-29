@@ -1,6 +1,7 @@
 @Library('util') _l1
 
 def release_profile = 'flowlogix-central-portal'
+def automaticCommand = ''
 
 pipeline {
     agent any
@@ -28,6 +29,9 @@ pipeline {
                     if (releaseToRepo.startsWith('Hope')) {
                         release_profile = 'release-flowlogix-to-hope'
                     }
+                    if (releaseInMaven.toBoolean()) {
+                        automaticCommand = '-Dnjord.publishingType=automatic'
+                    }
                 }
                 sh "mvn -V -N -B -ntp -C help:all-profiles"
                 script {
@@ -41,7 +45,8 @@ pipeline {
                     sh """
                     mvn -B -ntp -C release:prepare release:perform \
                     -DreleaseVersion=$Version -Drelease.profile=$release_profile -Dgoals=deploy \
-                    -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true -Dnjord.autoPublish=true \"
+                    -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true \
+                    -Dnjord.autoPublish=true -Dnjord.waitForStates=true $automaticCommand \"
                     """
                 }
             }

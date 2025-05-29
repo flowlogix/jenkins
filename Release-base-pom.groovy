@@ -2,6 +2,7 @@
 
 def repository_name = 'flowlogix-maven-central-portal'
 def repository_url = 'njord:'
+def automaticCommand = ''
 
 pipeline {
     agent any
@@ -31,6 +32,9 @@ pipeline {
                         repository_name = 'hope-nexus-artifacts'
                         repository_url = 'https://nexus.hope.nyc.ny.us/repository/maven-releases'
                     }
+                    if (releaseInMaven.toBoolean()) {
+                        automaticCommand = '-Dnjord.publishingType=automatic'
+                    }
                 }
                 mavenSettingsCredentials false, {
                     sh """
@@ -41,6 +45,7 @@ pipeline {
                     -Darguments=\"-Djar.skip-if-empty=true -Dmaven.install.skip=true \
                     -Dpayara.start.skip=true \
                     -Dnjord.publisher=sonatype-cp -Dnjord.autoPublish=true \
+                    -Dnjord.waitForStates=true $automaticCommand \
                     -Dnjord.publisher.sonatype-cp.releaseRepositoryId=$repository_name \
                     -DaltDeploymentRepository=$repository_name::$repository_url \"
                     """

@@ -4,6 +4,7 @@
 def payara_config = [domain_name : 'prod-domain']
 final def profiles = 'all-tests,payara-server-local'
 def release_profile = 'flowlogix-central-portal'
+def automaticCommand = ''
 
 pipeline {
     agent any
@@ -31,6 +32,9 @@ pipeline {
                     if (releaseToRepo.startsWith('Hope')) {
                         release_profile = 'release-flowlogix-to-hope'
                     }
+                    if (releaseInMaven.toBoolean()) {
+                        automaticCommand = '-Dnjord.publishingType=automatic'
+                    }
                 }
                 sh "mvn -V -N -B -ntp -C -P$profiles help:all-profiles"
                 script {
@@ -45,7 +49,8 @@ pipeline {
                     sh """
                     mvn -B -ntp -C -P$profiles release:prepare release:perform \
                     -DreleaseVersion=$Version -Drelease.profile=$release_profile -Dgoals=deploy \
-                    -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true -Dnjord.autoPublish=true \
+                    -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true \
+                    -Dnjord.autoPublish=true -Dnjord.waitForStates=true $automaticCommand \
                     \$(eval echo \$MAVEN_ADD_OPTIONS) -Ddrone.chrome.binary='\$(eval echo \$CHROME_BINARY)' \
                     -DadminPort=$payara_config.admin_port -Dpayara.https.port=$payara_config.ssl_port \"
                     """
