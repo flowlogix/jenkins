@@ -13,6 +13,8 @@ pipeline {
     parameters {
         booleanParam(name: 'releaseInMaven', defaultValue: true,
             description: 'Whether to release in Maven Central, or just close the repository')
+        booleanParam(name: 'createTag', defaultValue: true,
+                description: 'Whether to create tag in GitHub')
         string(name: 'Version', description: 'Version number to release', trim: true)
         choice(name: 'releaseToRepo', description: 'Which repository to publish the release',
                 choices: ['Maven Central', 'Hope Nexus'])
@@ -42,8 +44,7 @@ pipeline {
                     -DpushChanges=false -DlocalCheckout=true \
                     -DreleaseVersion=$Version -DtagNameFormat=Version-$Version \
                     -Dgoals=\"resources:resources jar:jar gpg:sign deploy\" \
-                    -Darguments=\"-Djar.skip-if-empty=true -Dmaven.install.skip=true \
-                    -Dpayara.start.skip=true \
+                    -Darguments=\"-Dmaven.install.skip=true \
                     -Dnjord.publisher=sonatype-cp -Dnjord.autoPublish=true \
                     -Dnjord.waitForStates=true $automaticCommand \
                     -Dnjord.publisher.sonatype-cp.releaseRepositoryId=$repository_name \
@@ -56,7 +57,14 @@ pipeline {
 
     post {
         success {
-            sh "git push origin Version-$Version"
+            script {
+                if (createTag.toBoolean()
+                        || (releaseInMaven.toBoolean() && releaseToRepo.startsWith('Maven'))) {
+                    sh "git push origin Version-$Version"
+                } else {
+                    sh "git tag -d Version-$Version || true"
+                }
+            }
         }
         failure {
             sh "git tag -d Version-$Version || true"
