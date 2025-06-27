@@ -267,6 +267,38 @@ organizationFolder('lprimak-private-org-repo') {
     triggerPullRequestBuild delegate, 'TriggerPRCommentBranchProperty', '.*jenkins.*test.*'
 }
 
+organizationFolder('mark-primak-repo') {
+    displayName 'Mark Primak Unit Tests and PR Builder'
+    organizations {
+        github {
+            repoOwner 'markprimak'
+            credentialsId personal_credential
+            githubParameters delegate, 'unit-tests', '', '*', true
+        }
+        triggers {
+            periodicFolderTrigger {
+                interval '1d'
+            }
+        }
+        projectFactories {
+            remoteJenkinsFileWorkflowMultiBranchProjectFactory {
+                githubScriptSource delegate, 'pom.xml', 'UnitTests.groovy'
+            }
+        }
+        properties {
+            folderLibraries {
+                libraries {
+                    libraryDef delegate, 'payara', 'payara-lib'
+                    libraryDef delegate, 'util', 'util-lib'
+                }
+            }
+        }
+    }
+
+    buildBranchesAndPullRequests delegate
+    triggerPullRequestBuild delegate, 'TriggerPRCommentBranchProperty', '.*jenkins.*test.*'
+}
+
 multibranchPipelineJob('flowlogix-ee-integration') {
     displayName 'FlowLogix JEE Integration Tests'
     description 'Flow Logix Components for Jakarta EE and PrimeFaces'
