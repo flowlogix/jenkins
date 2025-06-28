@@ -10,7 +10,6 @@ def call(String log_pattern, boolean checkConsole = true, qualityThreshold = 1) 
     recordIssues enabledForFailure: true, aggregatingResults: true, tools: checkTools,
         filters: [ excludeFile('.*/generated-sources/.*'),
             excludeMessage('Unsupported element'),
-            excludeMessage(/Can.+t extract module name from .*pom:.*/),
             excludeMessage(/The requested profile .* could not be activated because it does not exist\./),
             excludeMessage(/JAR will be empty - no content was marked for inclusion!/),
             excludeMessage(/.*com.orientechnologies.common.log.*/),
@@ -49,7 +48,6 @@ def call(String log_pattern, boolean checkConsole = true, qualityThreshold = 1) 
             excludeMessage(/JSF1064: Unable to find or serve resource.*/),
             excludeMessage(/SLF4J\(I\): Connected with provider of type.*/),
             excludeMessage(/The web application.*created a ThreadLocal.*value.*org.testng.internal.TestResult.*TestR.*/),
-            excludeMessage(/Type implements CloseableResource but not AutoCloseable: org.jboss.arquillian.junit5.JUnitJupiterTestClassLifecycleManager/),
             excludeMessage(/Setting .* is unknown and will be ignored/),
             excludeMessage(/Unprocessed event : UnprocessedChangeEvent.*/) ]
     }
