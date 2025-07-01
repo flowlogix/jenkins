@@ -1,5 +1,6 @@
 def org_credential = 'bacccb11-36f5-4f8f-b45e-26b123a438b0'
 def personal_credential = '187c3f6e-6b13-4024-8df2-10e702f213f8'
+def personal_credential_lprimak = '08fa0c41-d0d1-482a-86b1-96c2bdbd1483'
 def private_repository_credential = '574af081-7c70-4e3f-8446-5f04a837a53f'
 
 def githubMain = {
@@ -508,7 +509,7 @@ multibranchPipelineJob('release-jobs/apache-shiro-fork-release') {
                 git {
                     id '1948045'
                     remote 'git@github.com:lprimak/shiro.git'
-                    credentialsId personal_credential
+                    credentialsId personal_credential_lprimak
                     traits {
                         gitBranchDiscovery()
                         wipeWorkspaceTrait()
@@ -541,7 +542,7 @@ multibranchPipelineJob('release-jobs/apache-shiro-release') {
                 git {
                     id '1948073'
                     remote 'git@github.com:apache/shiro.git'
-                    credentialsId personal_credential
+                    credentialsId personal_credential_lprimak
                     traits {
                         gitBranchDiscovery()
                         wipeWorkspaceTrait()
