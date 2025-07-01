@@ -11,6 +11,8 @@ pipeline {
         disableConcurrentBuilds()
     }
     parameters {
+        booleanParam(name: 'createTag', defaultValue: true,
+                description: 'Whether to create tag in GitHub')
         string(name: 'Version', description: 'Version number to release', trim: true)
         choice(name: 'releaseToRepo', description: 'Which repository to publish the release',
                 choices: ['Maven Central', 'Hope Nexus'])
@@ -55,7 +57,13 @@ pipeline {
 
     post {
         success {
-            sh "git push origin $tag_name"
+            script {
+                if (createTag.toBoolean() && releaseToRepo.startsWith('Maven')) {
+                    sh "git push origin $tag_name"
+                } else {
+                    sh "git tag -d $tag_name || true"
+                }
+            }
         }
         failure {
             sh "git tag -d $tag_name || true"
