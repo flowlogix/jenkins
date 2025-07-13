@@ -1,6 +1,7 @@
 @Library('payara') _l1
 @Library('util') _l2
 
+def skipPipeline = false
 def mavenVersion = 4
 def profiles = optionalMavenProfiles mavenVersion, 'payara-server-local,ui-test,ci'
 def payara_config = [ domain_name : 'test-domain', asadmin : '/usr/share/payara/bin/asadmin' ]
@@ -28,6 +29,10 @@ pipeline {
                 script {
                     currentBuild.description = "Commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
 
+                    if (fileExists("$WORKSPACE/.jenkins_skip")) {
+                        skipPipeline = true
+                        return
+                    }
                     def mavenParamFileName = "$WORKSPACE/.jenkins_maven_args"
                     if (fileExists(mavenParamFileName)) {
                         mavenParamsFromFile = readFile(file: mavenParamFileName).trim()
@@ -35,6 +40,9 @@ pipeline {
                     if (env.GIT_URL.contains('shiro')) {
                         shiroPayaraConfig payara_config
                         qualityThreshold = 3
+                    }
+                    if (env.GIT_URL.contains('myonlinelogbook')) {
+                        qualityThreshold = 136
                     }
                     if (env.GIT_URL.contains('flowlogix/flowlogix')
                           && (env.CHANGE_TARGET == '5.x' || env.GIT_BRANCH == '5.x')) {
@@ -46,11 +54,17 @@ pipeline {
             }
         }
         stage('Maven Info') {
+            when {
+                expression { !skipPipeline }
+            }
             steps {
                 sh "$mvn_cmd -V -B -ntp -C -N -P$profiles $mavenParamsFromFile help:all-profiles"
             }
         }
         stage('Start Payara') {
+            when {
+                expression { !skipPipeline }
+            }
             steps {
                 startPayara payara_config
                 script {
@@ -63,6 +77,9 @@ pipeline {
             }
         }
         stage('Maven Verify - Tests') {
+            when {
+                expression { !skipPipeline }
+            }
             steps {
                 withMaven(options: [ jacocoPublisher(disabled: true) ]) {
                     sh """
@@ -76,6 +93,9 @@ pipeline {
             }
         }
         stage('Maven - JaCoCo Coverage') {
+            when {
+                expression { !skipPipeline }
+            }
             steps {
                 script {
                     if (payara_config.jacoco_started) {

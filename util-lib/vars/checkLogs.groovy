@@ -10,7 +10,6 @@ def call(String log_pattern, boolean checkConsole = true, qualityThreshold = 1) 
     recordIssues enabledForFailure: true, aggregatingResults: true, tools: checkTools,
         filters: [ excludeFile('.*/generated-sources/.*'),
             excludeMessage('Unsupported element'),
-            excludeMessage(/Can.+t extract module name from .*pom:.*/),
             excludeMessage(/The requested profile .* could not be activated because it does not exist\./),
             excludeMessage(/JAR will be empty - no content was marked for inclusion!/),
             excludeMessage(/.*com.orientechnologies.common.log.*/),
