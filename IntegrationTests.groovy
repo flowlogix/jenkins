@@ -78,7 +78,7 @@ pipeline {
                 expression { currentBuild.currentResult == 'SUCCESS' }
             }
             steps {
-                sh "mvn -B -C -fae deploy -Dmaven.install.skip=true -Dcheckstyle.skip=true -DskipTests"
+                sh "mvn -B -C -fae deploy -Dmaven.install.skip=true -Dcheckstyle.skip=true -DskipTests -P$profiles"
             }
         }
         stage('Maven Deploy documentation') {
