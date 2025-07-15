@@ -339,6 +339,44 @@ multibranchPipelineJob('flowlogix-ee-integration') {
     defaultOrphanItemStrategy delegate
 }
 
+multibranchPipelineJob('flowlogix-ee-docs') {
+    displayName 'FlowLogix JEE - Deploy Documentation'
+    description 'Documentation for Flow Logix Components for Jakarta EE and PrimeFaces'
+    branchSources {
+        branchSource {
+            source {
+                github {
+                    id '7234882'
+                    githubMain delegate, 'flowlogix'
+                    githubParameters delegate, 'docs', null, null, false, false, true
+                }
+            }
+            suppressBranchTriggers delegate
+            buildStrategies {
+                skipInitialBuildOnFirstBranchIndexing()
+            }
+        }
+    }
+    factory {
+        remoteJenkinsFileWorkflowBranchProjectFactory {
+            githubScriptSource delegate, 'pom.xml', 'DeployDocs.groovy'
+        }
+    }
+    triggers {
+        periodicFolderTrigger {
+            interval '1d'
+        }
+    }
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }
+    defaultOrphanItemStrategy delegate
+}
+
 multibranchPipelineJob('release-jobs/flowlogix-ee-release') {
     displayName 'Release FlowLogix JEE'
     branchSources {
