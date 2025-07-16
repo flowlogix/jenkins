@@ -1,0 +1,64 @@
+= Flow Logix Jenkins Pipelines
+
+This project contains a collection of Jenkins pipeline scripts for building, testing, and releasing various projects. The pipelines are written in Groovy and are designed to be used with the Jenkins Job DSL and Pipeline plugins.
+
+== Overview
+
+The pipelines are organized into the following categories:
+
+* *CI/CD Pipelines*: These pipelines are responsible for building, testing, and deploying the projects.
+* *Release Pipelines*: These pipelines are used to release new versions of the projects.
+* *Utility Pipelines*: These pipelines perform various utility tasks, such as deploying documentation and publishing websites.
+
+== Prerequisites
+
+The following are required to use these pipelines:
+
+* Jenkins
+* Jenkins Job DSL plugin
+* Jenkins Pipeline plugin
+* Jenkins Git plugin
+* Maven
+* Java
+
+== Pipelines
+
+The following is a list of the available pipelines and their descriptions:
+
+* *CreateJenkinsJobs.groovy*: This script creates the Jenkins jobs for the various projects.
+* *DeployDocs.groovy*: This pipeline deploys the documentation for the projects.
+* *IntegrationTests.groovy*: This pipeline runs the integration tests for the projects.
+* *IntegSample.groovy*: This is a sample integration test pipeline.
+* *NightlyPipeline-sample.groovy*: This is a sample nightly pipeline.
+* *PublishResume.groovy*: This pipeline publishes the resume to the website.
+* *PublishWebsite.groovy*: This pipeline publishes the website.
+* *Release-*.groovy*: These pipelines are used to release new versions of the projects.
+* *UnitTests.groovy*: This pipeline runs the unit tests for the projects.
+
+=== CI/CD Pipelines
+
+The CI/CD pipelines are responsible for building, testing, and deploying the projects. The following are the available CI/CD pipelines:
+
+* *UnitTests.groovy*: This pipeline runs the unit tests for the projects.
+* *IntegrationTests.groovy*: This pipeline runs the integration tests for the projects.
+* *DeployDocs.groovy*: This pipeline deploys the documentation for the projects.
+* *PublishWebsite.groovy*: This pipeline publishes the website.
+* *PublishResume.groovy*: This pipeline publishes the resume to the website.
+
+=== Release Pipelines
+
+The release pipelines are used to release new versions of the projects. The following are the available release pipelines:
+
+* *Release-JEE.groovy*: This pipeline is used to release the Jakarta EE projects.
+* *Release-apache-shiro.groovy*: This pipeline is used to release the Apache Shiro project.
+* *Release-arquillian-drone.groovy*: This pipeline is used to release the Arquillian Drone project.
+* *Release-arquillian-graphene.groovy*: This pipeline is used to release the Arquillian Graphene project.
+* *Release-base-pom.groovy*: This pipeline is used to release the base POM project.
+* *Release-jakartaee-api.groovy*: This pipeline is used to release the Jakarta EE API project.
+* *Release-payara-arquillian.groovy*: This pipeline is used to release the Payara Arquillian Connector project.
+* *Release-shrinkwrap-resolver.groovy*: This pipeline is used to release the ShrinkWrap Resolver project.
+* *Release-without-payara.groovy*: This pipeline is used to release projects that do not use Payara.
+
+== Usage
+
+To use these pipelines, you will need to create a Jenkins job that uses the `CreateJenkinsJobs.groovy` script to create the Jenkins jobs for the various projects. Once the jobs are created, you can then run them to build, test, and release your projects.
