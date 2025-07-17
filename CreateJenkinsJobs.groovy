@@ -15,7 +15,7 @@ def githubMain = {
 
 def githubParameters = {
     ctx, String ctxLabel, String excludeWildcard, String includeWildcard, boolean useTypeSuffix = true,
-    boolean excludeForks = true, boolean trustPermissions = false -> ctx.with {
+    boolean excludeForks = true, boolean trustPermissions = false, disableStatusChecks = false -> ctx.with {
         apiUri 'https://api.github.com'
         traits {
             if (excludeForks) {
@@ -39,11 +39,20 @@ def githubParameters = {
                     }
                 }
             }
-            gitHubStatusChecks { name "CI/$ctxLabel/status" }
             cleanBeforeCheckoutTrait { extension { deleteUntrackedNestedRepositories true } }
             notificationContextTrait {
                 contextLabel "CI/$ctxLabel"
                 typeSuffix useTypeSuffix
+            }
+            if (disableStatusChecks) {
+                disableStatusUpdateTrait()
+                gitHubStatusChecks {
+                    skip true
+                    skipProgressUpdates true
+                    skipNotifications true
+                }
+            } else {
+                gitHubStatusChecks { name "CI/$ctxLabel/status" }
             }
             submoduleOptionTrait {
                 extension {
@@ -348,7 +357,7 @@ multibranchPipelineJob('flowlogix-ee-docs') {
                 github {
                     id '7234882'
                     githubMain delegate, 'flowlogix'
-                    githubParameters delegate, 'docs', null, null, false, false, true
+                    githubParameters delegate, 'docs', null, null, false, false, true, true
                 }
             }
             suppressBranchTriggers delegate
