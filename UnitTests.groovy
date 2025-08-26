@@ -31,7 +31,7 @@ pipeline {
                     if (fileExists(mavenParamFileName)) {
                         mavenParamsFromFile = readFile(file: mavenParamFileName).trim()
                     }
-                    if (env.GIT_URL.contains('shiro')) {
+                    if (env.GIT_URL.endsWith('shiro.git')) {
                         shiroPayaraConfig payara_config
                         qualityThreshold = 3
                     }
