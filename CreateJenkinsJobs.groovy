@@ -910,3 +910,36 @@ multibranchPipelineJob('release-jobs/shrinkwrap-resolver-release') {
     }
     defaultOrphanItemStrategy delegate, '1', '2'
 }
+
+multibranchPipelineJob('release-jobs/maven-war-plugin-release') {
+    displayName 'Maven WAR Plugin - Release'
+    branchSources {
+        branchSource {
+            source {
+                git {
+                    id '25465162'
+                    remote 'git@github.com:lprimak/maven-war-plugin.git'
+                    credentialsId personal_credential_lprimak
+                    traits {
+                        gitBranchDiscovery()
+                        wipeWorkspaceTrait()
+                    }
+                }
+            }
+            suppressBranchTriggers delegate
+        }
+    }
+    factory {
+        remoteJenkinsFileWorkflowBranchProjectFactory {
+            githubScriptSource delegate, 'pom.xml', 'Release-maven-war-plugin.groovy'
+        }
+    }
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }
+    defaultOrphanItemStrategy delegate, '1', '2'
+}
