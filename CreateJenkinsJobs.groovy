@@ -911,6 +911,39 @@ multibranchPipelineJob('release-jobs/shrinkwrap-resolver-release') {
     defaultOrphanItemStrategy delegate, '1', '2'
 }
 
+multibranchPipelineJob('release-jobs/container-deploy-plugin-release') {
+    displayName 'Container Deploy Plugin - Release'
+    branchSources {
+        branchSource {
+            source {
+                git {
+                    id '28436231'
+                    remote 'git@github.com:flowlogix/container-deploy-plugin.git'
+                    credentialsId org_credential
+                    traits {
+                        gitBranchDiscovery()
+                        wipeWorkspaceTrait()
+                    }
+                }
+            }
+            suppressBranchTriggers delegate
+        }
+    }
+    factory {
+        remoteJenkinsFileWorkflowBranchProjectFactory {
+            githubScriptSource delegate, 'pom.xml', 'Release-without-payara.groovy'
+        }
+    }
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }
+    defaultOrphanItemStrategy delegate, '1', '2'
+}
+
 multibranchPipelineJob('release-jobs/maven-war-plugin-release') {
     displayName 'Maven WAR Plugin - Release'
     branchSources {
