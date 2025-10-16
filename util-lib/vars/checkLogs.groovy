@@ -61,7 +61,7 @@ void configParser() {
        getRegex(),
        // line number is not available (currently) in multi-line parsers
         'return builder.setFileName(fileName).setLineStart(lineNumber)' +
-        '.setCategory(matcher.group(3)).setMessage(matcher.group(9).take(256)).buildOptional()',
+        '.setCategory(matcher.group(3)).setMessage(matcher.group(9).take(512)).buildOptional()',
         "[2022-09-11T16:53:01.405-0500] [Payara 5.2022.3] [ERROR]"
         )
     def parsers = config.getParsers().findAll { it.getId() != 'payara-logs' }
