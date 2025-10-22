@@ -17,7 +17,7 @@ pipeline {
                 description: 'Whether to create tag in GitHub')
         string(name: 'Version', description: 'Version number to release', trim: true)
         choice(name: 'releaseToRepo', description: 'Which repository to publish the release',
-                choices: ['Maven Central', 'Hope Nexus'])
+                choices: ['Maven Central', 'FlowLogix Nexus'])
     }
 
     stages {
@@ -30,9 +30,9 @@ pipeline {
                         error msg
                     }
 
-                    if (releaseToRepo.startsWith('Hope')) {
-                        repository_name = 'hope-nexus-artifacts'
-                        repository_url = 'https://nexus.hope.nyc.ny.us/repository/maven-releases'
+                    if (releaseToRepo.startsWith('FlowLogix')) {
+                        repository_name = 'flowlogix-nexus-artifacts'
+                        repository_url = 'https://nexus.flowlogix.com/repository/maven-releases'
                     }
                     if (releaseInMaven.toBoolean()) {
                         automaticCommand = '-Dnjord.publishingType=automatic'

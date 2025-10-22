@@ -51,7 +51,7 @@ pipeline {
                 -DreleaseVersion=$Version -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true \
                 -DskipTests -Dgpg.skip -Dmaven.javadoc.skip=true -Dversion.maven.enforcer.java.limit=28 \
                 -Dversion.payara=$payara_version \
-                -DaltDeploymentRepository=hope-nexus-artifacts::https://nexus.hope.nyc.ny.us/repository/maven-releases/\"
+                -DaltDeploymentRepository=flowlogix-nexus-artifacts::https://nexus.flowlogix.com/repository/maven-releases/\"
                 """
             }
         }

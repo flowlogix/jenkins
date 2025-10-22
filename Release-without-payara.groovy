@@ -16,7 +16,7 @@ pipeline {
                 description: 'Whether to create tag in GitHub')
         string(name: 'Version', description: 'Version number to release', trim: true)
         choice(name: 'releaseToRepo', description: 'Which repository to publish the release',
-            choices: ['Maven Central', 'Hope Nexus'])
+            choices: ['Maven Central', 'FlowLogix Nexus'])
     }
 
     stages {
@@ -28,8 +28,8 @@ pipeline {
                         currentBuild.description = msg
                         error msg
                     }
-                    if (releaseToRepo.startsWith('Hope')) {
-                        release_profile = 'release-flowlogix-to-hope'
+                    if (releaseToRepo.startsWith('FlowLogix')) {
+                        release_profile = 'release-to-flowlogix'
                     }
                     if (releaseInMaven.toBoolean()) {
                         automaticCommand = '-Dnjord.publishingType=automatic'

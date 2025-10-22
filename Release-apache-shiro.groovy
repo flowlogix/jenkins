@@ -15,7 +15,7 @@ pipeline {
                 description: 'Whether to create tag in GitHub')
         string(name: 'Version', description: 'Version number to release', trim: true)
         choice(name: 'releaseToRepo', description: 'Which repository to publish the release',
-                choices: ['Maven Central', 'Hope Nexus'])
+                choices: ['Maven Central', 'FlowLogix Nexus'])
     }
 
     stages {
@@ -27,8 +27,8 @@ pipeline {
                         currentBuild.description = msg
                         error msg
                     }
-                    if (releaseToRepo.startsWith('Hope')) {
-                        alt_repository = "-DaltDeploymentRepository=hope-nexus-artifacts::https://nexus.hope.nyc.ny.us/repository/maven-releases"
+                    if (releaseToRepo.startsWith('FlowLogix')) {
+                        alt_repository = "-DaltDeploymentRepository=flowlogix-nexus-artifacts::https://nexus.flowlogix.com/repository/maven-releases"
                     } else {
                         // nexus_staging_profile = "nexus-staging"
                         alt_repository = "-DaltDeploymentRepository=apache.releases.https::https://repository.apache.org/service/local/staging/deploy/maven2"
