@@ -208,6 +208,11 @@ folder ('content') {
     description('Web Sites, Resume, other content')
 }
 
+folder ('apache-shiro') {
+    displayName('Apache Shiro')
+    description('Builds and Releases jobs for Apache Shiro')
+}
+
 organizationFolder('flowlogix-org-repo') {
     displayName 'FlowLogix Org Unit Tests and PR Builder'
     organizations {
@@ -509,7 +514,7 @@ multibranchPipelineJob('content/resume-builder') {
     defaultOrphanItemStrategy delegate
 }
 
-multibranchPipelineJob('apache-shiro-ci') {
+multibranchPipelineJob('apache-shiro/apache-shiro-ci') {
     displayName 'Apache Shiro CI'
     description 'Apache Shiro Continuous Integration'
     branchSources {
@@ -548,8 +553,8 @@ multibranchPipelineJob('apache-shiro-ci') {
     defaultOrphanItemStrategy delegate
 }
 
-multibranchPipelineJob('release-jobs/apache-shiro-fork-release') {
-    displayName 'Apache Shiro (fork) - Release'
+multibranchPipelineJob('apache-shiro/apache-shiro-fork-release') {
+    displayName 'Apache Shiro (lprimak-fork) - Release'
     branchSources {
         branchSource {
             source {
@@ -581,8 +586,8 @@ multibranchPipelineJob('release-jobs/apache-shiro-fork-release') {
     defaultOrphanItemStrategy delegate, '1', '2'
 }
 
-multibranchPipelineJob('release-jobs/apache-shiro-release') {
-    displayName 'Apache Shiro - Release'
+multibranchPipelineJob('apache-shiro/apache-shiro-release') {
+    displayName 'Apache Shiro (Official) - Release'
     branchSources {
         branchSource {
             source {
