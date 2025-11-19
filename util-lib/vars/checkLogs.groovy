@@ -9,13 +9,10 @@ def call(String log_pattern, boolean checkConsole = true, qualityThreshold = 1) 
     }
     recordIssues enabledForFailure: true, aggregatingResults: true, tools: checkTools,
         filters: [ excludeFile('.*/generated-sources/.*'),
-            excludeMessage('Unsupported element'),
             excludeMessage(/The requested profile .* could not be activated because it does not exist\./),
             excludeMessage(/JAR will be empty - no content was marked for inclusion!/),
-            excludeMessage(/Loading deprecated properties file.*maven\.properties.*/),
             excludeMessage(/.*com.orientechnologies.common.log.*/),
             excludeMessage(/.*INFO: arquillian-suite-deployment: Found class annotated.*/),
-            excludeMessage(/Unable to find the root directory\. Create a \.mvn directory in the root directory or add.*/),
             excludeMessage('No profiles detected!'), excludeMessage('Javadoc Warnings') ],
         name: 'Java Compiler', qualityGates: maximalQualityGates
 
