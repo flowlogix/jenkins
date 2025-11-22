@@ -31,6 +31,9 @@ pipeline {
                     if (fileExists(mavenParamFileName)) {
                         mavenParamsFromFile = readFile(file: mavenParamFileName).trim()
                     }
+                    payara_config << [ jacoco_profile : profiles + optionalMavenProfiles(mavenVersion, ',coverage') ]
+                    payara_config << [ jacoco_expr_args : mavenParamsFromFile ]
+
                     if (env.GIT_URL.endsWith('shiro.git')) {
                         shiroPayaraConfig payara_config
                         qualityThreshold = 3
@@ -42,8 +45,6 @@ pipeline {
                           && (env.CHANGE_TARGET == '5.x' || env.GIT_BRANCH == '5.x')) {
                         qualityThreshold = 2
                     }
-                    payara_config << [ jacoco_profile : profiles + optionalMavenProfiles(mavenVersion, ',coverage') ]
-                    payara_config << [ jacoco_expr_args : mavenParamsFromFile ]
                 }
             }
         }

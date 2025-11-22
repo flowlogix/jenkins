@@ -8,14 +8,14 @@ final def portbase = 4900 + (env.EXECUTOR_NUMBER as int) * 100
 @Field
 final def jenkinsPayaraFileName = "$WORKSPACE/.jenkins_payara"
 @Field
-final def jenkinsJacocoFileName = "$WORKSPACE/.jenkins_no_remote_jacoco"
+final def jenkinsIgnoreJacocoFileName = "$WORKSPACE/.jenkins_no_remote_jacoco"
 
 @Field
 final def payara_default_config =
     [ domain_name : 'domain1', payara_version : 'current',
       asadmin : "$HOME/apps/payara/current/bin/asadmin",
       force_start : false, workspace_base : "$WORKSPACE/target/dependency",
-      jacoco_started: false,
+      create_domain : true, domaindir_args : '', jacoco_started : false,
       jacoco_profile : '', jacoco_tcp_server : true, jacoco_expr_args : '' ]
 
 def call(def payara_config) {
@@ -43,25 +43,80 @@ def call(def payara_config) {
         }
     }
 
-    payara_config.domaindir_args = "--domaindir $payara_config.workspace_base/payara_domaindir"
-    sh """$payara_config.asadmin create-domain $payara_config.domaindir_args \
-       --nopassword --portbase $portbase $payara_config.domain_name"""
+    def cache_dir = "$HOME/.cache/jenkins-payara-domains/${payara_config.payara_version}-$portbase"
+    def using_cache = false
+    if (payara_config.create_domain) {
+        payara_config.domaindir_args = "--domaindir $payara_config.workspace_base/payara_domaindir"
+
+        if (fileExists(cache_dir) && cacheValid(payara_config, cache_dir)) {
+            using_cache = true
+            echo "Using cached Payara domain from $cache_dir"
+            sh """mkdir -p $payara_config.workspace_base/payara_domaindir
+                cp -R $cache_dir $payara_config.workspace_base/payara_domaindir/$payara_config.domain_name
+            """
+        } else {
+            sh """$payara_config.asadmin create-domain $payara_config.domaindir_args \
+                  --nopassword --portbase $portbase $payara_config.domain_name"""
+        }
+    } else {
+        payara_config.domain_name = ''
+    }
 
     if (!payara_config.admin_port) {
-        payara_config.admin_port = portbase + 48
+        payara_config.admin_port = payara_config.create_domain ? portbase + 48 : 4848
     }
     if (!payara_config.ssl_port) {
-        payara_config.ssl_port = portbase + 81
+        payara_config.ssl_port = payara_config.create_domain ? portbase + 81 : 8181
     }
-    sh """
-        $payara_config.asadmin start-domain $payara_config.domaindir_args $payara_config.domain_name
-        mkdir -p $payara_config.workspace_base/tmpdir
-        $payara_config.asadmin -p $payara_config.admin_port create-system-properties\
-            java.io.tmpdir=$payara_config.workspace_base/tmpdir
-        """
 
-    if (fileExists(jenkinsJacocoFileName)) {
-        return
+    String tmp_dir_option = '-D_empty_tmpdir=empty'
+    if (payara_config.create_domain) {
+        sh "mkdir -p $payara_config.workspace_base/tmpdir"
+        tmp_dir_option = "-Djava.io.tmpdir=$payara_config.workspace_base/tmpdir"
+    }
+
+    sh "PAYARA_JACOCO_OPTIONS=\"${jacocoCommandLine(payara_config)}\" \
+        PAYARA_TMPDIR_OPTIONS=$tmp_dir_option \
+        $payara_config.asadmin start-domain \
+        $payara_config.domaindir_args $payara_config.domain_name"
+
+    if (payara_config.create_domain) {
+        if (!using_cache) {
+            sh "$payara_config.asadmin -p $payara_config.admin_port \
+                create-jvm-options \\\${ENV=PAYARA_JACOCO_OPTIONS}:\\\${ENV=PAYARA_TMPDIR_OPTIONS}"
+            sh "rm -f $cache_dir/logs/server.log; \
+                $payara_config.asadmin -p $payara_config.admin_port restart-domain \
+                $payara_config.domaindir_args $payara_config.domain_name"
+        }
+
+        if (!fileExists(cache_dir)) {
+            echo "Caching Payara domain to $cache_dir"
+            sh """mkdir -p $HOME/.cache/jenkins-payara-domains
+                cp -R $payara_config.workspace_base/payara_domaindir/$payara_config.domain_name $cache_dir
+                rm -f $cache_dir/logs/server.log
+                touch -r $payara_config.asadmin $cache_dir
+            """
+        } else {
+            echo "Not caching Payara domain as cache is valid: $cache_dir"
+        }
+    }
+}
+
+boolean cacheValid(def payara_config, String cache_dir) {
+    def sourceMTime = sh(script: "stat -f %m ${payara_config.asadmin}", returnStdout: true).trim()
+    def targetMTime = sh(script: "stat -f %m ${cache_dir}", returnStdout: true).trim()
+
+    if (sourceMTime != targetMTime) {
+        echo "Cache invalid for $cache_dir, deleting it"
+        sh "rm -rf $cache_dir"
+        return false
+    }
+    return true
+}
+
+String jacocoCommandLine(def payara_config) {
+    if (fileExists(jenkinsIgnoreJacocoFileName)) {
+        return '-D_empty_jacoco=empty'
     }
 
     payara_config.jacoco_port = (payara_config.admin_port as int) + 10000
@@ -81,12 +136,10 @@ def call(def payara_config) {
     }
 
     if (jacoco_argline?.startsWith('-javaagent')) {
-        def escaped_argline = jacoco_argline.replaceAll(/[\/:=]/, /\\\\$0/).replaceAll(/[$]/, /\\$0/)
         def tcp_server_output = payara_config.jacoco_tcp_server ? ',output=tcpserver' : ''
-        sh """
-            $payara_config.asadmin -p $payara_config.admin_port create-jvm-options $escaped_argline$tcp_server_output
-            $payara_config.asadmin -p $payara_config.admin_port restart-domain $payara_config.domaindir_args $payara_config.domain_name
-        """
         payara_config.jacoco_started = true
+        def jacoco_argline_shell = jacoco_argline.replaceAll(/[$]/, /\\$0/)
+        return "$jacoco_argline_shell$tcp_server_output"
     }
+    return '-D_empty_jacoco=empty'
 }
