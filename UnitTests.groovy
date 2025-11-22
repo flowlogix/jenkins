@@ -15,7 +15,7 @@ pipeline {
         docker {
             label 'docker-agent'
             reuseNode true
-            image 'flowlogix/jenkins-agent'
+            image 'flowlogix/jenkins-agent:m4-p5-jdk21'
         }
     }
 
