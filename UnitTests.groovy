@@ -4,14 +4,20 @@
 def skipPipeline = false
 def mavenVersion = 4
 def profiles = optionalMavenProfiles mavenVersion, 'payara-server-local,ui-test,ci'
-def payara_config = [ domain_name : 'test-domain' ]
+def payara_config = [ domain_name : 'test-domain', asadmin : '/usr/share/payara/bin/asadmin' ]
 def mvn_cmd = 'mvn'
 def payara_build_options = ''
 def mavenParamsFromFile = ''
 def qualityThreshold = 1
 
 pipeline {
-    agent any
+    agent {
+        docker {
+            label 'docker-agent'
+            reuseNode true
+            image 'flowlogix/jenkins-agent'
+        }
+    }
 
     options {
         quietPeriod 0
@@ -36,6 +42,7 @@ pipeline {
                     }
                     payara_config << [ jacoco_profile : profiles + optionalMavenProfiles(mavenVersion, ',coverage') ]
                     payara_config << [ jacoco_expr_args : mavenParamsFromFile ]
+                    payara_config.create_domain = false
 
                     if (env.GIT_URL.endsWith('shiro.git')) {
                         shiroPayaraConfig payara_config
