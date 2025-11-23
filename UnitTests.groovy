@@ -27,6 +27,9 @@ pipeline {
                         skipPipeline = true
                         return
                     }
+                    if (fileExists("$HOME/.cache/maven.aot")) {
+                        env.MAVEN_OPTS = "${env.MAVEN_OPTS ?: ''} -XX:+IgnoreUnrecognizedVMOptions -XX:AOTCache=$HOME/.cache/maven.aot"
+                    }
                     def mavenParamFileName = "$WORKSPACE/.jenkins_maven_args"
                     if (fileExists(mavenParamFileName)) {
                         mavenParamsFromFile = readFile(file: mavenParamFileName).trim()

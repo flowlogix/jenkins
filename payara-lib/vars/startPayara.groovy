@@ -127,7 +127,13 @@ String jacocoCommandLine(def payara_config) {
 
     def jacoco_argline = ''
     def jacocoConfigOutput = "$WORKSPACE/target/jacoco-agent-config.txt"
-    sh "mvn -ntp initialize help:evaluate $jacoco_profile_cmd \
+
+    def maven_options_override = ''
+    if (payara_config.create_domain && !fileExists("$HOME/.cache/maven.aot")) {
+        echo "Creating Maven AOT cache"
+        maven_options_override = "MAVEN_OPTS='-XX:+IgnoreUnrecognizedVMOptions -XX:AOTCacheOutput=$HOME/.cache/maven.aot'"
+    }
+    sh "$maven_options_override mvn -ntp initialize help:evaluate $jacoco_profile_cmd \
         -Dexpression=jacocoAgent -q -DjacocoPort=$payara_config.jacoco_port \
         -Djacoco.destFile=$WORKSPACE/target/jacoco-it.exec -Doutput=$jacocoConfigOutput \
         ${payara_config.jacoco_tcp_server ? '-N' : ''} $payara_config.jacoco_expr_args || exit 0"
