@@ -949,6 +949,39 @@ multibranchPipelineJob('release-jobs/container-deploy-plugin-release') {
     defaultOrphanItemStrategy delegate, '1', '2'
 }
 
+multibranchPipelineJob('release-jobs/archetype-release') {
+    displayName 'FlowLogix Starter Archetype - Release'
+    branchSources {
+        branchSource {
+            source {
+                git {
+                    id '28452231'
+                    remote 'git@github.com:flowlogix/archetype.git'
+                    credentialsId org_credential
+                    traits {
+                        gitBranchDiscovery()
+                        wipeWorkspaceTrait()
+                    }
+                }
+            }
+            suppressBranchTriggers delegate
+        }
+    }
+    factory {
+        remoteJenkinsFileWorkflowBranchProjectFactory {
+            githubScriptSource delegate, 'pom.xml', 'Release-without-payara.groovy'
+        }
+    }
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }
+    defaultOrphanItemStrategy delegate, '1', '2'
+}
+
 multibranchPipelineJob('release-jobs/maven-war-plugin-release') {
     displayName 'Maven WAR Plugin - Release'
     branchSources {
