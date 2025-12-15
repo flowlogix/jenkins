@@ -982,6 +982,39 @@ multibranchPipelineJob('release-jobs/archetype-release') {
     defaultOrphanItemStrategy delegate, '1', '2'
 }
 
+multibranchPipelineJob('release-jobs/flowlogix-bom-release') {
+    displayName 'FlowLogix BOM - Release'
+    branchSources {
+        branchSource {
+            source {
+                git {
+                    id '28735781'
+                    remote 'git@github.com:flowlogix/flowlogix-bom.git'
+                    credentialsId org_credential
+                    traits {
+                        gitBranchDiscovery()
+                        wipeWorkspaceTrait()
+                    }
+                }
+            }
+            suppressBranchTriggers delegate
+        }
+    }
+    factory {
+        remoteJenkinsFileWorkflowBranchProjectFactory {
+            githubScriptSource delegate, 'pom.xml', 'Release-without-payara.groovy'
+        }
+    }
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }
+    defaultOrphanItemStrategy delegate, '1', '2'
+}
+
 multibranchPipelineJob('release-jobs/maven-war-plugin-release') {
     displayName 'Maven WAR Plugin - Release'
     branchSources {
