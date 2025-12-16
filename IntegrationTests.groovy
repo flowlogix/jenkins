@@ -101,9 +101,9 @@ pipeline {
                                               /var/flowlogix/html/javadoc/datamodel-apidocs
                 rsync -aH --delete-after ${env.WORKSPACE}/docs/$jbake_maven_project/target/output/ \
                     ${websiteHost()}:/var/flowlogix/html/docs/
-                rsync -aH --delete-after ${env.WORKSPACE}/jakarta-ee/flowlogix-jee/target/reports/apidocs/ \
+                rsync -aH --delete-after ${env.WORKSPACE}/flowlogix-jee/target/reports/apidocs/ \
                     ${websiteHost()}:/var/flowlogix/html/javadoc/jee-apidocs/
-                rsync -aH --delete-after ${env.WORKSPACE}/jakarta-ee/flowlogix-datamodel/target/reports/apidocs/ \
+                rsync -aH --delete-after ${env.WORKSPACE}/flowlogix-datamodel/target/reports/apidocs/ \
                     ${websiteHost()}:/var/flowlogix/html/javadoc/datamodel-apidocs/
                 """
             }
