@@ -40,6 +40,9 @@ pipeline {
                     if (env.GIT_URL.endsWith('shiro.git')) {
                         shiroPayaraConfig payara_config
                         qualityThreshold = 3
+                        if (env.CHANGE_TARGET == '3.x' || env.GIT_BRANCH == '3.x') {
+                            profiles = profiles +=',-ci'
+                        }
                     }
                     if (env.GIT_URL.contains('myonlinelogbook')) {
                         qualityThreshold = 136
