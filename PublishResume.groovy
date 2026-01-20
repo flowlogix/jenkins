@@ -36,7 +36,7 @@ pipeline {
                 for html_file in target/output/*.html
                 do
                     echo "Converting \$html_file to PDF ..."
-                    wkhtmltopdf --page-height 333mm --page-width 210mm --margin-bottom 10mm \
+                    wkhtmltopdf --page-height 333mm --page-width 220mm --margin-bottom 10mm \
                     https://apps.hope.nyc.ny.us/resume/`basename \$html_file` \
                     target/output/`basename \$html_file .html`.pdf
                 done
