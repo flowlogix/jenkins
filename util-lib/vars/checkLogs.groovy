@@ -49,6 +49,7 @@ def call(String log_pattern, boolean checkConsole = true, qualityThreshold = 1) 
             excludeMessage(/The SSL certificate has expired.*/),
             excludeMessage(/The web application.*created a ThreadLocal.*value.*org.testng.internal.TestResult.*TestR.*/),
             excludeMessage(/Setting .* is unknown and will be ignored/),
+            excludeMessage(/Class Not loaded yet com.sun.ejb.containers.interceptors._SystemInterceptorProxy_Serializable/),
             excludeMessage(/Unprocessed event : UnprocessedChangeEvent.*/) ]
     }
 }
