@@ -38,10 +38,12 @@ pipeline {
                     payara_config << [ jacoco_expr_args : mavenParamsFromFile ]
 
                     if (env.GIT_URL.endsWith('shiro.git')) {
-                        shiroPayaraConfig payara_config
                         qualityThreshold = 3
                         if (env.CHANGE_TARGET == '3.x' || env.GIT_BRANCH == '3.x') {
                             profiles = profiles +=',-ci'
+                            shiroPayaraConfig payara_config
+                        } else {
+                            shiroPayaraConfig payara_config, true
                         }
                     }
                     if (env.GIT_URL.contains('myonlinelogbook')) {
