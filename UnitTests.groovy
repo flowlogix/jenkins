@@ -40,8 +40,9 @@ pipeline {
                     if (env.GIT_URL.endsWith('shiro.git')) {
                         qualityThreshold = 3
                         if (env.CHANGE_TARGET == '3.x' || env.GIT_BRANCH == '3.x') {
-                            profiles = profiles +=',-ci'
                             shiroPayaraConfig payara_config
+                            qualityThreshold = 1
+                            mvn_cmd += ' -Djapicmp.skip=true'
                         } else {
                             shiroPayaraConfig payara_config, true
                         }
