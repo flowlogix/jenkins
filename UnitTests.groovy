@@ -9,6 +9,7 @@ def mvn_cmd = 'mvn'
 def payara_build_options = ''
 def mavenParamsFromFile = ''
 def qualityThreshold = 1
+float branchCoverageThreshold = 60.0
 
 pipeline {
     agent any
@@ -41,7 +42,8 @@ pipeline {
                         qualityThreshold = 3
                         if (env.CHANGE_TARGET == '3.x' || env.GIT_BRANCH == '3.x') {
                             shiroPayaraConfig payara_config
-                            qualityThreshold = 1
+                            qualityThreshold = 2
+                            branchCoverageThreshold = 55.0
                             mvn_cmd += ' -Djapicmp.skip=true'
                         } else {
                             shiroPayaraConfig payara_config, true
@@ -118,7 +120,7 @@ pipeline {
         always {
             stopPayara payara_config
             archiveArtifacts artifacts: '**/logs/server.log*', allowEmptyArchive: true
-            checkLogs payara_config.asadmin ? '**/logs/server.log*' : null, true, qualityThreshold
+            checkLogs payara_config.asadmin ? '**/logs/server.log*' : null, true, qualityThreshold, branchCoverageThreshold
         }
     }
 }
