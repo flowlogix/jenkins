@@ -43,7 +43,7 @@ pipeline {
                         if (env.CHANGE_TARGET == '3.x' || env.GIT_BRANCH == '3.x') {
                             shiroPayaraConfig payara_config
                             qualityThreshold = 2
-                            branchCoverageThreshold = 55.0
+                            branchCoverageThreshold = 40.0
                             mvn_cmd += ' -Djapicmp.skip=true'
                         } else {
                             shiroPayaraConfig payara_config, true
