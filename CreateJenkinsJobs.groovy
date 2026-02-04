@@ -1047,3 +1047,36 @@ multibranchPipelineJob('release-jobs/maven-war-plugin-release') {
     }
     defaultOrphanItemStrategy delegate, '1', '2'
 }
+
+multibranchPipelineJob('release-jobs/junit-servers-release') {
+    displayName 'JUnit Servers - Release'
+    branchSources {
+        branchSource {
+            source {
+                git {
+                    id '25465631'
+                    remote 'git@github.com:flowlogix/junit-servers.git'
+                    credentialsId org_credential
+                    traits {
+                        gitBranchDiscovery()
+                        wipeWorkspaceTrait()
+                    }
+                }
+            }
+            suppressBranchTriggers delegate
+        }
+    }
+    factory {
+        remoteJenkinsFileWorkflowBranchProjectFactory {
+            githubScriptSource delegate, 'pom.xml', 'Release-junit-servers.groovy'
+        }
+    }
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }
+    defaultOrphanItemStrategy delegate, '1', '2'
+}
