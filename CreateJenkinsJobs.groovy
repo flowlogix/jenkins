@@ -391,40 +391,6 @@ multibranchPipelineJob('flowlogix-ee-docs') {
     defaultOrphanItemStrategy delegate
 }
 
-multibranchPipelineJob('release-jobs/flowlogix-ee-release') {
-    displayName 'Release FlowLogix JEE'
-    branchSources {
-        branchSource {
-            source {
-                git {
-                    id '1948134'
-                    remote 'git@github.com:flowlogix/flowlogix.git'
-                    credentialsId org_credential
-                    traits {
-                        gitBranchDiscovery()
-                        wipeWorkspaceTrait()
-                    }
-                }
-            }
-            suppressBranchTriggers delegate
-        }
-    }
-    factory {
-        remoteJenkinsFileWorkflowBranchProjectFactory {
-            githubScriptSource delegate, 'pom.xml', 'Release-JEE.groovy'
-        }
-    }
-    properties {
-        folderLibraries {
-            libraries {
-                libraryDef delegate, 'payara', 'payara-lib'
-                libraryDef delegate, 'util', 'util-lib'
-            }
-        }
-    }
-    defaultOrphanItemStrategy delegate, '1', '2'
-}
-
 multibranchPipelineJob('content/flowlogix-website-builder') {
     displayName 'Flow Logix Web Site Publisher'
     description 'Hope and Flow Logix Web Site Publisher'
@@ -612,6 +578,40 @@ multibranchPipelineJob('apache-shiro/apache-shiro-release') {
     properties {
         folderLibraries {
             libraries {
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }
+    defaultOrphanItemStrategy delegate, '1', '2'
+}
+
+multibranchPipelineJob('release-jobs/flowlogix-ee-release') {
+    displayName 'Release FlowLogix JEE'
+    branchSources {
+        branchSource {
+            source {
+                git {
+                    id '1948134'
+                    remote 'git@github.com:flowlogix/flowlogix.git'
+                    credentialsId org_credential
+                    traits {
+                        gitBranchDiscovery()
+                        wipeWorkspaceTrait()
+                    }
+                }
+            }
+            suppressBranchTriggers delegate
+        }
+    }
+    factory {
+        remoteJenkinsFileWorkflowBranchProjectFactory {
+            githubScriptSource delegate, 'pom.xml', 'Release-JEE.groovy'
+        }
+    }
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'payara', 'payara-lib'
                 libraryDef delegate, 'util', 'util-lib'
             }
         }
