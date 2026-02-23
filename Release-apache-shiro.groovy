@@ -45,9 +45,9 @@ pipeline {
             steps {
                 mavenSettingsCredentials true, {
                     sh """
-                    mvn -B -ntp -C release:prepare release:perform -Dnexus-staging-profile=$nexus_staging_profile \
+                    mvn -B -ntp -C release:prepare release:perform -Pskip_jakarta_ee_tests \
+                    -Dnexus-staging-profile=$nexus_staging_profile \
                     -DreleaseVersion=$Version -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true \
-                    -DskipTests -Djakartaee.it.skip=true -Dpayara.start.skip=true -Dpayara.restart.skip=true \
                     $alt_repository \"
                     """
                 }
