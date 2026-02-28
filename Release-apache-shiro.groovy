@@ -3,6 +3,7 @@
 def tag_name = ""
 def nexus_staging_profile = ""
 def alt_repository = ""
+def altReleaseFlags = ""
 
 pipeline {
     agent any
@@ -29,6 +30,8 @@ pipeline {
                     }
                     if (releaseToRepo.startsWith('FlowLogix')) {
                         alt_repository = "-DaltDeploymentRepository=flowlogix-nexus-artifacts::https://nexus.flowlogix.com/repository/maven-releases"
+                        altReleaseFlags = "-DdistMgmtReleasesId=flowlogix-nexus-artifacts -DdistMgmtReleasesName=FlowLogixJenkins \
+                                           -DdistMgmtReleasesUrl=https://nexus.flowlogix.com/repository/maven-releases"
                     } else {
                         // nexus_staging_profile = "nexus-staging"
                         alt_repository = "-DaltDeploymentRepository=apache.releases.https::https://repository.apache.org/service/local/staging/deploy/maven2"
@@ -45,10 +48,11 @@ pipeline {
             steps {
                 mavenSettingsCredentials true, {
                     sh """
+                    export MAVEN_OPTS="\$MAVEN_OPTS $altReleaseFlags $alt_repository"
                     mvn -B -ntp -C release:prepare release:perform -Pskip_jakarta_ee_tests \
-                    -Dnexus-staging-profile=$nexus_staging_profile \
+                    -Dnexus-staging-profile=$nexus_staging_profile $altReleaseFlags \
                     -DreleaseVersion=$Version -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true \
-                    $alt_repository \"
+                    $alt_repository\" \
                     """
                 }
             }
