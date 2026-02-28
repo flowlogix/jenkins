@@ -47,7 +47,7 @@ pipeline {
             steps {
                 sh """
                 mvn -B -ntp -C -Dmaven.install.skip=true -DtrimStackTrace=false -DskipTests \
-                -DaltDeploymentRepository=flowlogix-nexus-artifacts::default::https://nexus.flowlogix.com/repository/maven-releases/ \
+                -DaltDeploymentRepository=flowlogix-nexus-artifacts::https://nexus.flowlogix.com/repository/maven-releases/ \
                 deploy
                 """
             }
