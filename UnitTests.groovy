@@ -3,7 +3,7 @@
 
 def skipPipeline = false
 def mavenVersion = 4
-def profiles = optionalMavenProfiles mavenVersion, 'payara-server-local,ui-test,ci'
+def profiles = optionalMavenProfiles mavenVersion, 'server-local,payara-server-local,ui-test,ci'
 def payara_config = [ domain_name : 'test-domain' ]
 def mvn_cmd = 'mvn'
 def payara_build_options = ''

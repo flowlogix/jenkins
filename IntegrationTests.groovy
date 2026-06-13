@@ -1,8 +1,8 @@
 @Library('payara') _l1
 @Library('util') _l2
 def mavenVersion = 4
-final def profiles           = optionalMavenProfiles mavenVersion, 'payara-server-local,coverage,all-tests'
-final def profiles_no_stress = optionalMavenProfiles mavenVersion, 'payara-server-local,coverage,ui-test'
+final def profiles           = optionalMavenProfiles mavenVersion, 'server-local,payara-server-local,coverage,all-tests'
+final def profiles_no_stress = optionalMavenProfiles mavenVersion, 'server-local,payara-server-local,coverage,ui-test'
 def payara_config = [ domain_name : 'test-domain', jacoco_profile : profiles ]
 def mvnCommandLine
 def jbake_maven_project = 'jbake-maven'

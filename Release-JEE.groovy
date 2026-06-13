@@ -2,7 +2,7 @@
 @Library('util') _l2
 
 def payara_config = [domain_name : 'prod-domain']
-final def profiles = 'all-tests,payara-server-local'
+final def profiles = 'all-tests,server-local'
 def release_profile = 'flowlogix-central-portal'
 def automaticCommand = ''
 
