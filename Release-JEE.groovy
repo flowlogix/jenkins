@@ -54,7 +54,7 @@ pipeline {
                     -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true \
                     -Dnjord.autoPublish=true -Dnjord.waitForStates=true $automaticCommand \
                     \$(eval echo \$MAVEN_ADD_OPTIONS) -Ddrone.chrome.binary='\$(eval echo \$CHROME_BINARY)' \
-                    -DadminPort=$payara_config.admin_port -Dpayara.https.port=$payara_config.ssl_port \"
+                    -DadminPort=$payara_config.admin_port -Dserver.https.port=$payara_config.ssl_port \"
                     """
                 }
             }
