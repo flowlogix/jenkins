@@ -39,13 +39,11 @@ pipeline {
                     payara_config << [ jacoco_expr_args : mavenParamsFromFile ]
 
                     if (env.GIT_URL.endsWith('shiro.git')) {
-                        qualityThreshold = 2
                         if (env.CHANGE_TARGET == '2.x' || env.GIT_BRANCH == '2.x') {
                             qualityThreshold = 3
                             shiroPayaraConfig payara_config, true
                         } else {
                             shiroPayaraConfig payara_config
-                            branchCoverageThreshold = 55.0
                             mvn_cmd += ' -Djapicmp.skip=true'
                         }
                     }
