@@ -38,8 +38,11 @@ pipeline {
                         mavenParamsFromFile = readFile(file: mavenParamFileName).trim()
                     }
                     def configContent = readFile "${WORKSPACE}/${jbake_props_file}"
+                    if (website_subdir as boolean) {
+                        configContent += "\nrootpath=${website_subdir}"
+                    }
                     writeFile file: "${WORKSPACE}/${jbake_props_file}",
-                            text: configContent + "\ngit.commit=${env.GIT_COMMIT[0..7]}"
+                            text: configContent + "\ngit.commit=${env.GIT_COMMIT[0..7]}\n"
                 }
             }
         }
