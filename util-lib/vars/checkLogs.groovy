@@ -11,7 +11,11 @@ def call(String log_pattern, boolean checkConsole = true, qualityThreshold = 1, 
         filters: [ excludeFile('.*/generated-sources/.*'),
             excludeMessage(/The requested profile .* could not be activated because it does not exist\./),
             excludeMessage(/JAR will be empty - no content was marked for inclusion!/),
+            // jbake messages
             excludeMessage(/.*com.orientechnologies.common.log.*/),
+            excludeMessage(/Cannot find default script language for javascript/),
+            excludeMessage(/IMPORTANT! Using default password is unsafe, please change password for user.*/),
+            // end jbake messages
             excludeMessage(/.*INFO: arquillian-suite-deployment: Found class annotated.*/),
             excludeMessage('No profiles detected!'), excludeMessage('Javadoc Warnings') ],
         name: 'Java Compiler', qualityGates: maximalQualityGates
