@@ -35,7 +35,7 @@ pipeline {
                     def pdfBaseOptions = '--page-height 333mm --page-width 250mm ' +
                             '--margin-bottom 0mm --margin-right 0mm --margin-left 0mm'
                     def zoomLevels = [
-                            [zoom: '1.15', suffix: ''],
+                            [zoom: '1.1', suffix: ''],
                             [zoom: '1.25', suffix: '-zoomed']
                     ]
 
