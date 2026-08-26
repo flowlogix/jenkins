@@ -31,17 +31,27 @@ pipeline {
         }
         stage('wkhtmltopdf - html-to-PDF') {
             steps {
-                sh """ \
-                set +x
-                for html_file in target/output/*.html
-                do
-                    echo "Converting \$html_file to PDF ..."
-                    wkhtmltopdf --page-height 333mm --page-width 220mm --margin-bottom 10mm \
-                    https://apps.hope.nyc.ny.us/resume/`basename \$html_file` \
-                    target/output/`basename \$html_file .html`.pdf
-                done
-                set -x
-                """
+                script {
+                    def pdfBaseOptions = '--page-height 333mm --page-width 220mm ' +
+                            '--margin-bottom 0mm --margin-right 0mm --margin-left 0mm'
+                    def zoomLevels = [
+                            [zoom: '1.08', suffix: ''],
+                            [zoom: '1.2', suffix: '-zoomed']
+                    ]
+
+                    for (zoom in zoomLevels) {
+                        sh """
+                        set +x
+                        for html_file in target/output/*.html
+                        do
+                            echo "Converting \$html_file to PDF with zoom ${zoom.zoom} ..."
+                            wkhtmltopdf --zoom ${zoom.zoom} ${pdfBaseOptions} https://apps.hope.nyc.ny.us/resume/\$(basename \$html_file) 
+                            target/output/\$(basename \$html_file .html)${zoom.suffix}.pdf
+                        done
+                        set -x
+                        """
+                    }
+                }
             }
         }
         stage('Publish - Web Host') {
