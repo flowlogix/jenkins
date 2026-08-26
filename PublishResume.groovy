@@ -32,11 +32,11 @@ pipeline {
         stage('wkhtmltopdf - html-to-PDF') {
             steps {
                 script {
-                    def pdfBaseOptions = '--page-height 333mm --page-width 220mm ' +
+                    def pdfBaseOptions = '--page-height 333mm --page-width 250mm ' +
                             '--margin-bottom 0mm --margin-right 0mm --margin-left 0mm'
                     def zoomLevels = [
-                            [zoom: '1.08', suffix: ''],
-                            [zoom: '1.2', suffix: '-zoomed']
+                            [zoom: '1.15', suffix: ''],
+                            [zoom: '1.25', suffix: '-zoomed']
                     ]
 
                     for (zoom in zoomLevels) {
