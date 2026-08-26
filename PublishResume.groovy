@@ -35,17 +35,20 @@ pipeline {
                     def pdfBaseOptions = '--page-height 333mm --page-width 250mm ' +
                             '--margin-bottom 0mm --margin-right 0mm --margin-left 0mm'
                     def zoomLevels = [
-                            [zoom: '1.1', suffix: ''],
-                            [zoom: '1.25', suffix: '-zoomed']
+                            [zoom: '1.08', suffix: ''],
+                            [zoom: '1.25', suffix: '-zoomed', pageWidth: '250mm'],
                     ]
+                    def defaultPageWidth = '220mm'
 
                     for (zoom in zoomLevels) {
+                        def pageWidth = zoom.pageWidth != null ? zoom.pageWidth : defaultPageWidth
                         sh """
                         set +x
                         for html_file in target/output/*.html
                         do
                             echo "Converting \$html_file to PDF with zoom ${zoom.zoom} ..."
-                            wkhtmltopdf --zoom ${zoom.zoom} ${pdfBaseOptions} https://apps.hope.nyc.ny.us/resume/\$(basename \$html_file) \
+                            wkhtmltopdf --zoom ${zoom.zoom} --page-width ${pageWidth} ${pdfBaseOptions} \
+                            https://apps.hope.nyc.ny.us/resume/\$(basename \$html_file) \
                             target/output/\$(basename \$html_file .html)${zoom.suffix}.pdf
                         done
                         set -x
