@@ -45,7 +45,7 @@ pipeline {
                         for html_file in target/output/*.html
                         do
                             echo "Converting \$html_file to PDF with zoom ${zoom.zoom} ..."
-                            wkhtmltopdf --zoom ${zoom.zoom} ${pdfBaseOptions} https://apps.hope.nyc.ny.us/resume/\$(basename \$html_file) 
+                            wkhtmltopdf --zoom ${zoom.zoom} ${pdfBaseOptions} https://apps.hope.nyc.ny.us/resume/\$(basename \$html_file) \
                             target/output/\$(basename \$html_file .html)${zoom.suffix}.pdf
                         done
                         set -x
