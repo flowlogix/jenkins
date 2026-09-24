@@ -42,7 +42,7 @@ pipeline {
                     sh """
                     mvn -B -ntp -C -Pflowlogix-base-release release:prepare release:perform \
                     -DpushChanges=false -DlocalCheckout=true \
-                    -DreleaseVersion=$Version -DtagNameFormat=Version-$Version \
+                    -DreleaseVersion=$Version -DtagNameFormat=v$Version \
                     -Dgoals=\"resources:resources jar:jar gpg:sign deploy\" \
                     -Darguments=\"-Dmaven.install.skip=true \
                     -Dnjord.publisher=sonatype-cp -Dnjord.autoPublish=true \
@@ -60,14 +60,14 @@ pipeline {
             script {
                 if (createTag.toBoolean()
                         || (releaseInMaven.toBoolean() && releaseToRepo.startsWith('Maven'))) {
-                    sh "git push origin Version-$Version"
+                    sh "git push origin v$Version"
                 } else {
-                    sh "git tag -d Version-$Version || true"
+                    sh "git tag -d v$Version || true"
                 }
             }
         }
         failure {
-            sh "git tag -d Version-$Version || true"
+            sh "git tag -d v$Version || true"
         }
     }
 }
