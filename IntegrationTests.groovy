@@ -93,6 +93,7 @@ pipeline {
             }
             steps {
                 sh """
+                ${java25()}
                 export MAVEN_OPTS="\$MAVEN_OPTS --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
                     --add-opens java.base/java.io=ALL-UNNAMED"
                 mvn -B -C -ntp process-resources -Dsass.skip=true -f ${env.WORKSPACE}/docs/${jbake_maven_project}/

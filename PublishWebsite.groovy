@@ -49,8 +49,9 @@ pipeline {
         stage('Maven - JBake') {
             steps {
                 withMaven {
-                    sh """ \
+                    sh """
                     set +x;
+                    ${java25()}
                     maven_interceptor_opts="$JAVA_TOOL_OPTIONS"
                     export MAVEN_OPTS="\$MAVEN_OPTS \
                         --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
