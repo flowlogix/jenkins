@@ -62,7 +62,7 @@ pipeline {
     post {
         success {
             script {
-                if (createTag.toBoolean() && releaseToRepo.startsWith('Maven')) {
+                if (createTag.toBoolean()) {
                     sh "git push origin $tag_name"
                 } else {
                     sh "git tag -d $tag_name || true"
