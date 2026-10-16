@@ -16,6 +16,7 @@ def call(String log_pattern, boolean checkConsole = true, qualityThreshold = 1, 
             excludeMessage(/Cannot find default script language for javascript/),
             excludeMessage(/IMPORTANT! Using default password is unsafe, please change password for user.*/),
             // end jbake messages
+            excludeMessage(/Reused session store is not available at .* new one will be created/),
             excludeMessage(/.*INFO: arquillian-suite-deployment: Found class annotated.*/),
             excludeMessage('No profiles detected!'), excludeMessage('Javadoc Warnings') ],
         name: 'Java Compiler', qualityGates: maximalQualityGates
