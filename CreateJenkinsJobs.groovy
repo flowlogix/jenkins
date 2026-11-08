@@ -530,7 +530,7 @@ multibranchPipelineJob('apache-shiro/apache-shiro-fork-release') {
                     credentialsId personal_credential_lprimak
                     traits {
                         gitBranchDiscovery()
-                        wipeWorkspaceTrait()
+                        cleanBeforeCheckoutTrait { extension { deleteUntrackedNestedRepositories true } }
                     }
                 }
             }
@@ -563,7 +563,7 @@ multibranchPipelineJob('apache-shiro/apache-shiro-release') {
                     credentialsId personal_credential_lprimak
                     traits {
                         gitBranchDiscovery()
-                        wipeWorkspaceTrait()
+                        cleanBeforeCheckoutTrait { extension { deleteUntrackedNestedRepositories true } }
                     }
                 }
             }
@@ -596,7 +596,7 @@ multibranchPipelineJob('release-jobs/flowlogix-ee-release') {
                     credentialsId org_credential
                     traits {
                         gitBranchDiscovery()
-                        wipeWorkspaceTrait()
+                        cleanBeforeCheckoutTrait { extension { deleteUntrackedNestedRepositories true } }
                     }
                 }
             }
@@ -630,7 +630,7 @@ multibranchPipelineJob('release-jobs/jakartaee-api-release') {
                     credentialsId org_credential
                     traits {
                         gitBranchDiscovery()
-                        wipeWorkspaceTrait()
+                        cleanBeforeCheckoutTrait { extension { deleteUntrackedNestedRepositories true } }
                     }
                 }
             }
@@ -663,7 +663,7 @@ multibranchPipelineJob('release-jobs/arquillian-drone-release') {
                     credentialsId org_credential
                     traits {
                         gitBranchDiscovery()
-                        wipeWorkspaceTrait()
+                        cleanBeforeCheckoutTrait { extension { deleteUntrackedNestedRepositories true } }
                     }
                 }
             }
@@ -696,7 +696,7 @@ multibranchPipelineJob('release-jobs/arquillian-graphene-release') {
                     credentialsId org_credential
                     traits {
                         gitBranchDiscovery()
-                        wipeWorkspaceTrait()
+                        cleanBeforeCheckoutTrait { extension { deleteUntrackedNestedRepositories true } }
                     }
                 }
             }
@@ -729,7 +729,7 @@ multibranchPipelineJob('release-jobs/weld-native-release') {
                     credentialsId org_credential
                     traits {
                         gitBranchDiscovery()
-                        wipeWorkspaceTrait()
+                        cleanBeforeCheckoutTrait { extension { deleteUntrackedNestedRepositories true } }
                     }
                 }
             }
@@ -762,7 +762,7 @@ multibranchPipelineJob('release-jobs/payara-arquillian-release') {
                     credentialsId org_credential
                     traits {
                         gitBranchDiscovery()
-                        wipeWorkspaceTrait()
+                        cleanBeforeCheckoutTrait { extension { deleteUntrackedNestedRepositories true } }
                     }
                 }
             }
@@ -795,7 +795,7 @@ multibranchPipelineJob('release-jobs/base-pom-release') {
                     credentialsId org_credential
                     traits {
                         gitBranchDiscovery()
-                        wipeWorkspaceTrait()
+                        cleanBeforeCheckoutTrait { extension { deleteUntrackedNestedRepositories true } }
                     }
                 }
             }
@@ -828,7 +828,7 @@ multibranchPipelineJob('release-jobs/depchain-release') {
                     credentialsId org_credential
                     traits {
                         gitBranchDiscovery()
-                        wipeWorkspaceTrait()
+                        cleanBeforeCheckoutTrait { extension { deleteUntrackedNestedRepositories true } }
                     }
                 }
             }
@@ -861,7 +861,7 @@ multibranchPipelineJob('release-jobs/faces-affinity-release') {
                     credentialsId org_credential
                     traits {
                         gitBranchDiscovery()
-                        wipeWorkspaceTrait()
+                        cleanBeforeCheckoutTrait { extension { deleteUntrackedNestedRepositories true } }
                     }
                 }
             }
@@ -894,7 +894,7 @@ multibranchPipelineJob('release-jobs/shrinkwrap-resolver-release') {
                     credentialsId org_credential
                     traits {
                         gitBranchDiscovery()
-                        wipeWorkspaceTrait()
+                        cleanBeforeCheckoutTrait { extension { deleteUntrackedNestedRepositories true } }
                     }
                 }
             }
@@ -927,7 +927,7 @@ multibranchPipelineJob('release-jobs/container-deploy-plugin-release') {
                     credentialsId org_credential
                     traits {
                         gitBranchDiscovery()
-                        wipeWorkspaceTrait()
+                        cleanBeforeCheckoutTrait { extension { deleteUntrackedNestedRepositories true } }
                     }
                 }
             }
@@ -960,7 +960,7 @@ multibranchPipelineJob('release-jobs/archetype-release') {
                     credentialsId org_credential
                     traits {
                         gitBranchDiscovery()
-                        wipeWorkspaceTrait()
+                        cleanBeforeCheckoutTrait { extension { deleteUntrackedNestedRepositories true } }
                     }
                 }
             }
@@ -993,7 +993,7 @@ multibranchPipelineJob('release-jobs/flowlogix-bom-release') {
                     credentialsId org_credential
                     traits {
                         gitBranchDiscovery()
-                        wipeWorkspaceTrait()
+                        cleanBeforeCheckoutTrait { extension { deleteUntrackedNestedRepositories true } }
                     }
                 }
             }
@@ -1026,7 +1026,7 @@ multibranchPipelineJob('release-jobs/maven-war-plugin-release') {
                     credentialsId personal_credential_lprimak
                     traits {
                         gitBranchDiscovery()
-                        wipeWorkspaceTrait()
+                        cleanBeforeCheckoutTrait { extension { deleteUntrackedNestedRepositories true } }
                     }
                 }
             }
@@ -1059,7 +1059,7 @@ multibranchPipelineJob('release-jobs/junit-servers-release') {
                     credentialsId org_credential
                     traits {
                         gitBranchDiscovery()
-                        wipeWorkspaceTrait()
+                        cleanBeforeCheckoutTrait { extension { deleteUntrackedNestedRepositories true } }
                     }
                 }
             }

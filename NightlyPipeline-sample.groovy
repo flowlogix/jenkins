@@ -9,8 +9,8 @@ pipeline {
         }
         stage('Checkout') {
             steps {
+                deleteDir()
                 checkout([$class: 'GitSCM', branches: [[name: '*/master']],
-                extensions: [[$class: 'WipeWorkspace']],
                 userRemoteConfigs: [[credentialsId: 'dd067490-e408-45cb-b911-d825906a05ee',
                     url: 'https://github.com/flowlogix/flowlogix']]])
             }
