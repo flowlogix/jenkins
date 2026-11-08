@@ -39,7 +39,7 @@ pipeline {
                                            -DdistMgmtReleasesUrl=https://nexus.flowlogix.com/repository/maven-releases"
                     } else {
                         java_setup = java25()
-                        maven_command = "./mvnw"
+                        maven_command = "./mvnw -s \$HOME/.m2/settings-shiro-release-maven3.xml"
                         maven_options = "${maven_options} -Dnjord.enabled=false"
                         // nexus_staging_profile = "nexus-staging"
                         alt_repository = "-DaltDeploymentRepository=apache.releases.https::https://repository.apache.org/service/local/staging/deploy/maven2"
@@ -63,7 +63,7 @@ pipeline {
                         export MAVEN_OPTS="\$MAVEN_OPTS $maven_options $altReleaseFlags $alt_repository"
                         $maven_command -B -ntp -C release:prepare release:perform -Pskip_jakarta_ee_tests \
                         -Dnexus-staging-profile=$nexus_staging_profile $altReleaseFlags \
-                        -DreleaseVersion=$Version -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true -DobrRepository=NONE \
+                        -DreleaseVersion=$Version -Darguments=\"-DtrimStackTrace=false $maven_options \
                         $alt_repository\" \
                     """
                 }
