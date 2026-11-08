@@ -51,7 +51,7 @@ pipeline {
                     sh """
                     mvn -B -ntp -C -P$profiles release:prepare release:perform \
                     -DreleaseVersion=$Version -Drelease.profile=$release_profile -Dgoals=deploy \
-                    -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true \
+                    -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true -DobrRepository=NONE \
                     -Dnjord.autoPublish=true -Dnjord.waitForStates=true $automaticCommand \
                     \$(eval echo \$MAVEN_ADD_OPTIONS) -Ddrone.chrome.binary='\$(eval echo \$CHROME_BINARY)' \
                     -DadminPort=$payara_config.admin_port -Dserver.https.port=$payara_config.ssl_port \"

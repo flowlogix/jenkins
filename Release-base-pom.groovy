@@ -44,7 +44,7 @@ pipeline {
                     -DpushChanges=false -DlocalCheckout=true \
                     -DreleaseVersion=$Version -DtagNameFormat=v$Version \
                     -Dgoals=\"resources:resources jar:jar gpg:sign deploy\" \
-                    -Darguments=\"-Dmaven.install.skip=true \
+                    -Darguments=\"-Dmaven.install.skip=true -DobrRepository=NONE \
                     -Dnjord.publisher=sonatype-cp -Dnjord.autoPublish=true \
                     -Dnjord.waitForStates=true $automaticCommand \
                     -Dnjord.publisher.sonatype-cp.releaseRepositoryId=$repository_name \

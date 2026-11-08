@@ -47,7 +47,7 @@ pipeline {
                     sh """
                     mvn -B -ntp -C release:prepare release:perform \
                     -DreleaseVersion=$Version -Drelease.profile=$release_profile -Dgoals=deploy \
-                    -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true \
+                    -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true -DobrRepository=NONE \
                     -Dnjord.autoPublish=true -Dnjord.waitForStates=true $automaticCommand \"
                     """
                 }

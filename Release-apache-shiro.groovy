@@ -51,7 +51,7 @@ pipeline {
                     export MAVEN_OPTS="\$MAVEN_OPTS $altReleaseFlags $alt_repository"
                     mvn -B -ntp -C release:prepare release:perform -Pskip_jakarta_ee_tests \
                     -Dnexus-staging-profile=$nexus_staging_profile $altReleaseFlags \
-                    -DreleaseVersion=$Version -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true \
+                    -DreleaseVersion=$Version -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true -DobrRepository=NONE \
                     $alt_repository\" \
                     """
                 }
