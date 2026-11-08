@@ -4,6 +4,11 @@ def tag_name = ""
 def nexus_staging_profile = ""
 def alt_repository = ""
 def altReleaseFlags = ""
+def java_setup = ""
+
+// maven 3 compatible settings
+def maven_command = "mvn"
+def maven_options = "-Dmaven.install.skip=true -DobrRepository=NONE"
 
 pipeline {
     agent any
@@ -33,12 +38,18 @@ pipeline {
                         altReleaseFlags = "-DdistMgmtReleasesId=flowlogix-nexus-artifacts -DdistMgmtReleasesName=FlowLogixJenkins \
                                            -DdistMgmtReleasesUrl=https://nexus.flowlogix.com/repository/maven-releases"
                     } else {
+                        java_setup = java25()
+                        maven_command = "./mvnw"
+                        maven_options = "${maven_options} -Dnjord.enabled=false"
                         // nexus_staging_profile = "nexus-staging"
                         alt_repository = "-DaltDeploymentRepository=apache.releases.https::https://repository.apache.org/service/local/staging/deploy/maven2"
                     }
                     tag_name = "shiro-root-$Version"
                 }
-                sh "mvn -V -N -B -ntp -C help:all-profiles"
+                sh """
+                   ${java_setup}
+                   MAVEN_OPTS="$maven_options" $maven_command -V -N -B -ntp -C help:all-profiles
+                   """
                 script {
                     currentBuild.description = "Commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
                 }
@@ -48,11 +59,12 @@ pipeline {
             steps {
                 mavenSettingsCredentials true, {
                     sh """
-                    export MAVEN_OPTS="\$MAVEN_OPTS $altReleaseFlags $alt_repository"
-                    mvn -B -ntp -C release:prepare release:perform -Pskip_jakarta_ee_tests \
-                    -Dnexus-staging-profile=$nexus_staging_profile $altReleaseFlags \
-                    -DreleaseVersion=$Version -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true -DobrRepository=NONE \
-                    $alt_repository\" \
+                        ${java_setup}
+                        export MAVEN_OPTS="\$MAVEN_OPTS $maven_options $altReleaseFlags $alt_repository"
+                        $maven_command -B -ntp -C release:prepare release:perform -Pskip_jakarta_ee_tests \
+                        -Dnexus-staging-profile=$nexus_staging_profile $altReleaseFlags \
+                        -DreleaseVersion=$Version -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true -DobrRepository=NONE \
+                        $alt_repository\" \
                     """
                 }
             }
