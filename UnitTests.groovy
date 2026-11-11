@@ -85,15 +85,11 @@ pipeline {
                 expression { !skipPipeline }
             }
             steps {
-                withMaven(options: [ jacocoPublisher(disabled: true) ]) {
-                    sh """
-                    maven_interceptor_opts="$JAVA_TOOL_OPTIONS"
-                    unset JAVA_TOOL_OPTIONS
-                    $mvn_cmd -B -ntp -C verify -fae -P$profiles \$(eval echo \$MAVEN_ADD_OPTIONS) \$maven_interceptor_opts \
-                    -Ddrone.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
-                    -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
-                    -Dmaven.install.skip=true $payara_build_options $mavenParamsFromFile"""
-                }
+                sh """
+                $mvn_cmd -B -ntp -C verify -fae -P$profiles \$(eval echo \$MAVEN_ADD_OPTIONS) \
+                -Ddrone.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
+                -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
+                -Dmaven.install.skip=true $payara_build_options $mavenParamsFromFile"""
             }
         }
         stage('Maven - JaCoCo Coverage') {
@@ -116,9 +112,12 @@ pipeline {
     }
     post {
         always {
-            stopPayara payara_config
-            archiveArtifacts artifacts: '**/logs/server.log*', allowEmptyArchive: true
             checkLogs payara_config.asadmin ? '**/logs/server.log*' : null, true, qualityThreshold, branchCoverageThreshold
+            junit testResults: '**/target/surefire-reports/*.xml,**/target/failsafe-reports/*.xml',
+                    allowEmptyResults: true
+            archiveArtifacts artifacts: '**/target/*.jar,**/target/*.war,**/target/*.ear,**/logs/server.log*',
+                    allowEmptyArchive: true
+            stopPayara payara_config
         }
     }
 }
