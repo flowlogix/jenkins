@@ -31,7 +31,8 @@ pipeline {
         stage('Maven - Update Versions') {
             steps {
                 sh """
-                mvn -V -B -ntp -C -Dprofile.display versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=$Version versions:set
+                mvn -V -B -ntp -C -Dprofile.display versions:set -DprocessAllModules=true \
+                -DgenerateBackupPoms=false -DnewVersion=$Version versions:set
                 sed -i.bak 's/<skip>true<\\/skip>/<skip>false<\\/skip>/g' pom.xml
                 git commit -am "[Release Version]"
                 """

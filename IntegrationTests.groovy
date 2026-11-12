@@ -39,7 +39,8 @@ pipeline {
                                 export MAVEN_OPTS="\$(eval echo \$MAVEN_OPTS)"
                                 maven_interceptor_opts="\$(eval echo \$JAVA_TOOL_OPTIONS)"
                                 unset JAVA_TOOL_OPTIONS
-                                mvn -V -B -ntp -C -fae -Dprofile.display \$(eval echo \$MAVEN_ADD_OPTIONS) \$maven_interceptor_opts \
+                                mvn -V -B -ntp -C -fae -Dprofile.display \
+                                \$(eval echo \$MAVEN_ADD_OPTIONS) \$maven_interceptor_opts \
                                 -Ddrone.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
                                 -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
                                 -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port \

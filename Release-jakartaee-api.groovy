@@ -34,7 +34,8 @@ pipeline {
                 GIT_TERMINAL_PROMPT=0 git fetch origin docs-profile:docs-profile
                 GIT_TERMINAL_PROMPT=0 git cherry-pick docs-profile
                 mvn -B -ntp -C -N versions:set-property -DgenerateBackupPoms=false -Dproperty=jakartaee.version -DnewVersion=10.0.0
-                mvn -V -B -ntp -C -Dprofile.display versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=$Version versions:set
+                mvn -V -B -ntp -C -Dprofile.display versions:set -DprocessAllModules=true \
+                -DgenerateBackupPoms=false -DnewVersion=$Version versions:set
                 git commit -am "[Release Version]"
                 """
             }
