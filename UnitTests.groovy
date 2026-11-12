@@ -57,14 +57,6 @@ pipeline {
                 }
             }
         }
-        stage('Maven Info') {
-            when {
-                expression { !skipPipeline }
-            }
-            steps {
-                sh "$mvn_cmd -V -B -ntp -C -N -P$profiles $mavenParamsFromFile help:all-profiles"
-            }
-        }
         stage('Start Payara') {
             when {
                 expression { !skipPipeline }
@@ -86,7 +78,7 @@ pipeline {
             }
             steps {
                 sh """
-                $mvn_cmd -B -ntp -C verify -fae -P$profiles \$(eval echo \$MAVEN_ADD_OPTIONS) \
+                $mvn_cmd -V -B -ntp -C verify -fae -P$profiles \$(eval echo \$MAVEN_ADD_OPTIONS) \
                 -Ddrone.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
                 -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
                 -Dmaven.install.skip=true $payara_build_options $mavenParamsFromFile"""
