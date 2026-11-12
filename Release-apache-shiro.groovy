@@ -25,7 +25,7 @@ pipeline {
     }
 
     stages {
-        stage('Maven Info') {
+        stage('Setup') {
             steps {
                 script {
                     if (Version.empty) {
@@ -46,10 +46,6 @@ pipeline {
                     }
                     tag_name = "shiro-root-$Version"
                 }
-                sh """
-                   ${java_setup}
-                   MAVEN_OPTS="$maven_options" $maven_command -V -N -B -ntp -C help:all-profiles
-                   """
                 script {
                     currentBuild.description = "Commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
                 }
@@ -61,7 +57,7 @@ pipeline {
                     sh """
                         ${java_setup}
                         export MAVEN_OPTS="\$MAVEN_OPTS $maven_options $altReleaseFlags $alt_repository"
-                        $maven_command -B -ntp -C release:prepare release:perform -Pskip_jakarta_ee_tests \
+                        $maven_command -V -B -ntp -C -Dprofile.display release:prepare release:perform -Pskip_jakarta_ee_tests \
                         -Dnexus-staging-profile=$nexus_staging_profile $altReleaseFlags \
                         -DreleaseVersion=$Version -Darguments=\"-DtrimStackTrace=false $maven_options \
                         $alt_repository\" \

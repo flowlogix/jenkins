@@ -34,14 +34,9 @@ pipeline {
                 sh """
                 mvn -B -ntp -C -N versions:set-property -DgenerateBackupPoms=false -Dversion.arquillian.drone=$droneVersion \
                 -Dproperty=version.arquillian.drone -DnewVersion=$droneVersion
-                mvn -B -ntp -C versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=$Version versions:set
+                mvn -V -B -ntp -C -Dprofile.display versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=$Version versions:set
                 git commit -am "[Release Version]"
                 """
-            }
-        }
-        stage('Maven Info') {
-            steps {
-                sh "mvn -V -N -B -ntp -C help:all-profiles"
             }
         }
         stage('Tag Release') {

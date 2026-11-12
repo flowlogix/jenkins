@@ -19,9 +19,8 @@ pipeline {
     }
 
     stages {
-        stage('Maven Info') {
+        stage('Setup') {
             steps {
-                sh "mvn -V -B -ntp -C -N -P$profiles help:all-profiles"
                 script {
                     currentBuild.description = "Commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
                     if (env.GIT_URL.contains('flowlogix/flowlogix') && env.GIT_BRANCH == '5.x') {
@@ -40,7 +39,7 @@ pipeline {
                                 export MAVEN_OPTS="\$(eval echo \$MAVEN_OPTS)"
                                 maven_interceptor_opts="\$(eval echo \$JAVA_TOOL_OPTIONS)"
                                 unset JAVA_TOOL_OPTIONS
-                                mvn -B -ntp -C -fae \$(eval echo \$MAVEN_ADD_OPTIONS) \$maven_interceptor_opts \
+                                mvn -V -B -ntp -C -fae -Dprofile.display \$(eval echo \$MAVEN_ADD_OPTIONS) \$maven_interceptor_opts \
                                 -Ddrone.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
                                 -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
                                 -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port \

@@ -20,7 +20,7 @@ pipeline {
     }
 
     stages {
-        stage('Maven Info') {
+        stage('Setup') {
             steps {
                 script {
                     if (Version.empty) {
@@ -35,7 +35,6 @@ pipeline {
                         automaticCommand = '-Dnjord.publishingType=automatic'
                     }
                 }
-                sh "mvn -V -N -B -ntp -C help:all-profiles"
                 script {
                     currentBuild.description = "Commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
                 }
@@ -45,7 +44,7 @@ pipeline {
             steps {
                 mavenSettingsCredentials false, {
                     sh """
-                    mvn -B -ntp -C release:prepare release:perform \
+                    mvn -V -B -ntp -C -Dprofile.display release:prepare release:perform \
                     -DreleaseVersion=$Version -Drelease.profile=$release_profile -Dgoals=deploy \
                     -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true -DobrRepository=NONE \
                     -Dnjord.autoPublish=true -Dnjord.waitForStates=true $automaticCommand \"

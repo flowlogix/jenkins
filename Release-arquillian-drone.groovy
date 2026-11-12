@@ -13,7 +13,7 @@ pipeline {
     }
 
     stages {
-        stage('Maven Info') {
+        stage('Setup') {
             steps {
                 script {
                     if (Version.empty) {
@@ -23,7 +23,6 @@ pipeline {
                     }
                     tag_name = "arquillian-drone-$Version"
                 }
-                sh "mvn -V -N -B -ntp -C help:all-profiles"
                 script {
                     currentBuild.description = "Commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
                 }
@@ -32,7 +31,7 @@ pipeline {
         stage('Maven - Update Versions') {
             steps {
                 sh """
-                mvn -B -ntp -C versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=$Version versions:set
+                mvn -V -B -ntp -C -Dprofile.display versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=$Version versions:set
                 git commit -am "[Release Version]"
                 """
             }

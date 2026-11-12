@@ -15,11 +15,6 @@ pipeline {
                     url: 'https://github.com/flowlogix/flowlogix']]])
             }
         }
-        stage('Maven Info') {
-            steps {
-                sh 'mvn -V -N -B -C help:all-profiles'
-            }
-        }
         stage('Maven Verify - Regular + Stress Tests') {
             steps {
                 withMaven {
@@ -27,7 +22,7 @@ pipeline {
                     sdk current
                     export MAVEN_OPTS="\$MAVEN_OPTS $JAVA_TOOL_OPTIONS"
                     unset JAVA_TOOL_OPTIONS
-                    mvn -B -C verify -DforkCount=0 -Dsurefire.useSystemClassLoader=false \
+                    mvn -V -B -C verify -Dprofile.display -DforkCount=0 -Dsurefire.useSystemClassLoader=false \
                     -Dmaven.install.skip=true -Pall-tests -fae
                     """
                 }

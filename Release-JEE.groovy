@@ -23,7 +23,7 @@ pipeline {
     }
 
     stages {
-        stage('Maven Info') {
+        stage('Setup') {
             steps {
                 script {
                     if (Version.empty) {
@@ -38,7 +38,6 @@ pipeline {
                         automaticCommand = '-Dnjord.publishingType=automatic'
                     }
                 }
-                sh "mvn -V -N -B -ntp -C -P$profiles help:all-profiles"
                 script {
                     currentBuild.description = "Commit ${env.GIT_COMMIT[0..7]} Node $env.NODE_NAME"
                 }
@@ -49,7 +48,7 @@ pipeline {
                 startPayara payara_config
                 mavenSettingsCredentials false, {
                     sh """
-                    mvn -B -ntp -C -P$profiles release:prepare release:perform \
+                    mvn -V -B -ntp -C -Dprofile.display -P$profiles release:prepare release:perform \
                     -DreleaseVersion=$Version -Drelease.profile=$release_profile -Dgoals=deploy \
                     -Darguments=\"-DtrimStackTrace=false -Dmaven.install.skip=true -DobrRepository=NONE \
                     -Dnjord.autoPublish=true -Dnjord.waitForStates=true $automaticCommand \

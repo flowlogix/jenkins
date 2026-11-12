@@ -80,7 +80,7 @@ pipeline {
                 sh """
                 $mvn_cmd -V -B -ntp -C verify -fae -P$profiles \$(eval echo \$MAVEN_ADD_OPTIONS) \
                 -Ddrone.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
-                -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
+                -Dmaven.test.failure.ignore=true -DtrimStackTrace=false -Dprofile.display \
                 -Dmaven.install.skip=true $payara_build_options $mavenParamsFromFile"""
             }
         }
