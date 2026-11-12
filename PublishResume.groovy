@@ -10,19 +10,15 @@ pipeline {
     stages {
         stage('Maven - Asciidoc - convert to html/pdf') {
             steps {
-                withMaven {
-                    sh """ \
-                    set +x
-                    ${java25()}
-                    maven_interceptor_opts="$JAVA_TOOL_OPTIONS"
-                    export MAVEN_OPTS="\$MAVEN_OPTS \
-                        --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
-                        --add-opens java.base/java.io=ALL-UNNAMED"
-                    unset JAVA_TOOL_OPTIONS
-                    set -x
-                    mvn -B -C -ntp generate-resources \$maven_interceptor_opts
-                    """
-                }
+                sh """ \
+                set +x
+                ${java25()}
+                export MAVEN_OPTS="\$MAVEN_OPTS \
+                    --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
+                    --add-opens java.base/java.io=ALL-UNNAMED"
+                set -x
+                mvn -B -C -ntp generate-resources
+                """
             }
         }
         stage('Intermediate - Publish Resume Locally') {
@@ -72,7 +68,10 @@ pipeline {
     }
     post {
         always {
-            archiveArtifacts artifacts: '**/output/*'
+            junit testResults: '**/target/surefire-reports/*.xml,**/target/failsafe-reports/*.xml',
+                    allowEmptyResults: true
+            archiveArtifacts artifacts: '**/target/*.jar,**/target/*.war,**/target/*.ear,**/output/*',
+                    allowEmptyArchive: true
         }
     }
 }

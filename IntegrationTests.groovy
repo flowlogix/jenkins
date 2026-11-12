@@ -32,28 +32,28 @@ pipeline {
         stage ('Set up Payara and Maven') {
             steps {
                 startPayara payara_config
-                withMaven {
-                    script {
-                        mvnCommandLine =
-                            """
-                                export MAVEN_OPTS="\$(eval echo \$MAVEN_OPTS)"
-                                maven_interceptor_opts="\$(eval echo \$JAVA_TOOL_OPTIONS)"
-                                unset JAVA_TOOL_OPTIONS
-                                mvn -V -B -ntp -C -fae -Dprofile.display \
-                                \$(eval echo \$MAVEN_ADD_OPTIONS) \$maven_interceptor_opts \
-                                -Ddrone.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
-                                -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
-                                -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port \
-                                -Dserver.https.port=$payara_config.ssl_port -DjacocoPort=$payara_config.jacoco_port \
-                            """
-                    }
+                script {
+                    mvnCommandLine =
+                        """
+                            export MAVEN_OPTS="\$(eval echo \$MAVEN_OPTS)"
+                            mvn -V -B -ntp -C -fae -Dprofile.display \
+                            \$(eval echo \$MAVEN_ADD_OPTIONS) \
+                            -Ddrone.chrome.binary="\$(eval echo \$CHROME_BINARY)" \
+                            -Dmaven.test.failure.ignore=true -DtrimStackTrace=false \
+                            -Dmaven.install.skip=true -DadminPort=$payara_config.admin_port \
+                            -Dserver.https.port=$payara_config.ssl_port -DjacocoPort=$payara_config.jacoco_port \
+                        """
                 }
             }
         }
         stage('Maven Verify - All Tests') {
             steps {
-                withMaven(options: [ jacocoPublisher(disabled: true) ]) {
-                    sh "$mvnCommandLine verify -P${profiles}"
+                sh "$mvnCommandLine verify -P${profiles}"
+            }
+            post {
+                always {
+                    junit testResults: '**/target/surefire-reports/*.xml,**/target/failsafe-reports/*.xml',
+                            allowEmptyResults: true
                 }
             }
         }
@@ -114,7 +114,8 @@ pipeline {
     post {
         always {
             stopPayara payara_config
-            archiveArtifacts artifacts: '**/logs/server.log*'
+            archiveArtifacts artifacts: '**/target/*.jar,**/target/*.war,**/target/*.ear,**/logs/server.log*',
+                    allowEmptyArchive: true
             checkLogs payara_config.asadmin ? '**/logs/server.log*' : null, true, qualityThreshold
         }
         success {

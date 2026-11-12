@@ -48,19 +48,15 @@ pipeline {
         }
         stage('Maven - JBake') {
             steps {
-                withMaven {
-                    sh """
-                    set +x;
-                    ${java25()}
-                    maven_interceptor_opts="$JAVA_TOOL_OPTIONS"
-                    export MAVEN_OPTS="\$MAVEN_OPTS \
-                        --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
-                        --add-opens java.base/java.io=ALL-UNNAMED"
-                    unset JAVA_TOOL_OPTIONS
-                    set -x
-                    mvn -B -C -ntp -f $jbake_maven_project $mavenParamsFromFile generate-resources \$maven_interceptor_opts
-                    """
-                }
+                sh """
+                set +x;
+                ${java25()}
+                export MAVEN_OPTS="\$MAVEN_OPTS \
+                    --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
+                    --add-opens java.base/java.io=ALL-UNNAMED"
+                set -x
+                mvn -B -C -ntp -f $jbake_maven_project $mavenParamsFromFile generate-resources
+                """
             }
         }
         stage('Publish - Web Host') {
@@ -88,6 +84,12 @@ pipeline {
     }
 
     post {
+        always {
+            junit testResults: '**/target/surefire-reports/*.xml,**/target/failsafe-reports/*.xml',
+                    allowEmptyResults: true
+            archiveArtifacts artifacts: '**/target/*.jar,**/target/*.war,**/target/*.ear',
+                    allowEmptyArchive: true
+        }
         success {
             script {
                 if (website_subdir as boolean) {
