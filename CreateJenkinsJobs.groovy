@@ -1080,3 +1080,36 @@ multibranchPipelineJob('release-jobs/junit-servers-release') {
     }
     defaultOrphanItemStrategy delegate, '1', '2'
 }
+
+multibranchPipelineJob('release-jobs/profile-display-plugin-release') {
+    displayName 'Maven Profile Display Plugin - Release'
+    branchSources {
+        branchSource {
+            source {
+                git {
+                    id '75324878'
+                    remote 'git@github.com:flowlogix/profile-display-plugin.git'
+                    credentialsId org_credential
+                    traits {
+                        gitBranchDiscovery()
+                        cleanBeforeCheckoutTrait { extension { deleteUntrackedNestedRepositories true } }
+                    }
+                }
+            }
+            suppressBranchTriggers delegate
+        }
+    }
+    factory {
+        remoteJenkinsFileWorkflowBranchProjectFactory {
+            githubScriptSource delegate, 'pom.xml', 'Release-without-payara.groovy'
+        }
+    }
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }
+    defaultOrphanItemStrategy delegate, '1', '2'
+}
