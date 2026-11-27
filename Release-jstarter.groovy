@@ -4,6 +4,18 @@
 // with this repository's native-build.yml workflow, uploads their zips to dl.flowlogix.com, then runs
 // JReleaser, which publishes them through its configured channels. No GitHub release is created;
 // dl.flowlogix.com hosts the downloads. JReleaser's config comes from the util library's jreleaser/native.yaml template.
+// The Linux executables are also published as APT and DNF repositories by the publishLinuxRepositories step.
+
+def name = 'jstarter'                // the tool, its executable, zips, packages and tag
+def repository = 'apps'              // under flowlogix on GitHub
+def project = 'starter-generator'    // Maven project that holds the CLI module
+
+// Shared by the Linux packages and JReleaser
+def about = [
+        description: 'Java and Jakarta EE project starter by Flow Logix',
+        homepage   : 'https://start.flowlogix.com/',
+        license    : 'Apache-2.0',
+]
 
 pipeline {
     agent any
@@ -14,7 +26,7 @@ pipeline {
     parameters {
         string(name: 'Version', description: 'Version number to release, e.g. 1.0.0', trim: true)
         booleanParam(name: 'createTag', defaultValue: true,
-                description: 'Whether to push the jstarter-v<Version> tag to GitHub')
+                description: "Whether to push the $name-v<Version> tag to GitHub")
     }
 
     stages {
@@ -26,48 +38,54 @@ pipeline {
                         currentBuild.description = msg
                         error msg
                     }
-                    currentBuild.description = "jstarter $Version"
+                    currentBuild.description = "$name $Version"
                 }
             }
         }
         stage('Build native on GitHub') {
             steps {
-                runGithubWorkflow 'native-build.yml', [
-                        repository: 'flowlogix/apps',
-                        commit    : env.GIT_COMMIT,
-                        version   : Version,
-                        project   : 'starter-generator',
-                        module    : 'cli',
-                        executable: 'jstarter',
-                        name      : 'jstarter',
-                ]
+                script {
+                    runGithubWorkflow 'native-build.yml', [
+                            repository: "flowlogix/$repository",
+                            commit    : env.GIT_COMMIT,
+                            version   : Version,
+                            project   : project,
+                            module    : 'cli',
+                            executable: name,
+                            name      : name,
+                            packages  : writeJSON(returnText: true,
+                                    json: about + [maintainer: 'Flow Logix, Inc. <noreply@flowlogix.com>']),
+                    ]
+                }
             }
         }
         stage('Upload') {
             steps {
-                sh "ssh ${websiteHost()} mkdir -p ${downloadsDir()}/releases/jstarter/$Version"
-                sh "scp dist/jstarter-$Version-*.zip ${websiteHost()}:${downloadsDir()}/releases/jstarter/$Version/"
+                sh "ssh ${websiteHost()} mkdir -p ${downloadsDir()}/releases/$name/$Version"
+                sh "scp dist/$name-$Version-*.zip ${websiteHost()}:${downloadsDir()}/releases/$name/$Version/"
+            }
+        }
+        stage('Linux repositories') {
+            steps {
+                publishLinuxRepositories name
             }
         }
         stage('Publish') {
             steps {
-                jreleaserConfig 'native', [
-                        name           : 'jstarter',
-                        executable     : 'jstarter',
-                        description    : 'Java and Jakarta EE project starter by Flow Logix',
+                jreleaserConfig 'native', about + [
+                        name           : name,
+                        executable     : name,
                         longDescription: 'JStarter creates a complete, testable Java or Jakarta EE project ' +
                                 'from the Flow Logix starter archetype, using the same generator as start.flowlogix.com.',
-                        homepage       : 'https://start.flowlogix.com/',
-                        license        : 'Apache-2.0',
                         inceptionYear  : '2024',
-                        repository     : 'apps',
+                        repository     : repository,
                 ]
                 githubAppCredentials 'JRELEASER_GITHUB_TOKEN', {
                     // JReleaser takes the version from the POM
                     sh """
-                    mvn -B -ntp -C -f starter-generator/pom.xml versions:set \
+                    mvn -B -ntp -C -f $project/pom.xml versions:set \
                         -DnewVersion=$Version -DprocessAllModules -DgenerateBackupPoms=false
-                    DOWNLOAD_BASE=${downloadsUrl()}/releases/jstarter/$Version \
+                    DOWNLOAD_BASE=${downloadsUrl()}/releases/$name/$Version \
                     mvn -B -ntp -C -N org.jreleaser:jreleaser-maven-plugin:RELEASE:full-release \
                         -Djreleaser.config.file=jreleaser.yaml
                     """
@@ -80,7 +98,7 @@ pipeline {
         success {
             script {
                 if (createTag.toBoolean()) {
-                    sh "git tag jstarter-v$Version && git push origin jstarter-v$Version"
+                    sh "git tag $name-v$Version && git push origin $name-v$Version"
                 }
             }
         }
