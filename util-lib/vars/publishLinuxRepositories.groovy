@@ -21,9 +21,10 @@ void call(String name, String dir = 'dist') {
 
             # rpmsign feeds gpg the package on stdin, so the passphrase comes on file descriptor 3.
             # One RPM at a time, so each gpg gets the passphrase. RPM 6 names the key with
-            # _openpgp_sign_id, older versions with _gpg_name.
+            # _openpgp_sign_id, older versions with _gpg_name. RPM defaults to /usr/bin/gpg,
+            # so __gpg is the gpg found on the PATH.
             for rpm in "$DIR"/rpm/*.rpm; do
-                printf '%s' "$MAVEN_GPG_PASSPHRASE" | rpmsign --addsign \
+                printf '%s' "$MAVEN_GPG_PASSPHRASE" | rpmsign --addsign --define "__gpg $(command -v gpg)" \
                     --define "_openpgp_sign_id $GPG_KEY" --define "_gpg_name $GPG_KEY" \
                     --define "_gpg_sign_cmd_extra_args --batch --pinentry-mode loopback --passphrase-fd 3" \
                     "$rpm" 3<&0 0< /dev/null
