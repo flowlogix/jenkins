@@ -82,13 +82,53 @@ jobs:
         with:
           repository: ${{ inputs.repository }}
           ref: ${{ inputs.commit }}
-      - uses: graalvm/setup-graalvm@60e76998d25690099182b796e99b8804da582d90 # v1.6.10
+      # The newest GraalVM CE, from SDKMAN, as installed on the Jenkins agents
+      - name: Find GraalVM
+        id: graalvm
+        shell: bash
+        run: |
+          case "$RUNNER_OS-$RUNNER_ARCH" in
+              Linux-X64) platform=linuxx64 ;;
+              Linux-ARM64) platform=linuxarm64 ;;
+              macOS-ARM64) platform=darwinarm64 ;;
+              Windows-X64) platform=windowsx64 ;;
+          esac
+          version=$(curl -fsSL "https://api.sdkman.io/2/candidates/java/$platform/versions/list?installed=" \
+              | grep -oE '[0-9][0-9.]*-graalce' | sort -uV | tail -1)
+          echo "platform=$platform" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          java-version: '25'
-          # Quarkus's own GraalVM distribution, kept current for Quarkus releases
-          distribution: mandrel
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          cache: maven
+          path: ~/graalvm
+          key: graalvm-${{ steps.graalvm.outputs.platform }}-${{ steps.graalvm.outputs.version }}
+      - name: Install GraalVM ${{ steps.graalvm.outputs.version }}
+        shell: bash
+        env:
+          GRAALVM_PLATFORM: ${{ steps.graalvm.outputs.platform }}
+          GRAALVM_VERSION: ${{ steps.graalvm.outputs.version }}
+        run: |
+          if [ ! -d ~/graalvm ]; then
+              mkdir ~/graalvm && cd ~/graalvm
+              # Only over https, redirects included. SDKMAN publishes no checksum for these builds
+              curl -fsSL --proto '=https' --proto-redir '=https' -o archive \
+                  "https://api.sdkman.io/2/broker/download/java/$GRAALVM_VERSION/$GRAALVM_PLATFORM"
+              if [ "$RUNNER_OS" = Windows ]; then 7z x -bd archive > /dev/null; else tar -xzf archive; fi
+              rm archive
+          fi
+          home=$(echo ~/graalvm/*)
+          [ -d "$home/Contents/Home" ] && home="$home/Contents/Home"
+          [ "$RUNNER_OS" = Windows ] && home=$(cygpath -w "$home")
+          echo "JAVA_HOME=$home" >> "$GITHUB_ENV"
+          echo "GRAALVM_HOME=$home" >> "$GITHUB_ENV"
+          echo "$home/bin" >> "$GITHUB_PATH"
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-${{ runner.os }}-${{ runner.arch }}-
+      # native-image on Windows needs Visual Studio's build environment
+      - uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
+        if: runner.os == 'Windows'
       - name: Build native executable
         shell: bash
         run: |
