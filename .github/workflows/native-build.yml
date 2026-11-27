@@ -78,7 +78,8 @@ jobs:
       - uses: graalvm/setup-graalvm@60e76998d25690099182b796e99b8804da582d90 # v1.6.10
         with:
           java-version: '25'
-          distribution: graalvm-community
+          # Quarkus's own GraalVM distribution, kept current for Quarkus releases
+          distribution: mandrel
           github-token: ${{ secrets.GITHUB_TOKEN }}
           cache: maven
       - name: Build native executable
