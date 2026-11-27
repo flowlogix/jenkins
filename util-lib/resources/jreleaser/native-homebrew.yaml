@@ -1,6 +1,6 @@
 # JReleaser config template for a native executable released from Jenkins.
 # The release job builds the zip for its agent's platform into dist/<name>-<version>-<platform>.zip,
-# deploys it to FlowLogix Nexus, and sets DOWNLOAD_BASE to that version's Nexus directory.
+# uploads it to dl.flowlogix.com, and sets DOWNLOAD_BASE to that version's download directory.
 # JReleaser then publishes the Homebrew formula pointing at that download. No GitHub release is created.
 # Each @key@ is set by the job through the jreleaserConfig step.
 project:
@@ -20,7 +20,7 @@ release:
     name: "@repository@"
     # The job pushes its own tag
     skipTag: true
-    # Downloads are hosted on FlowLogix Nexus
+    # Downloads are hosted on dl.flowlogix.com
     skipRelease: true
 
 distributions:

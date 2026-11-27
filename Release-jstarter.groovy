@@ -1,8 +1,8 @@
 @Library('util') _l1
 
 // Releases the JStarter CLI from flowlogix/apps: builds the native executable for the agent's platform,
-// deploys its zip to FlowLogix Nexus, then runs JReleaser, which publishes the Homebrew formula.
-// No GitHub release is created; Nexus hosts the download.
+// uploads its zip to dl.flowlogix.com, then runs JReleaser, which publishes the Homebrew formula.
+// No GitHub release is created; dl.flowlogix.com hosts the download.
 // JReleaser's config comes from the util library's jreleaser/native-homebrew.yaml template.
 
 pipeline {
@@ -40,8 +40,7 @@ pipeline {
                 ${java25('graalvm-version')}
                 mvn -B -ntp -C -f starter-generator/pom.xml versions:set \
                     -DnewVersion=$Version -DprocessAllModules -DgenerateBackupPoms=false
-                mvn -B -ntp -C -f starter-generator/pom.xml -pl cli -am verify -Dnative \
-                    -Dquarkus.native.container-build=false
+                mvn -B -ntp -C -f starter-generator/pom.xml -pl cli -am verify -Pnative
                 """
             }
         }
@@ -55,19 +54,10 @@ pipeline {
                 """
             }
         }
-        stage('Deploy to Nexus') {
+        stage('Upload') {
             steps {
-                mavenSettingsCredentials false, {
-                    dir('dist') {
-                        sh """
-                        mvn -B -ntp -C deploy:deploy-file \
-                            -DrepositoryId=${nexusRepositoryId()} -Durl=${nexusReleasesUrl()} \
-                            -Dfile=jstarter-$Version-\$PLATFORM.zip -DgroupId=com.flowlogix \
-                            -DartifactId=jstarter -Dversion=$Version -Dpackaging=zip \
-                            -Dclassifier=\$PLATFORM -DgeneratePom=true
-                        """
-                    }
-                }
+                sh "ssh ${websiteHost()} mkdir -p ${downloadsDir()}/releases/jstarter/$Version"
+                sh "scp dist/jstarter-$Version-\$PLATFORM.zip ${websiteHost()}:${downloadsDir()}/releases/jstarter/$Version/"
             }
         }
         stage('Homebrew') {
@@ -91,7 +81,7 @@ pipeline {
                     // and publishes only the zip for the platform it is running on
                     sh """
                     ${java25('graalvm-version')}
-                    DOWNLOAD_BASE=${nexusReleasesUrl()}/com/flowlogix/jstarter/$Version \
+                    DOWNLOAD_BASE=${downloadsUrl()}/releases/jstarter/$Version \
                     mvn -B -ntp -C -N org.jreleaser:jreleaser-maven-plugin:RELEASE:full-release \
                         -Djreleaser.config.file=jreleaser.yaml -Djreleaser.select.current.platform=true
                     """
