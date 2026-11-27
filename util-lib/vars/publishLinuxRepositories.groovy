@@ -1,13 +1,15 @@
-// Publishes the Linux packages that native-build.yml built into <dir>/deb and <dir>/rpm as an APT and
-// a DNF repository on the hosting provider: deb/<name> and rpm/<name> under downloadsDir, each listing
-// only the release being published. Signs the RPMs and both repository indexes with the Flow Logix key,
+// Publishes the Linux packages that linux-packages.yml built into <dir>/deb and <dir>/rpm as an APT and
+// a DNF repository on the hosting provider, in releases/<name>/apt and releases/<name>/dnf under
+// downloadsDir, with the signing key in releases/. Each repository lists only the release being published.
+// The web server serves them as <downloadsUrl>/apt/<name>, <downloadsUrl>/dnf/<name> and
+// <downloadsUrl>/flowlogix.asc (see the dl.flowlogix.com virtual host in flowlogix infra). Signs the RPMs and both repository indexes with the Flow Logix key,
 // and indexes the RPMs with createrepo_c in a container. The container gets the RPMs and returns the
 // index through tar on stdin and stdout, so it works with a remote Docker daemon.
 
 void call(String name, String dir = 'dist') {
     String key = 'Flow Logix, Inc.'
     String host = websiteHost()
-    String remote = downloadsDir()
+    String releases = "${downloadsDir()}/releases"
     String url = downloadsUrl()
 
     mavenSettingsCredentials false, {
@@ -50,7 +52,7 @@ void call(String name, String dir = 'dist') {
     writeFile file: "$dir/rpm/${name}.repo", text: """\
 [flowlogix-$name]
 name=$name by Flow Logix
-baseurl=$url/rpm/$name
+baseurl=$url/dnf/$name
 enabled=1
 gpgcheck=1
 repo_gpgcheck=1
@@ -60,12 +62,12 @@ gpgkey=$url/flowlogix.asc
     // Packages go up before the indexes that list them, so an index never points at a missing file.
     // repodata/ is replaced whole, since createrepo_c names its files after their checksums.
     sh """
-    ssh $host mkdir -p $remote/deb/$name $remote/rpm/$name
-    scp $dir/flowlogix.asc $host:$remote/
-    scp $dir/deb/*.deb $host:$remote/deb/$name/
+    ssh $host mkdir -p $releases/$name/apt $releases/$name/dnf
+    scp $dir/flowlogix.asc $host:$releases/
+    scp $dir/deb/*.deb $host:$releases/$name/apt/
     scp $dir/deb/Packages $dir/deb/Packages.gz $dir/deb/Release $dir/deb/InRelease $dir/deb/Release.gpg \
-        $host:$remote/deb/$name/
-    scp $dir/rpm/*.rpm $dir/rpm/${name}.repo $host:$remote/rpm/$name/
-    rsync -a --delete $dir/rpm/repodata/ $host:$remote/rpm/$name/repodata/
+        $host:$releases/$name/apt/
+    scp $dir/rpm/*.rpm $dir/rpm/${name}.repo $host:$releases/$name/dnf/
+    rsync -a --delete $dir/rpm/repodata/ $host:$releases/$name/dnf/repodata/
     """
 }
