@@ -42,10 +42,11 @@ pipeline {
                 }
             }
         }
-        stage('Build native on GitHub') {
+        stage('Build on GitHub') {
             steps {
                 script {
-                    runGithubWorkflow 'native-build.yml', [
+                    // Reuses a successful build of this commit and version, so a retry doesn't rebuild
+                    def buildRun = runGithubWorkflow('native-build.yml', [
                             repository: "flowlogix/$repository",
                             commit    : env.GIT_COMMIT,
                             version   : Version,
@@ -53,8 +54,13 @@ pipeline {
                             module    : 'cli',
                             executable: name,
                             name      : name,
-                            packages  : writeJSON(returnText: true,
-                                    json: about + [maintainer: 'Flow Logix, Inc. <noreply@flowlogix.com>']),
+                    ], "$name-$Version-${env.GIT_COMMIT}")
+                    runGithubWorkflow 'linux-packages.yml', about + [
+                            'build-run': buildRun,
+                            name       : name,
+                            version    : Version,
+                            executable : name,
+                            maintainer : 'Flow Logix, Inc. <noreply@flowlogix.com>',
                     ]
                 }
             }

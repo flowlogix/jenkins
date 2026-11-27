@@ -4,8 +4,7 @@
 #
 # Each zip is <name>-<version>-<platform>.zip, holding <name>-<version>/bin/<executable>,
 # the layout the util library's jreleaser/native.yaml template expects.
-# With the packages input, it also packages the Linux executables as deb/*.deb and rpm/*.rpm, with the
-# deb/ directory's APT index. The publishLinuxRepositories step then signs them and indexes the RPMs.
+# linux-packages.yml packages the Linux zips of a run of this workflow.
 name: Native Build
 run-name: ${{ inputs.name }} ${{ inputs.version }} native build (${{ inputs.request }})
 
@@ -39,11 +38,6 @@ on:
       request:
         description: Identifies this run to the Jenkins job that started it
         required: true
-      packages:
-        description: >-
-          To also build .deb and .rpm packages of the Linux executables, their metadata as JSON:
-          {"description": ..., "homepage": ..., "license": ..., "maintainer": ...}
-        default: ''
 
 permissions:
   contents: read
@@ -118,65 +112,5 @@ jobs:
         with:
           name: ${{ inputs.name }}-${{ matrix.platform }}
           path: dist/*.zip
-          if-no-files-found: error
-          retention-days: 1
-
-  linux-packages:
-    needs: build
-    if: inputs.packages != ''
-    runs-on: ubuntu-latest
-    env:
-      NFPM_VERSION: v2.48.0
-      PKG_NAME: ${{ inputs.name }}
-      PKG_VERSION: ${{ inputs.version }}
-      PKG_EXECUTABLE: ${{ inputs.executable }}
-      PKG_DESCRIPTION: ${{ fromJSON(inputs.packages).description }}
-      PKG_HOMEPAGE: ${{ fromJSON(inputs.packages).homepage }}
-      PKG_LICENSE: ${{ fromJSON(inputs.packages).license }}
-      PKG_MAINTAINER: ${{ fromJSON(inputs.packages).maintainer }}
-    steps:
-      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
-        with:
-          pattern: ${{ inputs.name }}-linux-*
-          path: zips
-          merge-multiple: true
-      - name: Install packaging tools
-        run: |
-          go install "github.com/goreleaser/nfpm/v2/cmd/nfpm@$NFPM_VERSION"
-          sudo apt-get install -y -q apt-utils
-      - name: Package
-        shell: bash
-        run: |
-          mkdir -p packages/deb packages/rpm
-          for zip in zips/*.zip; do
-              case "$zip" in
-                  *-linux-x86_64.zip) PKG_ARCH=amd64 ;;
-                  *-linux-aarch64.zip) PKG_ARCH=arm64 ;;
-                  *) continue ;;
-              esac
-              rm -rf unpacked && unzip -q "$zip" -d unpacked
-              # The config is JSON, which nfpm reads as YAML; jq quotes every value. 493 is mode 0755
-              jq -n --arg arch "$PKG_ARCH" \
-                  --arg src "unpacked/$PKG_NAME-$PKG_VERSION/bin/$PKG_EXECUTABLE" '{
-                  name: env.PKG_NAME, arch: $arch, platform: "linux", version: env.PKG_VERSION,
-                  description: env.PKG_DESCRIPTION, homepage: env.PKG_HOMEPAGE,
-                  license: env.PKG_LICENSE, maintainer: env.PKG_MAINTAINER,
-                  contents: [{src: $src, dst: ("/usr/bin/" + env.PKG_EXECUTABLE), file_info: {mode: 493}}]
-              }' > nfpm.yaml
-              for packager in deb rpm; do
-                  "$(go env GOPATH)/bin/nfpm" package --config nfpm.yaml --packager $packager --target packages/$packager/
-              done
-          done
-      - name: Index the APT repository
-        working-directory: packages/deb
-        run: |
-          apt-ftparchive packages . > Packages
-          gzip -9kn Packages
-          apt-ftparchive -o APT::FTPArchive::Release::Origin="Flow Logix" \
-              -o APT::FTPArchive::Release::Label="$PKG_NAME" release . > Release
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: ${{ inputs.name }}-linux-packages
-          path: packages/
           if-no-files-found: error
           retention-days: 1
