@@ -36,11 +36,11 @@ void call(String workflow, Map inputs, String dir = 'dist') {
             error "GitHub workflow run finished with '${run.conclusion}': ${run.html_url}"
         }
 
-        sh "rm -rf $dir && mkdir -p $dir"
+        sh "mkdir -p '$dir'"
         for (artifact in github("$api/runs/$runId/artifacts?per_page=100").artifacts) {
             sh """
             curl -fsSL ${headers()} -o github-artifact.zip ${artifact.archive_download_url}
-            unzip -o -q github-artifact.zip -d $dir && rm github-artifact.zip
+            unzip -o -q github-artifact.zip -d '$dir' && rm github-artifact.zip
             """
         }
     }
