@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chocolatey package template, filled in by .github/workflows/chocolatey-package.yml.
+     Each @key@ comes from the workflow's metadata input; the workflow escapes the values for XML. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>@id@</id>
+    <version>@version@</version>
+    <packageSourceUrl>@packageSourceUrl@</packageSourceUrl>
+    <owners>@owners@</owners>
+    <title>@title@</title>
+    <authors>@authors@</authors>
+    <projectUrl>@projectUrl@</projectUrl>
+    <iconUrl>@iconUrl@</iconUrl>
+    <copyright>@copyright@</copyright>
+    <licenseUrl>@licenseUrl@</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <tags>@tags@</tags>
+    <summary>@summary@</summary>
+    <description>@description@</description>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

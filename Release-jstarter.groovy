@@ -4,7 +4,8 @@
 // with this repository's native-build.yml workflow, uploads their zips to dl.flowlogix.com, then runs
 // JReleaser, which publishes them through its configured channels. No GitHub release is created;
 // dl.flowlogix.com hosts the downloads. JReleaser's config comes from the util library's jreleaser/native.yaml template.
-// The Linux executables are also published as APT and DNF repositories by the publishLinuxRepositories step.
+// The Linux executables are also published as APT and DNF repositories by the publishLinuxRepositories step,
+// and the Windows one as a Chocolatey package by chocolatey-package.yml and the publishChocolatey step.
 
 def name = 'jstarter'                // the tool, its executable, zips, packages and tag
 def repository = 'apps'              // under flowlogix on GitHub
@@ -16,6 +17,8 @@ def about = [
         homepage   : 'https://start.flowlogix.com/',
         license    : 'Apache-2.0',
 ]
+def longDescription = 'JStarter creates a complete, testable Java or Jakarta EE project ' +
+        'from the Flow Logix starter archetype, using the same generator as start.flowlogix.com.'
 
 pipeline {
     agent any
@@ -46,7 +49,7 @@ pipeline {
             steps {
                 script {
                     // Reuses a successful build of this commit and version, so a retry doesn't rebuild
-                    def buildRun = runGithubWorkflow('native-build.yml', [
+                    env.BUILD_RUN = runGithubWorkflow('native-build.yml', [
                             repository: "flowlogix/$repository",
                             commit    : env.GIT_COMMIT,
                             version   : Version,
@@ -56,7 +59,7 @@ pipeline {
                             name      : name,
                     ], "$name-$Version-${env.GIT_COMMIT}")
                     runGithubWorkflow 'linux-packages.yml', about + [
-                            'build-run': buildRun,
+                            'build-run': env.BUILD_RUN,
                             name       : name,
                             version    : Version,
                             executable : name,
@@ -76,13 +79,39 @@ pipeline {
                 publishLinuxRepositories name
             }
         }
+        stage('Chocolatey') {
+            steps {
+                script {
+                    // Packs and test-installs the package on GitHub, from the zip uploaded above
+                    runGithubWorkflow 'chocolatey-package.yml', [
+                            'build-run': env.BUILD_RUN,
+                            name       : name,
+                            version    : Version,
+                            metadata   : writeJSON(returnText: true, json: [
+                                    title      : 'JStarter',
+                                    authors    : 'Flow Logix, Inc.',
+                                    owners     : 'lprimak',
+                                    summary    : about.description,
+                                    description: longDescription,
+                                    projectUrl : about.homepage,
+                                    iconUrl    : "${downloadsUrl()}/releases/$name/icon.png",
+                                    licenseUrl : 'https://www.apache.org/licenses/LICENSE-2.0',
+                                    copyright  : 'Copyright (C) 2011-2026 Flow Logix, Inc. All Rights Reserved.',
+                                    tags       : 'java jakarta-ee maven starter cli project-generator',
+                                    url        : "${downloadsUrl()}/releases/$name/$Version/$name-$Version-windows-x86_64.zip",
+                                    executable : name,
+                            ]),
+                    ]
+                }
+                publishChocolatey()
+            }
+        }
         stage('Publish') {
             steps {
                 jreleaserConfig 'native', about + [
                         name           : name,
                         executable     : name,
-                        longDescription: 'JStarter creates a complete, testable Java or Jakarta EE project ' +
-                                'from the Flow Logix starter archetype, using the same generator as start.flowlogix.com.',
+                        longDescription: longDescription,
                         inceptionYear  : '2024',
                         repository     : repository,
                 ]

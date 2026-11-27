@@ -1,0 +1,82 @@
+# Builds a Chocolatey package for the Windows zip of a native-build.yml run, test-installs it, and returns
+# the .nupkg as this run's artifact. A Jenkins release job starts it through the runGithubWorkflow step,
+# once the zip is on dl.flowlogix.com; the publishChocolatey step then pushes the package.
+# The package template is util-lib/resources/chocolatey in this repository. This workflow holds no secrets.
+name: Chocolatey Package
+run-name: ${{ inputs.name }} ${{ inputs.version }} Chocolatey package (${{ inputs.request }})
+
+on:
+  workflow_dispatch:
+    inputs:
+      build-run:
+        description: ID of the native-build.yml run whose Windows zip to package
+        required: true
+      name:
+        description: Package ID, and base name of the zips
+        required: true
+      version:
+        description: Package version
+        required: true
+      metadata:
+        description: >-
+          The package's metadata as JSON: title, authors, owners, summary, description, projectUrl,
+          iconUrl, licenseUrl, copyright, tags, url (the zip's download URL) and executable (for the test)
+        required: true
+      request:
+        description: Identifies this run to the Jenkins job that started it
+        required: true
+
+permissions:
+  contents: read
+  # to download the build run's artifacts
+  actions: read
+
+jobs:
+  package:
+    runs-on: windows-latest
+    env:
+      PKG_NAME: ${{ inputs.name }}
+      PKG_VERSION: ${{ inputs.version }}
+      PKG_METADATA: ${{ inputs.metadata }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          run-id: ${{ inputs.build-run }}
+          github-token: ${{ github.token }}
+          name: ${{ inputs.name }}-windows-x86_64
+          path: zips
+      - name: Fill in the package template
+        shell: pwsh
+        run: |
+          $zip = Get-ChildItem zips -Filter *.zip | Select-Object -First 1
+          $values = @{
+              id               = $env:PKG_NAME
+              version          = $env:PKG_VERSION
+              packageSourceUrl = "$env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/tree/$env:GITHUB_SHA/util-lib/resources/chocolatey"
+              checksum         = (Get-FileHash $zip.FullName -Algorithm SHA256).Hash.ToLower()
+          }
+          ($env:PKG_METADATA | ConvertFrom-Json).PSObject.Properties | ForEach-Object { $values[$_.Name] = [string]$_.Value }
+
+          Copy-Item -Recurse util-lib/resources/chocolatey package
+          $nuspec = Get-Content package/package.nuspec -Raw
+          $install = Get-Content package/tools/chocolateyinstall.ps1 -Raw
+          foreach ($key in $values.Keys) {
+              # XML-escaped in the nuspec; inside single quotes in the install script
+              $nuspec = $nuspec.Replace("@$key@", [System.Security.SecurityElement]::Escape($values[$key]))
+              $install = $install.Replace("@$key@", $values[$key].Replace("'", "''"))
+          }
+          Set-Content package/package.nuspec $nuspec
+          Set-Content package/tools/chocolateyinstall.ps1 $install
+      - name: Pack
+        run: choco pack package/package.nuspec --outputdirectory out
+      - name: Test install
+        run: |
+          choco install $env:PKG_NAME --version $env:PKG_VERSION --source "$PWD\out" -y --no-progress
+          & ($env:PKG_METADATA | ConvertFrom-Json).executable --version
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ${{ inputs.name }}-chocolatey
+          path: out/*.nupkg
+          if-no-files-found: error
+          retention-days: 1
