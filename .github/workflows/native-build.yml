@@ -61,7 +61,8 @@ jobs:
       EXECUTABLE: ${{ inputs.executable }}
       NAME: ${{ inputs.name }}
       BUILD_ARGS: ${{ inputs.build-args }}
-      PLATFORM: ${{ matrix.platform }}
+      # Not PLATFORM: on Windows, Visual Studio's build environment sets Platform=x64
+      ZIP_PLATFORM: ${{ matrix.platform }}
       EXE: ${{ matrix.exe }}
     steps:
       - name: Only build this organization's repositories
@@ -102,9 +103,9 @@ jobs:
           cp "$PROJECT/$MODULE"/target/*-runner"$EXE" "dist/$D/bin/$EXECUTABLE$EXE"
           cd dist
           if [ "$RUNNER_OS" = Windows ]; then
-              7z a -bd "$D-$PLATFORM.zip" "$D"
+              7z a -bd "$D-$ZIP_PLATFORM.zip" "$D"
           else
-              zip -qr "$D-$PLATFORM.zip" "$D"
+              zip -qr "$D-$ZIP_PLATFORM.zip" "$D"
           fi
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
