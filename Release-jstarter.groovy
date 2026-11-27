@@ -98,7 +98,7 @@ pipeline {
         stage('Upload') {
             steps {
                 sh "ssh ${websiteHost()} mkdir -p ${downloadsDir()}/releases/$name/$Version"
-                sh "scp dist/$name-$Version-*.zip dist/$name-$Version.jar ${websiteHost()}:${downloadsDir()}/releases/$name/$Version/"
+                sh "scp dist/$name-$Version-*.zip dist/$name-${Version}.jar ${websiteHost()}:${downloadsDir()}/releases/$name/$Version/"
             }
         }
         stage('JBang') {
