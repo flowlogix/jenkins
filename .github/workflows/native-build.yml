@@ -147,31 +147,22 @@ jobs:
       - name: Package
         shell: bash
         run: |
-          # nfpm expands the ${...} variables itself, so the metadata is never parsed as YAML
-          cat > nfpm.yaml <<'EOF'
-          name: ${PKG_NAME}
-          arch: ${PKG_ARCH}
-          platform: linux
-          version: ${PKG_VERSION}
-          description: ${PKG_DESCRIPTION}
-          homepage: ${PKG_HOMEPAGE}
-          license: ${PKG_LICENSE}
-          maintainer: ${PKG_MAINTAINER}
-          contents:
-            - src: ${PKG_SRC}
-              dst: /usr/bin/${PKG_EXECUTABLE}
-              file_info:
-                mode: 0755
-          EOF
           mkdir -p packages/deb packages/rpm
           for zip in zips/*.zip; do
               case "$zip" in
-                  *-linux-x86_64.zip) export PKG_ARCH=amd64 ;;
-                  *-linux-aarch64.zip) export PKG_ARCH=arm64 ;;
+                  *-linux-x86_64.zip) PKG_ARCH=amd64 ;;
+                  *-linux-aarch64.zip) PKG_ARCH=arm64 ;;
                   *) continue ;;
               esac
               rm -rf unpacked && unzip -q "$zip" -d unpacked
-              export PKG_SRC="unpacked/$PKG_NAME-$PKG_VERSION/bin/$PKG_EXECUTABLE"
+              # The config is JSON, which nfpm reads as YAML; jq quotes every value. 493 is mode 0755
+              jq -n --arg arch "$PKG_ARCH" \
+                  --arg src "unpacked/$PKG_NAME-$PKG_VERSION/bin/$PKG_EXECUTABLE" '{
+                  name: env.PKG_NAME, arch: $arch, platform: "linux", version: env.PKG_VERSION,
+                  description: env.PKG_DESCRIPTION, homepage: env.PKG_HOMEPAGE,
+                  license: env.PKG_LICENSE, maintainer: env.PKG_MAINTAINER,
+                  contents: [{src: $src, dst: ("/usr/bin/" + env.PKG_EXECUTABLE), file_info: {mode: 493}}]
+              }' > nfpm.yaml
               for packager in deb rpm; do
                   "$(go env GOPATH)/bin/nfpm" package --config nfpm.yaml --packager $packager --target packages/$packager/
               done
