@@ -1,0 +1,108 @@
+# Builds native executables of a Maven project on GitHub's runners, one zip per platform.
+# A Jenkins release job starts it through the runGithubWorkflow step, waits for it and downloads
+# the zips as the run's artifacts; Jenkins then publishes them. This workflow holds no secrets.
+#
+# Each zip is <name>-<version>-<platform>.zip, holding <name>-<version>/bin/<executable>,
+# the layout the util library's jreleaser/native.yaml template expects.
+name: Native Build
+run-name: ${{ inputs.name }} ${{ inputs.version }} native build (${{ inputs.request }})
+
+on:
+  workflow_dispatch:
+    inputs:
+      repository:
+        description: Repository to build, e.g. flowlogix/apps
+        required: true
+      commit:
+        description: Commit to build
+        required: true
+      version:
+        description: Version to release, set into the POMs
+        required: true
+      project:
+        description: Directory of the Maven project that holds the module
+        required: true
+      module:
+        description: Module that builds the native executable
+        required: true
+      executable:
+        description: Name of the executable in bin/
+        required: true
+      name:
+        description: Base name of the zips
+        required: true
+      build-args:
+        description: Maven arguments that build the native executable
+        default: -Pnative
+      request:
+        description: Identifies this run to the Jenkins job that started it
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { os: ubuntu-latest, platform: linux-x86_64 }
+          - { os: ubuntu-24.04-arm, platform: linux-aarch64 }
+          - { os: macos-latest, platform: osx-aarch64 }
+          - { os: windows-latest, platform: windows-x86_64, exe: .exe }
+    runs-on: ${{ matrix.os }}
+    # Inputs reach the shell only as environment variables, never pasted into scripts
+    env:
+      REPOSITORY: ${{ inputs.repository }}
+      VERSION: ${{ inputs.version }}
+      PROJECT: ${{ inputs.project }}
+      MODULE: ${{ inputs.module }}
+      EXECUTABLE: ${{ inputs.executable }}
+      NAME: ${{ inputs.name }}
+      BUILD_ARGS: ${{ inputs.build-args }}
+      PLATFORM: ${{ matrix.platform }}
+      EXE: ${{ matrix.exe }}
+    steps:
+      - name: Only build this organization's repositories
+        shell: bash
+        run: |
+          case "$REPOSITORY" in
+              "$GITHUB_REPOSITORY_OWNER"/*) ;;
+              *) echo "Refusing to build $REPOSITORY, outside $GITHUB_REPOSITORY_OWNER"; exit 1 ;;
+          esac
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          repository: ${{ inputs.repository }}
+          ref: ${{ inputs.commit }}
+      - uses: graalvm/setup-graalvm@60e76998d25690099182b796e99b8804da582d90 # v1.6.10
+        with:
+          java-version: '25'
+          distribution: graalvm-community
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          cache: maven
+      - name: Build native executable
+        shell: bash
+        run: |
+          ./mvnw -B -ntp -C -f "$PROJECT/pom.xml" versions:set \
+              -DnewVersion="$VERSION" -DprocessAllModules -DgenerateBackupPoms=false
+          # BUILD_ARGS is split into separate arguments on purpose
+          ./mvnw -B -ntp -C -f "$PROJECT/pom.xml" -pl "$MODULE" -am verify $BUILD_ARGS
+      - name: Package
+        shell: bash
+        run: |
+          D="$NAME-$VERSION"
+          mkdir -p "dist/$D/bin"
+          cp "$PROJECT/$MODULE"/target/*-runner"$EXE" "dist/$D/bin/$EXECUTABLE$EXE"
+          cd dist
+          if [ "$RUNNER_OS" = Windows ]; then
+              7z a -bd "$D-$PLATFORM.zip" "$D"
+          else
+              zip -qr "$D-$PLATFORM.zip" "$D"
+          fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ${{ inputs.name }}-${{ matrix.platform }}
+          path: dist/*.zip
+          if-no-files-found: error
+          retention-days: 1

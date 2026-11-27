@@ -1,0 +1,15 @@
+name: "Dependabot Auto Approve and Merge"
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+# This repository's default token is read-only, and the shared job also reads check runs
+permissions:
+  contents: read
+  checks: read
+
+jobs:
+  call-automerge:
+    uses: flowlogix/base-pom/.github/workflows/dependabot-automerge.yml@f6fc748b203fa6e3c35cc49660356f28ae4fad01 # v153
+    secrets:
+      github-token: ${{ secrets.GH_AUTOMERGE_TOKEN }}
