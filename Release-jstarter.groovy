@@ -31,6 +31,10 @@ pipeline {
         string(name: 'Version', description: 'Version number to release, e.g. 1.0.0', trim: true)
         booleanParam(name: 'createTag', defaultValue: true,
                 description: "Whether to push the $name-v<Version> tag to GitHub")
+        // Package managers that moderate submissions. Turn one off while its previous version
+        // is still in review: Chocolatey, for one, refuses a new version until the first is approved
+        booleanParam(name: 'chocolatey', defaultValue: true,
+                description: 'Whether to push the package to Chocolatey, which moderates it')
     }
 
     stages {
@@ -110,6 +114,9 @@ pipeline {
             }
         }
         stage('Chocolatey') {
+            when {
+                expression { params.chocolatey }
+            }
             steps {
                 script {
                     // Packs and test-installs the package on GitHub, from the zip uploaded above
