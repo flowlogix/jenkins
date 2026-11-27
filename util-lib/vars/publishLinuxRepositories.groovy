@@ -13,6 +13,8 @@ void call(String name, String dir = 'dist') {
     mavenSettingsCredentials false, {
         withEnv(["GPG_KEY=$key", "DIR=$dir", "NAME=$name"]) {
             sh '''
+            # A failure anywhere in a pipe, such as docker run, fails the step
+            set -o pipefail
             # Like maven-gpg-plugin, gpg reads the passphrase from a pipe, never from a file
             sign() {
                 printf '%s' "$MAVEN_GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback \
