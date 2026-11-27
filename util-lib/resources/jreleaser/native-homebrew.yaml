@@ -1,0 +1,52 @@
+# JReleaser config template for a native executable released from Jenkins.
+# The release job builds the zip for its agent's platform into dist/<name>-<version>-<platform>.zip,
+# deploys it to FlowLogix Nexus, and sets DOWNLOAD_BASE to that version's Nexus directory.
+# JReleaser then publishes the Homebrew formula pointing at that download. No GitHub release is created.
+# Each @key@ is set by the job through the jreleaserConfig step.
+project:
+  name: "@name@"
+  description: "@description@"
+  longDescription: "@longDescription@"
+  authors:
+    - Flow Logix
+  license: "@license@"
+  inceptionYear: "@inceptionYear@"
+  links:
+    homepage: "@homepage@"
+
+release:
+  github:
+    owner: flowlogix
+    name: "@repository@"
+    # The job pushes its own tag
+    skipTag: true
+    # Downloads are hosted on FlowLogix Nexus
+    skipRelease: true
+
+distributions:
+  "@name@":
+    type: BINARY
+    executable:
+      name: "@executable@"
+    # The platforms a native build can run on; JReleaser uses only the one it is running on
+    artifacts:
+      - path: 'dist/{{distributionName}}-{{projectVersion}}-osx-aarch64.zip'
+        platform: osx-aarch_64
+      - path: 'dist/{{distributionName}}-{{projectVersion}}-osx-x86_64.zip'
+        platform: osx-x86_64
+      - path: 'dist/{{distributionName}}-{{projectVersion}}-linux-aarch64.zip'
+        platform: linux-aarch_64
+      - path: 'dist/{{distributionName}}-{{projectVersion}}-linux-x86_64.zip'
+        platform: linux-x86_64
+    brew:
+      active: RELEASE
+      # Guards each download by OS and CPU, so the formula installs only on the released platform
+      multiPlatform: true
+      downloadUrl: '{{Env.DOWNLOAD_BASE}}/{{artifactFile}}'
+      commitAuthor:
+        name: flowlogix-bot
+        email: noreply@flowlogix.com
+      repository:
+        owner: flowlogix
+        name: homebrew-tap
+        tagRepository: false

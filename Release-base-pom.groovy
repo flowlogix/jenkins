@@ -31,8 +31,8 @@ pipeline {
                     }
 
                     if (releaseToRepo.startsWith('FlowLogix')) {
-                        repository_name = 'flowlogix-nexus-artifacts'
-                        repository_url = 'https://nexus.flowlogix.com/repository/maven-releases'
+                        repository_name = nexusRepositoryId()
+                        repository_url = nexusReleasesUrl()
                     }
                     if (releaseInMaven.toBoolean()) {
                         automaticCommand = '-Dnjord.publishingType=automatic'

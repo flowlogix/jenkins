@@ -55,6 +55,7 @@ The release pipelines are used to release new versions of the projects. The foll
 * *Release-arquillian-graphene.groovy*: This pipeline is used to release the Arquillian Graphene project.
 * *Release-base-pom.groovy*: This pipeline is used to release the base POM project.
 * *Release-jakartaee-api.groovy*: This pipeline is used to release the Jakarta EE API project.
+* *Release-jstarter.groovy*: This pipeline releases the JStarter CLI: it builds the native executable for the agent's platform, deploys its zip to FlowLogix Nexus, then runs JReleaser to update the formula in the `flowlogix/homebrew-tap` Homebrew tap. Its JReleaser config is the `util` library's `jreleaser/native-homebrew.yaml` template, filled in by the `jreleaserConfig` step.
 * *Release-payara-arquillian.groovy*: This pipeline is used to release the Payara Arquillian Connector project.
 * *Release-shrinkwrap-resolver.groovy*: This pipeline is used to release the ShrinkWrap Resolver project.
 * *Release-without-payara.groovy*: This pipeline is used to release projects that do not use Payara.

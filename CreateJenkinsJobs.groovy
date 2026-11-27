@@ -982,6 +982,39 @@ multibranchPipelineJob('release-jobs/archetype-release') {
     defaultOrphanItemStrategy delegate, '1', '2'
 }
 
+multibranchPipelineJob('release-jobs/jstarter-release') {
+    displayName 'JStarter CLI - Release'
+    branchSources {
+        branchSource {
+            source {
+                git {
+                    id '95992583'
+                    remote 'git@github.com:flowlogix/apps.git'
+                    credentialsId org_credential
+                    traits {
+                        gitBranchDiscovery()
+                        cleanBeforeCheckoutTrait { extension { deleteUntrackedNestedRepositories true } }
+                    }
+                }
+            }
+            suppressBranchTriggers delegate
+        }
+    }
+    factory {
+        remoteJenkinsFileWorkflowBranchProjectFactory {
+            githubScriptSource delegate, 'starter-generator/cli/pom.xml', 'Release-jstarter.groovy'
+        }
+    }
+    properties {
+        folderLibraries {
+            libraries {
+                libraryDef delegate, 'util', 'util-lib'
+            }
+        }
+    }
+    defaultOrphanItemStrategy delegate, '1', '2'
+}
+
 multibranchPipelineJob('release-jobs/flowlogix-bom-release') {
     displayName 'FlowLogix BOM - Release'
     branchSources {
