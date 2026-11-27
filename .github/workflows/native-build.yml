@@ -71,6 +71,11 @@ jobs:
               "$GITHUB_REPOSITORY_OWNER"/*) ;;
               *) echo "Refusing to build $REPOSITORY, outside $GITHUB_REPOSITORY_OWNER"; exit 1 ;;
           esac
+      - name: Keep LF line endings on Windows
+        shell: bash
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ${{ inputs.repository }}
