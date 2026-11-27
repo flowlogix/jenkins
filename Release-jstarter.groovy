@@ -112,7 +112,7 @@ pipeline {
                         name           : name,
                         executable     : name,
                         longDescription: longDescription,
-                        inceptionYear  : '2024',
+                        inceptionYear  : '2011',
                         repository     : repository,
                 ]
                 githubAppCredentials 'JRELEASER_GITHUB_TOKEN', {
